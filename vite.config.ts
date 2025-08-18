@@ -2,29 +2,91 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import path from "node:path";
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  // --- 外掛 (Plugins) ---
+  plugins: [
+    // Tailwind CSS 支援
+    tailwindcss(),
+    // React Router 支援
+    reactRouter(),
+    // 支援 tsconfig.json 中的路徑別名
+    tsconfigPaths()
+  ],
+
+  // --- CSS 相關設定 ---
   css: {
     modules: {
       localsConvention: 'camelCaseOnly'
     }
   },
+
+  // --- 路徑解析 (Resolve) ---
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.css']
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.css'],
+    alias: {
+      // 設定 '~' 路徑別名，指向 'app' 目錄
+      // 這必須與 tsconfig.json 中的 'paths' 選項保持同步
+      '~': path.resolve(__dirname, './app'),
+    }
   },
+
+  // --- 依賴優化 ---
   optimizeDeps: {
     include: ['@mui/x-data-grid']
   },
-  build: {
-    cssCodeSplit: false
-  },
+
+  // --- 開發伺服器選項 (Server Options) ---
   server: {
+    // 伺服器監聽的埠號
+    port: 6002,
+    // 啟動時自動在瀏覽器中開啟應用程式
+    open: true,
+    // 關閉 HMR 錯誤覆蓋層
     hmr: {
       overlay: false
+    },
+    // 為開發伺服器設定代理規則，解決跨域問題
+    proxy: {
+      '/api': {
+        target: 'http://localhost:7001', // 後端 API 的地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
     }
   },
-    // 處理SSR中的CSS文件
+
+  // --- 建置選項 (Build Options) ---
+  build: {
+    // 指定建置輸出的目錄
+    outDir: 'dist',
+    // 建置時生成 source map 檔案，方便在生產環境中偵錯
+    sourcemap: true,
+    // 禁用 CSS 代碼分割
+    cssCodeSplit: false,
+    // Rollup 選項，用於更細粒度的打包控制
+    rollupOptions: {
+      output: {
+        // 設定靜態資源的輸出路徑和命名規則
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: 'js/[name]-[hash].js',
+      }
+    },
+    // 設定 chunk 大小警告的限制（單位為 kB）
+    chunkSizeWarningLimit: 1500
+  },
+
+  // --- 預覽伺服器選項 (Preview Options) ---
+  preview: {
+    // 預覽伺服器監聽的埠號
+    port: 4173
+  },
+
+  // --- SSR 選項 ---
+  // 處理 SSR 中的 CSS 文件
   ssr: {
     noExternal: ['@mui/x-data-grid', '@mui/material', '@emotion/react', '@emotion/styled']
   }

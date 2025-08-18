@@ -1,27 +1,42 @@
 {
   "include": [
-    "**/*",
+    "app/**/*",
     "**/.server/**/*",
     "**/.client/**/*",
     ".react-router/types/**/*"
   ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    // --- 核心編譯選項 ---
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["node", "vite/client"],
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    
+    // --- 專案結構 ---
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]
     },
+    
+    // --- 模組解析 ---
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true
+    
+    // --- 嚴格模式與程式碼品質 ---
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    
+    // --- Vite 與環境整合 ---
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true
   }
 }

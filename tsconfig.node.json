@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // --- 核心編譯選項 ---
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    
+    // --- 模組解析 ---
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    
+    // --- 嚴格模式與程式碼品質 ---
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "vite.config.ts",
+    "server.ts"
+  ]
+}

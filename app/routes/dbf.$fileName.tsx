@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecords } from '../services/api';
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 interface DbfRecord {
   _id: string;
@@ -23,6 +24,56 @@ interface DbfRecordsResponse {
     total: number;
     pageSize: number;
   };
+}
+
+// 計算 DataGrid 的列定義
+function getColumns(priorityFields: string[], availableFields: string[], fileName: string): GridColDef[] {
+  // 基本列定義
+  const baseColumns: GridColDef[] = [
+    {
+      field: 'recordNo',
+      headerName: '記錄編號',
+      width: 100,
+      filterable: true
+    }
+  ];
+  
+  // 優先顯示欄位
+  const priorityColumns = priorityFields.map(field => ({
+    field,
+    headerName: field,
+    width: 150,
+    filterable: true
+  }));
+  
+  // 其他欄位
+  const otherColumns = availableFields
+    .filter(field => !priorityFields.includes(field))
+    .map(field => ({
+      field,
+      headerName: field,
+      width: 150,
+      filterable: true
+    }));
+  
+  // 操作列
+  const actionColumn = {
+    field: 'actions',
+    headerName: '操作',
+    width: 100,
+    sortable: false,
+    filterable: false,
+    renderCell: (params: any) => (
+      <Link
+        to={`/dbf/${fileName}/${params.value}`}
+        className="text-blue-600 hover:text-blue-900"
+      >
+        詳情
+      </Link>
+    )
+  };
+  
+  return [...baseColumns, ...priorityColumns, ...otherColumns, actionColumn];
 }
 
 export default function DbfFile() {
@@ -78,6 +129,7 @@ export default function DbfFile() {
 
     loadDbfRecords();
   }, [fileName, page, pageSize, search, field]);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,61 +230,23 @@ export default function DbfFile() {
                     ...record.data,
                     actions: record._recordNo
                   }))}
-                  columns={useMemo(() => {
-                    // 基本列定義
-                    const columns: GridColDef[] = [
-                      {
-                        field: 'recordNo',
-                        headerName: '記錄編號',
-                        width: 100,
-                        filterable: true
-                      },
-                      // 優先顯示欄位
-                      ...priorityFields.map(field => ({
-                        field,
-                        headerName: field,
-                        width: 150,
-                        filterable: true
-                      })),
-                      // 其他欄位
-                      ...availableFields
-                        .filter(field => !priorityFields.includes(field))
-                        .map(field => ({
-                          field,
-                          headerName: field,
-                          width: 150,
-                          filterable: true
-                        })),
-                      // 操作列
-                      {
-                        field: 'actions',
-                        headerName: '操作',
-                        width: 100,
-                        sortable: false,
-                        filterable: false,
-                        renderCell: (params) => (
-                          <Link
-                            to={`/dbf/${fileName}/${params.value}`}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            詳情
-                          </Link>
-                        )
-                      }
-                    ];
-                    return columns;
-                  }, [priorityFields, availableFields, fileName])}
+                  columns={getColumns(priorityFields, availableFields, fileName)}
                   pagination
                   paginationMode="server"
                   rowCount={data.pagination.total}
-                  page={data.pagination.currentPage - 1}
-                  pageSize={data.pagination.pageSize}
-                  rowsPerPageOptions={[10, 20, 50, 100]}
-                  onPageChange={(newPage) => handlePageChange(newPage + 1)}
-                  disableSelectionOnClick
-                  disableDensitySelector
-                  components={{ Toolbar: GridToolbar }}
-                  componentsProps={{
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: data.pagination.pageSize,
+                        page: data.pagination.currentPage - 1,
+                      },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20, 50, 100]}
+                  onPaginationModelChange={(model) => handlePageChange(model.page + 1)}
+                  disableRowSelectionOnClick
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
                     toolbar: {
                       showQuickFilter: true,
                       quickFilterProps: { debounceMs: 500 },
