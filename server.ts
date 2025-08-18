@@ -1,7 +1,12 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const { MongoClient } = require('mongodb');
-const path = require('path');
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import dotenv from 'dotenv';
+import { MongoClient, Collection, Db } from 'mongodb';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 載入環境變數
 dotenv.config();
@@ -15,21 +20,33 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 允許跨域請求
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
-// MongoDB 連接
-let db = null;
-let dbfRecordsCollections = {};
+// 定義記錄類型
+interface DbfRecord {
+  _id: string;
+  _recordNo: number;
+  _file: string;
+  hash: string;
+  data: Record<string, any>;
+  _created: string;
+  _updated: string;
+  _truncated?: boolean;
+}
 
-async function connectMongo() {
+// MongoDB 連接
+let db: Db | null = null;
+let dbfRecordsCollections: Record<string, Collection<DbfRecord>> = {};
+
+async function connectMongo(): Promise<Db> {
   if (db) return db;
   
   try {
-    const mongoClient = new MongoClient(process.env.MONGO_URI);
+    const mongoClient = new MongoClient(process.env.MONGO_URI || '');
     await mongoClient.connect();
     
     db = mongoClient.db(process.env.MONGO_DB);
@@ -39,9 +56,9 @@ async function connectMongo() {
     
     // 為每個 DBF 檔案創建集合引用
     for (const collection of collections) {
-      if (collection.name.startsWith(process.env.MONGO_COLLECTION_PREFIX)) {
-        const fileName = collection.name.replace(process.env.MONGO_COLLECTION_PREFIX, '');
-        dbfRecordsCollections[fileName] = db.collection(collection.name);
+      if (collection.name.startsWith(process.env.MONGO_COLLECTION_PREFIX || '')) {
+        const fileName = collection.name.replace(process.env.MONGO_COLLECTION_PREFIX || '', '');
+        dbfRecordsCollections[fileName] = db.collection<DbfRecord>(collection.name);
       }
     }
     
@@ -56,15 +73,15 @@ async function connectMongo() {
 // API 路由
 
 // 獲取所有 DBF 檔案列表
-app.get('/api/dbf-files', async (req, res) => {
+app.get('/api/dbf-files', async (req: Request, res: Response) => {
   try {
     await connectMongo();
     
-    const collections = await db.listCollections().toArray();
+    const collections = await db!.listCollections().toArray();
     const dbfFiles = collections
-      .filter(collection => collection.name.startsWith(process.env.MONGO_COLLECTION_PREFIX))
+      .filter(collection => collection.name.startsWith(process.env.MONGO_COLLECTION_PREFIX || ''))
       .map(collection => {
-        const fileName = collection.name.replace(process.env.MONGO_COLLECTION_PREFIX, '');
+        const fileName = collection.name.replace(process.env.MONGO_COLLECTION_PREFIX || '', '');
         return {
           fileName: `${fileName.toUpperCase()}.DBF`,
           baseName: fileName,
@@ -80,9 +97,14 @@ app.get('/api/dbf-files', async (req, res) => {
 });
 
 // 獲取特定 DBF 檔案的記錄
-app.get('/api/dbf/:fileName', async (req, res) => {
+app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   const { fileName } = req.params;
-  const { page = 1, pageSize = 20, search = '', field = '' } = req.query;
+  const { page = '1', pageSize = '20', search = '', field = '' } = req.query as {
+    page?: string;
+    pageSize?: string;
+    search?: string;
+    field?: string;
+  };
   const skip = (parseInt(page) - 1) * parseInt(pageSize);
   
   try {
@@ -96,17 +118,19 @@ app.get('/api/dbf/:fileName', async (req, res) => {
     }
     
     // 構建查詢條件
-    let query = {};
+    let query: any = {};
     if (search && field) {
       // 如果指定了欄位，則在該欄位中搜尋
       query[`data.${field}`] = { $regex: search, $options: 'i' };
     } else if (search) {
       // 如果沒有指定欄位，則在所有欄位中搜尋
-      query.$or = Object.keys(await collection.findOne({}, { projection: { data: 1 } }))
-        .filter(key => key.startsWith('data.'))
-        .map(field => ({
-          [field]: { $regex: search, $options: 'i' }
-        }));
+      const firstRecord = await collection.findOne({}, { projection: { data: 1 } });
+      if (firstRecord && firstRecord.data) {
+        query.$or = Object.keys(firstRecord.data)
+          .map(field => ({
+            [`data.${field}`]: { $regex: search, $options: 'i' }
+          }));
+      }
     }
     
     // 獲取總記錄數
@@ -137,7 +161,7 @@ app.get('/api/dbf/:fileName', async (req, res) => {
 });
 
 // 獲取特定記錄
-app.get('/api/dbf/:fileName/:recordNo', async (req, res) => {
+app.get('/api/dbf/:fileName/:recordNo', async (req: Request, res: Response) => {
   const { fileName, recordNo } = req.params;
   
   try {
@@ -164,13 +188,13 @@ app.get('/api/dbf/:fileName/:recordNo', async (req, res) => {
 });
 
 // KCSTMR 查詢
-app.get('/api/KCSTMR/:value', async (req, res) => {
+app.get('/api/KCSTMR/:value', async (req: Request, res: Response) => {
   const { value } = req.params;
   
   try {
     await connectMongo();
     
-    const recordsByFile = {};
+    const recordsByFile: Record<string, { records: DbfRecord[]; count: number }> = {};
     let totalRecords = 0;
     
     // 對每個 DBF 檔案進行查詢
@@ -204,9 +228,9 @@ app.get('/api/KCSTMR/:value', async (req, res) => {
 });
 
 // KDRUG 查詢
-app.get('/api/KDRUG/:value', async (req, res) => {
+app.get('/api/KDRUG/:value', async (req: Request, res: Response) => {
   const { value } = req.params;
-  const { startDate = '', endDate = '' } = req.query;
+  const { startDate = '', endDate = '' } = req.query as { startDate?: string; endDate?: string };
   
   try {
     await connectMongo();
@@ -233,7 +257,7 @@ app.get('/api/KDRUG/:value', async (req, res) => {
     }
     
     // 構建查詢條件 - 精確匹配 KDRUG 欄位
-    let query = { 'data.KDRUG': value };
+    let query: any = { 'data.KDRUG': value };
     
     // 如果有日期區間，添加到查詢條件
     if (startDate && endDate) {

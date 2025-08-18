@@ -1,10 +1,29 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import { type RouteConfig } from "@react-router/dev/routes";
 
 export default [
-  index("routes/home.tsx"),
-  route("routes/dbf-files.tsx"),
-  route("routes/dbf.$fileName.tsx"),
-  route("routes/dbf.$fileName.$recordNo.tsx"),
-  route("routes/kcstmr.$value.tsx"),
-  route("routes/kdrug.$value.tsx")
+  {
+    path: "/",
+    file: "routes/home.tsx",
+    index: true
+  },
+  {
+    path: "/dbf-files",
+    file: "routes/dbf-files.tsx"
+  },
+  {
+    path: "/dbf/:fileName",
+    file: "routes/dbf.$fileName.tsx"
+  },
+  {
+    path: "/dbf/:fileName/:recordNo",
+    file: "routes/dbf.$fileName.$recordNo.tsx"
+  },
+  {
+    path: "/kcstmr/:value",
+    file: "routes/kcstmr.$value.tsx"
+  },
+  {
+    path: "/kdrug/:value",
+    file: "routes/kdrug.$value.tsx"
+  }
 ] satisfies RouteConfig;

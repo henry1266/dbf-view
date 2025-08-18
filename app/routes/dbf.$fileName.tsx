@@ -1,0 +1,262 @@
+import React, { useEffect, useState, useMemo } from 'react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { Layout } from '../components/Layout';
+import { fetchDbfRecords } from '../services/api';
+import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+
+interface DbfRecord {
+  _id: string;
+  _recordNo: number;
+  _file: string;
+  hash: string;
+  data: Record<string, any>;
+  _created: string;
+  _updated: string;
+}
+
+interface DbfRecordsResponse {
+  fileName: string;
+  records: DbfRecord[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    total: number;
+    pageSize: number;
+  };
+}
+
+export default function DbfFile() {
+  const { fileName } = useParams<{ fileName: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1');
+  const pageSize = parseInt(searchParams.get('pageSize') || '20');
+  const search = searchParams.get('search') || '';
+  const field = searchParams.get('field') || '';
+
+  const [data, setData] = useState<DbfRecordsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState(search);
+  const [searchField, setSearchField] = useState(field);
+  const [availableFields, setAvailableFields] = useState<string[]>([]);
+
+  // 設置優先顯示欄位
+  const getPriorityFields = (fileName: string) => {
+    if (fileName.toUpperCase() === 'CO02P.DBF') {
+      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
+    } else if (fileName.toUpperCase() === 'CO03L.DBF') {
+      return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'];
+    }
+    return [];
+  };
+
+  const priorityFields = fileName ? getPriorityFields(fileName) : [];
+
+  useEffect(() => {
+    const loadDbfRecords = async () => {
+      if (!fileName) return;
+
+      try {
+        setLoading(true);
+        const result = await fetchDbfRecords(fileName, page, pageSize, search, field);
+        setData(result);
+
+        // 從第一筆記錄中提取可用的欄位名稱
+        if (result.records.length > 0 && result.records[0].data) {
+          setAvailableFields(Object.keys(result.records[0].data));
+        }
+
+        setError(null);
+      } catch (err) {
+        console.error(`Failed to fetch ${fileName} records:`, err);
+        setError(`無法載入 ${fileName} 的記錄。請稍後再試。`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDbfRecords();
+  }, [fileName, page, pageSize, search, field]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', '1');
+    newParams.set('search', searchValue);
+    if (searchField) {
+      newParams.set('field', searchField);
+    } else {
+      newParams.delete('field');
+    }
+    setSearchParams(newParams);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', newPage.toString());
+    setSearchParams(newParams);
+  };
+
+  return (
+    <Layout title={`${fileName || 'DBF 檔案'} 瀏覽`}>
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">錯誤！</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+      ) : (
+        <>
+          {/* 搜尋表單 */}
+          <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+              <div className="flex-grow">
+                <label htmlFor="searchValue" className="block text-sm font-medium text-gray-700 mb-1">
+                  搜尋值
+                </label>
+                <input
+                  type="text"
+                  id="searchValue"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="輸入搜尋值"
+                />
+              </div>
+              <div className="md:w-1/3">
+                <label htmlFor="searchField" className="block text-sm font-medium text-gray-700 mb-1">
+                  欄位 (可選)
+                </label>
+                <select
+                  id="searchField"
+                  value={searchField}
+                  onChange={(e) => setSearchField(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">所有欄位</option>
+                  {availableFields.map((field) => (
+                    <option key={field} value={field}>
+                      {field}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:flex-shrink-0 md:self-end">
+                <button
+                  type="submit"
+                  className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
+                >
+                  搜尋
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* 使用 DataGrid 顯示記錄 */}
+          {data && (
+            <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+              <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    記錄列表 ({data.pagination.total} 筆記錄)
+                  </h2>
+                  <div className="text-sm text-gray-500">
+                    第 {data.pagination.currentPage} 頁，共 {data.pagination.totalPages} 頁
+                  </div>
+                </div>
+              </div>
+              
+              <div style={{ height: 600, width: '100%' }}>
+                <DataGrid
+                  rows={data.records.map(record => ({
+                    id: record._id,
+                    recordNo: record._recordNo,
+                    ...record.data,
+                    actions: record._recordNo
+                  }))}
+                  columns={useMemo(() => {
+                    // 基本列定義
+                    const columns: GridColDef[] = [
+                      {
+                        field: 'recordNo',
+                        headerName: '記錄編號',
+                        width: 100,
+                        filterable: true
+                      },
+                      // 優先顯示欄位
+                      ...priorityFields.map(field => ({
+                        field,
+                        headerName: field,
+                        width: 150,
+                        filterable: true
+                      })),
+                      // 其他欄位
+                      ...availableFields
+                        .filter(field => !priorityFields.includes(field))
+                        .map(field => ({
+                          field,
+                          headerName: field,
+                          width: 150,
+                          filterable: true
+                        })),
+                      // 操作列
+                      {
+                        field: 'actions',
+                        headerName: '操作',
+                        width: 100,
+                        sortable: false,
+                        filterable: false,
+                        renderCell: (params) => (
+                          <Link
+                            to={`/dbf/${fileName}/${params.value}`}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            詳情
+                          </Link>
+                        )
+                      }
+                    ];
+                    return columns;
+                  }, [priorityFields, availableFields, fileName])}
+                  pagination
+                  paginationMode="server"
+                  rowCount={data.pagination.total}
+                  page={data.pagination.currentPage - 1}
+                  pageSize={data.pagination.pageSize}
+                  rowsPerPageOptions={[10, 20, 50, 100]}
+                  onPageChange={(newPage) => handlePageChange(newPage + 1)}
+                  disableSelectionOnClick
+                  disableDensitySelector
+                  components={{ Toolbar: GridToolbar }}
+                  componentsProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      quickFilterProps: { debounceMs: 500 },
+                    },
+                  }}
+                  sx={{
+                    '& .MuiDataGrid-cell': {
+                      whiteSpace: 'normal',
+                      lineHeight: 'normal',
+                      padding: '8px',
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </Layout>
+  );
+}
+
+export function meta({ params }: { params: { fileName: string } }) {
+  return [
+    { title: `${params.fileName} - DBF 檔案瀏覽器` },
+    { name: "description", content: `瀏覽 ${params.fileName} 的記錄` },
+  ];
+}
