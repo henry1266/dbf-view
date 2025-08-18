@@ -461,7 +461,16 @@ export default function DbfFile() {
                         backdropFilter: 'blur(10px)',
                         border: '1px solid rgba(100, 255, 218, 0.1)',
                       }}>
-                        <TableContainer sx={{ maxHeight: 'calc(80vh - 250px)' }}>
+                        <TableContainer sx={{
+                          maxHeight: 'calc(80vh - 240px)',
+                          overflowY: 'auto',
+                          '&::-webkit-scrollbar': {
+                            width: '0px',
+                            background: 'transparent'
+                          },
+                          msOverflowStyle: 'none',
+                          scrollbarWidth: 'none'
+                        }}>
                           <Table stickyHeader aria-label="數據表格" size="small">
                             <TableHead>
                               <TableRow>
