@@ -20,6 +20,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
                   <Link to="/" className="hover:text-gray-300">首頁</Link>
                 </li>
                 <li>
+                  <Link to="/dashboard" className="hover:text-gray-300">儀表板</Link>
+                </li>
+                <li>
                   <Link to="/dbf-files" className="hover:text-gray-300">DBF 檔案列表</Link>
                 </li>
               </ul>

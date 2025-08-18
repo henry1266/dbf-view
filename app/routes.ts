@@ -7,6 +7,10 @@ export default [
     index: true
   },
   {
+    path: "/dashboard",
+    file: "routes/dashboard.tsx"
+  },
+  {
     path: "/dbf-files",
     file: "routes/dbf-files.tsx"
   },
