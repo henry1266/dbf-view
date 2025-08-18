@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfFiles } from '../services/api';
+import TechBackground from '../components/TechBackground';
+import { Box } from '@mui/material';
 
 interface DbfFile {
   fileName: string;
@@ -34,64 +36,161 @@ export default function DbfFiles() {
 
   return (
     <Layout title="DBF 檔案列表">
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">錯誤！</strong>
-          <span className="block sm:inline"> {error}</span>
-        </div>
-      ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    檔案名稱
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    集合名稱
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    操作
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {dbfFiles.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
-                      沒有找到 DBF 檔案
-                    </td>
-                  </tr>
-                ) : (
-                  dbfFiles.map((file) => (
-                    <tr key={file.fileName} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {file.fileName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {file.collectionName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link
-                          to={`/dbf/${encodeURIComponent(file.fileName)}`}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
-                        >
-                          瀏覽資料
-                        </Link>
-                      </td>
+      <TechBackground>
+        <Box sx={{ p: 2 }}>
+          {loading ? (
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              py: 6
+            }}>
+              <Box sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                border: '3px solid rgba(100, 255, 218, 0.3)',
+                borderTop: '3px solid rgba(100, 255, 218, 0.8)',
+                animation: 'spin 1s linear infinite',
+                '@keyframes spin': {
+                  '0%': { transform: 'rotate(0deg)' },
+                  '100%': { transform: 'rotate(360deg)' }
+                },
+                boxShadow: '0 0 15px rgba(100, 255, 218, 0.5)'
+              }} />
+            </Box>
+          ) : error ? (
+            <Box sx={{
+              bgcolor: 'rgba(255, 100, 100, 0.2)',
+              border: '1px solid rgba(255, 100, 100, 0.5)',
+              color: '#ffcccc',
+              p: 2,
+              borderRadius: 1,
+              boxShadow: '0 0 15px rgba(255, 100, 100, 0.3)'
+            }}>
+              <Box component="span" sx={{ fontWeight: 'bold' }}>錯誤！</Box>
+              <Box component="span" sx={{ ml: 1 }}>{error}</Box>
+            </Box>
+          ) : (
+            <Box sx={{
+              bgcolor: 'rgba(17, 34, 64, 0.6)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              overflow: 'hidden',
+              border: '1px solid rgba(64, 175, 255, 0.3)',
+              boxShadow: '0 4px 30px rgba(0, 120, 255, 0.5)'
+            }}>
+              <Box sx={{ overflowX: 'auto' }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  color: '#e6f1ff'
+                }}>
+                  <thead>
+                    <tr style={{
+                      borderBottom: '1px solid rgba(64, 175, 255, 0.3)',
+                      background: 'rgba(10, 25, 47, 0.7)'
+                    }}>
+                      <th style={{
+                        padding: '12px 16px',
+                        textAlign: 'left',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        color: '#64ffda',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        fontFamily: 'monospace'
+                      }}>
+                        檔案名稱
+                      </th>
+                      <th style={{
+                        padding: '12px 16px',
+                        textAlign: 'left',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        color: '#64ffda',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        fontFamily: 'monospace'
+                      }}>
+                        集合名稱
+                      </th>
+                      <th style={{
+                        padding: '12px 16px',
+                        textAlign: 'left',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        color: '#64ffda',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        fontFamily: 'monospace'
+                      }}>
+                        操作
+                      </th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                  </thead>
+                  <tbody>
+                    {dbfFiles.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} style={{
+                          padding: '16px',
+                          textAlign: 'center',
+                          color: 'rgba(230, 241, 255, 0.7)',
+                          borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
+                        }}>
+                          沒有找到 DBF 檔案
+                        </td>
+                      </tr>
+                    ) : (
+                      dbfFiles.map((file) => (
+                        <tr key={file.fileName} style={{
+                          borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                          transition: 'background-color 0.3s'
+                        }} className="hover:bg-[rgba(100,255,218,0.05)]">
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.9rem',
+                            fontFamily: 'monospace',
+                            color: '#e6f1ff'
+                          }}>
+                            {file.fileName}
+                          </td>
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.9rem',
+                            color: 'rgba(230, 241, 255, 0.7)'
+                          }}>
+                            {file.collectionName}
+                          </td>
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.9rem'
+                          }}>
+                            <Link
+                              to={`/dbf/${encodeURIComponent(file.fileName)}`}
+                              style={{
+                                color: '#64ffda',
+                                textDecoration: 'none',
+                                position: 'relative'
+                              }}
+                              className="hover:text-[#64ffda] hover:text-shadow-[0_0_8px_rgba(100,255,218,0.8)]"
+                            >
+                              瀏覽資料
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </TechBackground>
     </Layout>
   );
 }

@@ -22,11 +22,26 @@ export const fetchDbfFiles = async () => {
 };
 
 // 獲取特定 DBF 檔案的記錄
-export const fetchDbfRecords = async (fileName: string, page = 1, pageSize = 20, search = '', field = '') => {
+export const fetchDbfRecords = async (
+  fileName: string,
+  page = 1,
+  pageSize = 20,
+  search = '',
+  field = '',
+  sortField = '',
+  sortDirection = ''
+) => {
   try {
     const encodedFileName = encodeURIComponent(fileName);
     const response = await api.get(`/dbf/${encodedFileName}`, {
-      params: { page, pageSize, search, field },
+      params: {
+        page,
+        pageSize,
+        search,
+        field,
+        sortField,
+        sortDirection
+      },
     });
     return response.data;
   } catch (error) {

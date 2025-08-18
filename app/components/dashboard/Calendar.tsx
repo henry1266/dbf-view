@@ -7,6 +7,7 @@ const Calendar = () => {
   return (
     <Paper
       sx={{
+
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -33,14 +34,15 @@ const Calendar = () => {
           left: '10%',
           width: '80%',
           height: '1px',
-          background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.7), transparent)',
-          boxShadow: '0 0 15px rgba(64, 175, 255, 0.5)'
+          background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.7), transparent)'
         }
       }}
     >
       <Box sx={{
         width: '100%',
-        height: '100%',
+        height: 'auto',
+        maxHeight: '180px',
+        padding: '15px 0',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -72,7 +74,7 @@ const Calendar = () => {
           background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
           boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
         }
-      }}>
+        }}>
         <Typography variant="h4" sx={{
           fontFamily: 'monospace',
           fontWeight: 'bold',
@@ -113,7 +115,6 @@ const Calendar = () => {
           content: '""',
           position: 'absolute',
           top: -10,
-          left: 0,
           right: 0,
           height: '1px',
           background: 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.2), transparent)'
@@ -141,7 +142,7 @@ const Calendar = () => {
               key={i}
               sx={{
                 textAlign: 'center',
-                p: 0.5,
+                p: 1,
                 borderRadius: 1,
                 bgcolor: isToday ? 'rgba(64, 175, 255, 0.8)' : isCurrentMonth ? 'rgba(17, 34, 64, 0.5)' : 'transparent',
                 color: isToday ? 'white' : isCurrentMonth ? '#e6f1ff' : 'rgba(230, 241, 255, 0.4)',

@@ -93,7 +93,7 @@ export default function KcstmrQuery() {
             <div key={fileName} className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
               <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
                 <h2 className="text-lg font-semibold text-gray-700">
-                  {fileName} ({fileData.count} 筆記錄)
+                  {fileName} ({fileData.count} 123筆記錄)
                 </h2>
               </div>
 

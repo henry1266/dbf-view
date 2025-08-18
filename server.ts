@@ -99,11 +99,20 @@ app.get('/api/dbf-files', async (req: Request, res: Response) => {
 // 獲取特定 DBF 檔案的記錄
 app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   const { fileName } = req.params;
-  const { page = '1', pageSize = '20', search = '', field = '' } = req.query as {
+  const {
+    page = '1',
+    pageSize = '20',
+    search = '',
+    field = '',
+    sortField = 'PDATE',  // 默認按 PDATE 排序
+    sortDirection = 'desc'  // 默認降序排序（最新優先）
+  } = req.query as {
     page?: string;
     pageSize?: string;
     search?: string;
     field?: string;
+    sortField?: string;
+    sortDirection?: string;
   };
   const skip = (parseInt(page) - 1) * parseInt(pageSize);
   
@@ -137,12 +146,113 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     const total = await collection.countDocuments(query);
     const totalPages = Math.ceil(total / parseInt(pageSize));
     
-    // 獲取當前頁的記錄
-    const records = await collection.find(query)
-      .sort({ _recordNo: 1 })
-      .skip(skip)
-      .limit(parseInt(pageSize))
-      .toArray();
+    // 準備聚合管道
+    let aggregationPipeline: any[] = [];
+    
+    // 添加查詢條件
+    if (Object.keys(query).length > 0) {
+      aggregationPipeline.push({ $match: query });
+    }
+    
+    // 處理排序
+    const sortOrder = sortDirection.toLowerCase() === 'asc' ? 1 : -1;
+    
+    // 特別處理 PDATE 欄位的排序（民國年日期格式）
+    if (sortField.toUpperCase() === 'PDATE') {
+      console.log('使用 PDATE 特殊排序邏輯（民國年轉西元年）');
+      
+      // 添加轉換欄位，將 PDATE 字串轉換為可排序的日期物件
+      aggregationPipeline.push({
+        $addFields: {
+          // 建立一個臨時的日期物件欄位，供後續排序使用
+          convertedGregorianDate: {
+            $cond: {
+              // 檢查 PDATE 是否存在且格式正確（長度為 7 的字符串）
+              if: {
+                $and: [
+                  { $ne: ["$data.PDATE", null] },
+                  { $ne: ["$data.PDATE", ""] },
+                  { $eq: [{ $strLenCP: "$data.PDATE" }, 7] },
+                  // 確保前三位是數字
+                  { $regexMatch: { input: { $substrCP: ["$data.PDATE", 0, 3] }, regex: /^\d+$/ } },
+                  // 確保中間兩位是數字
+                  { $regexMatch: { input: { $substrCP: ["$data.PDATE", 3, 2] }, regex: /^\d+$/ } },
+                  // 確保後兩位是數字
+                  { $regexMatch: { input: { $substrCP: ["$data.PDATE", 5, 2] }, regex: /^\d+$/ } }
+                ]
+              },
+              // 如果 PDATE 格式正確，則進行轉換
+              then: {
+                $let: {
+                  vars: {
+                    // 拆解 PDATE 字串 '1130814'
+                    minguoYearStr: { $substrCP: ["$data.PDATE", 0, 3] }, // 取前3碼 "113"
+                    monthStr: { $substrCP: ["$data.PDATE", 3, 2] },      // 取中間2碼 "08"
+                    dayStr: { $substrCP: ["$data.PDATE", 5, 2] }         // 取後方2碼 "14"
+                  },
+                  in: {
+                    // 將拆分後的字串組合回 MongoDB 認識的 ISO 格式 "YYYY-MM-DD"
+                    $dateFromString: {
+                      dateString: {
+                        $concat: [
+                          // 將民國年轉為數字，加上 1911，再轉回字串
+                          {
+                            $toString: {
+                              $add: [
+                                {
+                                  $toInt: {
+                                    $cond: {
+                                      if: { $regexMatch: { input: "$$minguoYearStr", regex: /^\d+$/ } },
+                                      then: "$$minguoYearStr",
+                                      else: "0" // 如果不是數字，則使用 0
+                                    }
+                                  }
+                                },
+                                1911
+                              ]
+                            }
+                          },
+                          "-",
+                          "$$monthStr",
+                          "-",
+                          "$$dayStr"
+                        ]
+                      },
+                      onError: new Date(0) // 處理無效日期
+                    }
+                  }
+                }
+              },
+              // 如果 PDATE 格式不正確，則使用一個默認日期（1970-01-01）
+              else: new Date(0)
+            }
+          }
+        }
+      });
+      
+      // 根據轉換後的日期欄位排序
+      aggregationPipeline.push({
+        $sort: { convertedGregorianDate: sortOrder }
+      });
+    } else {
+      // 其他欄位使用標準排序
+      console.log(`使用標準排序: ${sortField} ${sortDirection}`);
+      
+      // 如果是排序資料欄位，需要加上 data. 前綴
+      const sortKey = sortField.startsWith('_') ? sortField : `data.${sortField}`;
+      
+      aggregationPipeline.push({
+        $sort: { [sortKey]: sortOrder }
+      });
+    }
+    
+    // 添加分頁
+    aggregationPipeline.push({ $skip: skip });
+    aggregationPipeline.push({ $limit: parseInt(pageSize) });
+    
+    // 執行聚合查詢
+    console.log('執行聚合查詢:', JSON.stringify(aggregationPipeline, null, 2));
+    const records = await collection.aggregate(aggregationPipeline).toArray();
     
     res.json({
       fileName,
@@ -152,6 +262,10 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
         totalPages,
         total,
         pageSize: parseInt(pageSize)
+      },
+      sortApplied: {
+        field: sortField,
+        direction: sortDirection
       }
     });
   } catch (err) {
