@@ -196,66 +196,6 @@ export default function Dashboard() {
          opacity: 0.6
        }} />
        
-       {/* 浮動粒子效果 */}
-       <Box sx={{
-         position: 'absolute',
-         top: '10%',
-         left: '5%',
-         width: '8px',
-         height: '8px',
-         borderRadius: '50%',
-         background: 'rgba(100, 255, 218, 0.8)',
-         boxShadow: '0 0 15px rgba(100, 255, 218, 0.9)',
-         animation: 'float1 15s infinite ease-in-out',
-         zIndex: 0,
-         '@keyframes float1': {
-           '0%': { transform: 'translate(0, 0)' },
-           '25%': { transform: 'translate(20px, 30px)' },
-           '50%': { transform: 'translate(40px, 0)' },
-           '75%': { transform: 'translate(20px, -30px)' },
-           '100%': { transform: 'translate(0, 0)' }
-         }
-       }} />
-       
-       <Box sx={{
-         position: 'absolute',
-         top: '70%',
-         left: '80%',
-         width: '6px',
-         height: '6px',
-         borderRadius: '50%',
-         background: 'rgba(64, 175, 255, 0.8)',
-         boxShadow: '0 0 15px rgba(64, 175, 255, 0.9)',
-         animation: 'float2 18s infinite ease-in-out',
-         zIndex: 0,
-         '@keyframes float2': {
-           '0%': { transform: 'translate(0, 0)' },
-           '33%': { transform: 'translate(-30px, -20px)' },
-           '66%': { transform: 'translate(30px, -40px)' },
-           '100%': { transform: 'translate(0, 0)' }
-         }
-       }} />
-       
-       <Box sx={{
-         position: 'absolute',
-         top: '40%',
-         left: '20%',
-         width: '5px',
-         height: '5px',
-         borderRadius: '50%',
-         background: 'rgba(204, 114, 255, 0.8)',
-         boxShadow: '0 0 15px rgba(204, 114, 255, 0.9)',
-         animation: 'float3 20s infinite ease-in-out',
-         zIndex: 0,
-         '@keyframes float3': {
-           '0%': { transform: 'translate(0, 0)' },
-           '20%': { transform: 'translate(40px, 20px)' },
-           '40%': { transform: 'translate(60px, -20px)' },
-           '60%': { transform: 'translate(20px, -40px)' },
-           '80%': { transform: 'translate(-20px, -20px)' },
-           '100%': { transform: 'translate(0, 0)' }
-         }
-       }} />
        
        {/* 額外的浮動粒子 */}
        <Box sx={{
@@ -889,31 +829,6 @@ export default function Dashboard() {
                   boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
                 }
               }}>
-                <Box sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  mb: 2,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  background: 'linear-gradient(90deg, rgba(17, 34, 64, 0.5) 0%, rgba(64, 175, 255, 0.3) 100%)',
-                  backdropFilter: 'blur(4px)',
-                  boxShadow: '0 2px 15px rgba(64, 175, 255, 0.4)',
-                  border: '1px solid rgba(64, 175, 255, 0.4)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
-                    boxShadow: '0 0 15px rgba(64, 175, 255, 0.7)'
-                  }
-                }}>
                   <Typography variant="h4" sx={{
                     fontFamily: 'monospace',
                     fontWeight: 'bold',
@@ -921,7 +836,7 @@ export default function Dashboard() {
                     textShadow: '0 0 15px rgba(100, 255, 218, 0.8)',
                     letterSpacing: '0.05em'
                   }}>
-                    {dayjs().locale('zh-tw').format('MM/DD')}
+                    {dayjs().locale('zh-tw').format('YYYY/MM')}
                   </Typography>
                   <Typography variant="h6" sx={{
                     fontFamily: 'monospace',
