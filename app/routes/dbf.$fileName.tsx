@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { fetchDbfRecords } from '../services/api';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import type { GridColDef } from '@mui/x-data-grid';
+import { TextField, Select, MenuItem, Button, Box, InputLabel, FormControl } from '@mui/material';
 
 interface DbfRecord {
   _id: string;
@@ -165,46 +166,40 @@ export default function DbfFile() {
         <>
           {/* 搜尋表單 */}
           <div className="bg-white shadow-md rounded-lg p-4 mb-6">
-            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-              <div className="flex-grow">
-                <label htmlFor="searchValue" className="block text-sm font-medium text-gray-700 mb-1">
-                  搜尋值
-                </label>
-                <input
-                  type="text"
-                  id="searchValue"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="輸入搜尋值"
-                />
-              </div>
-              <div className="md:w-1/3">
-                <label htmlFor="searchField" className="block text-sm font-medium text-gray-700 mb-1">
-                  欄位 (可選)
-                </label>
-                <select
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
+              <TextField
+                id="searchValue"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="輸入搜尋值"
+                size="small"
+                fullWidth
+                sx={{ flexGrow: 1 }}
+              />
+              <FormControl sx={{ minWidth: 180 }} size="small">
+                <InputLabel id="search-field-label">欄位</InputLabel>
+                <Select
+                  labelId="search-field-label"
                   id="searchField"
                   value={searchField}
-                  onChange={(e) => setSearchField(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  onChange={(e) => setSearchField(e.target.value as string)}
+                  label="欄位"
                 >
-                  <option value="">所有欄位</option>
+                  <MenuItem value="">所有欄位</MenuItem>
                   {availableFields.map((field) => (
-                    <option key={field} value={field}>
+                    <MenuItem key={field} value={field}>
                       {field}
-                    </option>
+                    </MenuItem>
                   ))}
-                </select>
-              </div>
-              <div className="md:flex-shrink-0 md:self-end">
-                <button
-                  type="submit"
-                  className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
-                >
-                  搜尋
-                </button>
-              </div>
+                </Select>
+              </FormControl>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+              >
+                搜尋
+              </Button>
             </form>
           </div>
 
@@ -216,9 +211,6 @@ export default function DbfFile() {
                   <h2 className="text-lg font-semibold text-gray-700">
                     記錄列表 ({data.pagination.total} 筆記錄)
                   </h2>
-                  <div className="text-sm text-gray-500">
-                    第 {data.pagination.currentPage} 頁，共 {data.pagination.totalPages} 頁
-                  </div>
                 </div>
               </div>
               
