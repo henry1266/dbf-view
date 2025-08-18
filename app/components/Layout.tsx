@@ -9,8 +9,8 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-gray-800 text-white">
+    <div className="min-h-screen flex flex-col bg-white">
+      <header className="bg-blue-600 text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-xl font-bold">DBF 檔案瀏覽器</Link>
