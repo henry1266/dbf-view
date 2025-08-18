@@ -178,7 +178,7 @@ export default function DbfFiles() {
                               }}
                               className="hover:text-[#64ffda] hover:text-shadow-[0_0_8px_rgba(100,255,218,0.8)]"
                             >
-                              瀏覽資料
+                              瀏覽資料12345
                             </Link>
                           </td>
                         </tr>

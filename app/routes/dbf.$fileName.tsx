@@ -331,10 +331,10 @@ export default function DbfFile() {
   };
 
   return (
-    <Layout title={`${fileName || 'DBF 檔案'} 瀏覽`}>
+    <Layout title="">
       <TechBackground>
         <Box sx={{ width: '98%', mx: 'auto', my: '1%'  }}>
-          <Typography variant="h5" sx={{ mb: '3%', color: '#64ffda', fontWeight: 'bold' }}>
+          <Typography variant="h5" sx={{ mb: '1%', color: '#64ffda', fontWeight: 'bold' }}>
             {fileName} 數據瀏覽
           </Typography>
           
@@ -351,7 +351,7 @@ export default function DbfFile() {
               ) : (
                 <>
                   {/* 搜尋表單 */}
-                  <Box sx={{ mb: '3%', p: '1%', bgcolor: 'rgba(0, 0, 0, 0.2)', borderRadius: 1 }}>
+                  <Box sx={{ mb: '2%', p: '1%', bgcolor: 'rgba(0, 0, 0, 0.2)', borderRadius: 1 }}>
                     <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
                       <TextField
                         id="searchValue"
