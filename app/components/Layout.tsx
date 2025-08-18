@@ -13,7 +13,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       <header className="bg-blue-600 text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-xl font-bold">DBF 檔案瀏覽器</Link>
+            <Link to="/" className="text-xl font-bold">處方瀏覽器</Link>
             <nav>
               <ul className="flex space-x-4">
                 <li>
