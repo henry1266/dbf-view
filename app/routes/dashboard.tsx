@@ -15,15 +15,26 @@ export function meta() {
 const DashboardCard = ({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) => (
   <Card sx={{
     height: '100%',
-    bgcolor: 'background.paper',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+    bgcolor: 'rgba(17, 34, 64, 0.6)',
+    backdropFilter: 'blur(8px)',
+    boxShadow: `0 4px 30px rgba(${color === 'primary' ? '64, 175, 255' :
+                color === 'success' ? '100, 255, 218' :
+                color === 'warning' ? '255, 152, 0' :
+                color === 'info' ? '0, 120, 255' : '0, 0, 0'}, 0.5)`,
     borderRadius: 2,
     position: 'relative',
     overflow: 'hidden',
     transition: 'all 0.3s',
+    border: `1px solid rgba(${color === 'primary' ? '64, 175, 255' :
+              color === 'success' ? '100, 255, 218' :
+              color === 'warning' ? '255, 152, 0' :
+              color === 'info' ? '0, 120, 255' : '0, 0, 0'}, 0.3)`,
     '&:hover': {
       transform: 'translateY(-5px)',
-      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)'
+      boxShadow: `0 8px 35px rgba(${color === 'primary' ? '64, 175, 255' :
+                  color === 'success' ? '100, 255, 218' :
+                  color === 'warning' ? '255, 152, 0' :
+                  color === 'info' ? '0, 120, 255' : '0, 0, 0'}, 0.6)`,
     },
     '&::before': {
       content: '""',
@@ -32,17 +43,29 @@ const DashboardCard = ({ title, value, icon, color }: { title: string, value: st
       left: 0,
       width: '100%',
       height: '3px',
-      background: `linear-gradient(90deg, ${color}.main, ${color}.light)`
+      background: `linear-gradient(90deg, ${color}.main, ${color}.light)`,
+      boxShadow: `0 0 25px ${color}.main`
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: '10%',
+      width: '80%',
+      height: '1px',
+      background: `linear-gradient(90deg, transparent, ${color}.light, transparent)`,
+      opacity: 0.7
     }
   }}>
     <CardContent sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6" component="div" sx={{
-          color: 'text.secondary',
+          color: '#e6f1ff',
           fontFamily: 'monospace',
           letterSpacing: '0.05em',
           fontSize: '0.9rem',
-          textTransform: 'uppercase'
+          textTransform: 'uppercase',
+          textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
         }}>
           {title}
         </Typography>
@@ -54,7 +77,7 @@ const DashboardCard = ({ title, value, icon, color }: { title: string, value: st
           color: `${color}.main`,
           borderRadius: '50%',
           p: 1,
-          boxShadow: `0 0 10px ${color}.light`
+          boxShadow: `0 0 20px ${color}.light`
         }}>
           {icon}
         </Box>
@@ -62,14 +85,17 @@ const DashboardCard = ({ title, value, icon, color }: { title: string, value: st
       <Typography variant="h4" component="div" sx={{
         fontFamily: 'monospace',
         fontWeight: 'bold',
-        letterSpacing: '0.05em'
+        letterSpacing: '0.05em',
+        color: '#ffffff',
+        textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
       }}>
         {value}
       </Typography>
       <Box sx={{
         mt: 2,
         height: '2px',
-        background: `linear-gradient(90deg, transparent, ${color}.light, transparent)`
+        background: `linear-gradient(90deg, transparent, ${color}.light, transparent)`,
+        boxShadow: `0 0 10px ${color}.light`
       }} />
     </CardContent>
   </Card>
@@ -379,135 +405,6 @@ export default function Dashboard() {
          }
        }} />
        
-       {/* 掃描線效果 */}
-       <Box sx={{
-         position: 'absolute',
-         top: 0,
-         left: 0,
-         right: 0,
-         height: '100%',
-         zIndex: 0,
-         pointerEvents: 'none',
-         overflow: 'hidden',
-         '&::after': {
-           content: '""',
-           position: 'absolute',
-           top: 0,
-           left: 0,
-           right: 0,
-           height: '2px',
-           background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.7), transparent)',
-           boxShadow: '0 0 15px rgba(100, 255, 218, 0.5)',
-           animation: 'scanline 8s linear infinite',
-         },
-         '@keyframes scanline': {
-           '0%': { top: '0%' },
-           '100%': { top: '100%' }
-         }
-       }} />
-       
-       {/* 水平掃描線 */}
-       <Box sx={{
-         position: 'absolute',
-         top: 0,
-         left: 0,
-         bottom: 0,
-         width: '100%',
-         zIndex: 0,
-         pointerEvents: 'none',
-         overflow: 'hidden',
-         '&::after': {
-           content: '""',
-           position: 'absolute',
-           left: 0,
-           top: 0,
-           bottom: 0,
-           width: '2px',
-           background: 'linear-gradient(180deg, transparent, rgba(64, 175, 255, 0.7), transparent)',
-           boxShadow: '0 0 15px rgba(64, 175, 255, 0.5)',
-           animation: 'hscanline 12s linear infinite',
-         },
-         '@keyframes hscanline': {
-           '0%': { left: '0%' },
-           '100%': { left: '100%' }
-         }
-       }} />
-       
-       {/* 數字雨效果 - 左側 */}
-       <Box sx={{
-         position: 'absolute',
-         top: '5%',
-         left: '2%',
-         fontSize: '10px',
-         fontFamily: 'monospace',
-         color: 'rgba(100, 255, 218, 0.6)',
-         lineHeight: 1.2,
-         zIndex: 0,
-         pointerEvents: 'none',
-         userSelect: 'none',
-         animation: 'pulse 4s infinite ease-in-out',
-         '@keyframes pulse': {
-           '0%': { opacity: 0.4 },
-           '50%': { opacity: 0.8 },
-           '100%': { opacity: 0.4 }
-         }
-       }}>
-         10110101<br />
-         01001010<br />
-         11010010<br />
-         00101101<br />
-         10101001<br />
-         01010110<br />
-         10010101<br />
-         01101001
-       </Box>
-       
-       {/* 數字雨效果 - 右側 */}
-       <Box sx={{
-         position: 'absolute',
-         top: '15%',
-         right: '3%',
-         fontSize: '10px',
-         fontFamily: 'monospace',
-         color: 'rgba(64, 175, 255, 0.6)',
-         lineHeight: 1.2,
-         zIndex: 0,
-         pointerEvents: 'none',
-         userSelect: 'none',
-         animation: 'pulse 5s infinite ease-in-out',
-       }}>
-         01101001<br />
-         10010101<br />
-         01010110<br />
-         10101001<br />
-         00101101<br />
-         11010010<br />
-         01001010<br />
-         10110101
-       </Box>
-       
-       {/* 額外的數字雨效果 */}
-       <Box sx={{
-         position: 'absolute',
-         bottom: '10%',
-         left: '8%',
-         fontSize: '10px',
-         fontFamily: 'monospace',
-         color: 'rgba(204, 114, 255, 0.6)',
-         lineHeight: 1.2,
-         zIndex: 0,
-         pointerEvents: 'none',
-         userSelect: 'none',
-         animation: 'pulse 6s infinite ease-in-out',
-       }}>
-         11100111<br />
-         00110011<br />
-         10011001<br />
-         01100110<br />
-         11001100<br />
-         00111100<br />
-       </Box>
-       
        {/* 內容容器 - 確保內容在背景元素之上 */}
        <Box sx={{ position: 'relative', zIndex: 1 }}>
         {/* 頂部標題 */}
@@ -521,31 +418,61 @@ export default function Dashboard() {
         }}>
           <Typography variant="h5" sx={{
             fontFamily: 'monospace',
-            letterSpacing: '0.1em',
-            color: 'primary.main',
-            fontWeight: 'bold'
+            letterSpacing: '0.15em',
+            color: '#64ffda',
+            fontWeight: 'bold',
+            textShadow: '0 0 20px rgba(100, 255, 218, 0.8)',
+            position: 'relative',
+            display: 'inline-block',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              bottom: '-5px',
+              left: '0',
+              width: '100%',
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.8), transparent)',
+              boxShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
+            }
           }}>
-            SYSTEM DASHBOARD
+            科技儀表板
           </Typography>
           <Typography variant="body2" sx={{
             fontFamily: 'monospace',
-            color: 'text.secondary'
+            color: '#e6f1ff',
+            textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
+            letterSpacing: '0.05em',
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: 'rgba(17, 34, 64, 0.6)',
+            backdropFilter: 'blur(8px)',
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1,
+            border: '1px solid rgba(64, 175, 255, 0.3)',
+            boxShadow: '0 0 10px rgba(64, 175, 255, 0.3)'
           }}>
             <Box component="span" sx={{
               width: 8,
               height: 8,
               borderRadius: '50%',
-              bgcolor: 'success.main',
+              bgcolor: '#64ffda',
               display: 'inline-block',
               mr: 1,
-              boxShadow: '0 0 5px rgba(0,200,0,0.5)'
+              boxShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
+              animation: 'pulse 1.5s infinite',
+              '@keyframes pulse': {
+                '0%': { opacity: 0.5, transform: 'scale(0.8)' },
+                '50%': { opacity: 1, transform: 'scale(1.2)' },
+                '100%': { opacity: 0.5, transform: 'scale(0.8)' }
+              }
             }}/>
             ONLINE • {dayjs().format('YYYY-MM-DD')}
           </Typography>
         </Box>
         
         {/* 頂部統計卡片 */}
-        <Grid container spacing={2}>
+        <Grid container>
           <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' }, p: 1.5 }}>
             <DashboardCard 
               title="總檔案數" 
@@ -591,11 +518,13 @@ export default function Dashboard() {
                   display: 'flex',
                   flexDirection: 'column',
                   height: 140,
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+                  bgcolor: 'rgba(17, 34, 64, 0.6)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 30px rgba(64, 175, 255, 0.4)',
                   borderRadius: 2,
                   position: 'relative',
                   overflow: 'hidden',
+                  border: '1px solid rgba(64, 175, 255, 0.3)',
                   '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -603,7 +532,18 @@ export default function Dashboard() {
                     left: 0,
                     width: '100%',
                     height: '2px',
-                    background: 'linear-gradient(90deg, transparent, rgba(25, 118, 210, 0.5), transparent)'
+                    background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                    boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: 0,
+                    left: '10%',
+                    width: '80%',
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.6), transparent)',
+                    boxShadow: '0 0 10px rgba(64, 175, 255, 0.4)'
                   }
                 }}
               >
@@ -611,17 +551,19 @@ export default function Dashboard() {
                   fontFamily: 'monospace',
                   letterSpacing: '0.05em',
                   fontSize: '0.9rem',
-                  color: 'primary.main',
+                  color: '#64ffda',
                   display: 'flex',
                   alignItems: 'center',
+                  textShadow: '0 0 10px rgba(100, 255, 218, 0.6)',
                   '&::after': {
                     content: '""',
                     display: 'inline-block',
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    bgcolor: 'primary.main',
+                    bgcolor: '#64ffda',
                     ml: 1,
+                    boxShadow: '0 0 10px rgba(100, 255, 218, 0.8)',
                     animation: 'pulse 1.5s infinite'
                   },
                   '@keyframes pulse': {
@@ -633,16 +575,64 @@ export default function Dashboard() {
                   RECENT ACTIVITY
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <span style={{ marginRight: '0.25rem', color: 'var(--mui-palette-primary-main)' }}>📈</span>
-                  <Typography variant="body2">CO02P.DBF 更新</Typography>
+                  <Box sx={{
+                    mr: 1,
+                    color: '#40afff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    bgcolor: 'rgba(64, 175, 255, 0.2)',
+                    boxShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
+                  }}>📈</Box>
+                  <Typography variant="body2" sx={{
+                    color: '#e6f1ff',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                    fontFamily: 'monospace',
+                    letterSpacing: '0.03em'
+                  }}>CO02P.DBF 更新</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <span style={{ marginRight: '0.25rem', color: 'var(--mui-palette-success-main)' }}>☁️</span>
-                  <Typography variant="body2">CO03L.DBF 上傳</Typography>
+                  <Box sx={{
+                    mr: 1,
+                    color: '#64ffda',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    bgcolor: 'rgba(100, 255, 218, 0.2)',
+                    boxShadow: '0 0 8px rgba(100, 255, 218, 0.5)'
+                  }}>☁️</Box>
+                  <Typography variant="body2" sx={{
+                    color: '#e6f1ff',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                    fontFamily: 'monospace',
+                    letterSpacing: '0.03em'
+                  }}>CO03L.DBF 上傳</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ marginRight: '0.25rem', color: 'var(--mui-palette-warning-main)' }}>📊</span>
-                  <Typography variant="body2">查詢量增加 12%</Typography>
+                  <Box sx={{
+                    mr: 1,
+                    color: '#ffab40',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    bgcolor: 'rgba(255, 171, 64, 0.2)',
+                    boxShadow: '0 0 8px rgba(255, 171, 64, 0.5)'
+                  }}>📊</Box>
+                  <Typography variant="body2" sx={{
+                    color: '#e6f1ff',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                    fontFamily: 'monospace',
+                    letterSpacing: '0.03em'
+                  }}>查詢量增加 12%</Typography>
                 </Box>
               </Paper>
 
@@ -652,11 +642,13 @@ export default function Dashboard() {
                   display: 'flex',
                   flexDirection: 'column',
                   height: 200,
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+                  bgcolor: 'rgba(17, 34, 64, 0.6)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
                   borderRadius: 2,
                   position: 'relative',
                   overflow: 'hidden',
+                  border: '1px solid rgba(100, 255, 218, 0.3)',
                   '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -664,7 +656,18 @@ export default function Dashboard() {
                     left: 0,
                     width: '100%',
                     height: '2px',
-                    background: 'linear-gradient(90deg, transparent, rgba(25, 118, 210, 0.5), transparent)'
+                    background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
+                    boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)'
+                  },
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: 0,
+                    left: '10%',
+                    width: '80%',
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
+                    boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)'
                   }
                 }}
               >
@@ -672,34 +675,26 @@ export default function Dashboard() {
                   fontFamily: 'monospace',
                   letterSpacing: '0.05em',
                   fontSize: '0.9rem',
-                  color: 'primary.main',
+                  color: '#64ffda',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  textShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
                 }}>
                   <span>SYSTEM STATUS</span>
                   <Box component="span" sx={{
                     fontSize: '0.7rem',
-                    color: 'success.main',
+                    color: '#64ffda',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
                   }}>
-                    <Box component="span" sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      bgcolor: 'success.main',
-                      display: 'inline-block',
-                      mr: 0.5,
-                      boxShadow: '0 0 5px rgba(0,200,0,0.5)'
-                    }}/>
-                    OPERATIONAL
                   </Box>
                 </Typography>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: 1 }}>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>CPU</Typography>
-                  <Typography variant="body2" color="primary.main" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>32%</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>CPU</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#40afff', textShadow: '0 0 8px rgba(64, 175, 255, 0.7)' }}>32%</Typography>
                 </Box>
                 <Box sx={{
                   width: '100%',
@@ -734,8 +729,8 @@ export default function Dashboard() {
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>MEMORY</Typography>
-                  <Typography variant="body2" color="warning.main" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>68%</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>MEMORY</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#ffab40', textShadow: '0 0 8px rgba(255, 171, 64, 0.6)' }}>68%</Typography>
                 </Box>
                 <Box sx={{
                   width: '100%',
@@ -752,7 +747,6 @@ export default function Dashboard() {
                     left: 0,
                     height: '100%',
                     width: '100%',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
                     animation: 'shimmer 2s infinite',
                   }
                 }}>
@@ -766,8 +760,8 @@ export default function Dashboard() {
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>DISK</Typography>
-                  <Typography variant="body2" color="success.main" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>45%</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>DISK</Typography>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#64ffda', textShadow: '0 0 8px rgba(100, 255, 218, 0.6)' }}>45%</Typography>
                 </Box>
                 <Box sx={{
                   width: '100%',
@@ -801,34 +795,60 @@ export default function Dashboard() {
 
           {/* 中央日曆 */}
           <Grid sx={{ width: { xs: '100%', md: '50%' }, p: 1.5 }}>
-            <Paper 
-              sx={{ 
-                p: 2, 
-                display: 'flex', 
-                flexDirection: 'column', 
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                bgcolor: 'background.paper',
-                boxShadow: 3,
+                bgcolor: 'rgba(17, 34, 64, 0.6)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 40px rgba(64, 175, 255, 0.5)',
                 borderRadius: 2,
-                height: '100%'
+                height: '100%',
+                border: '1px solid rgba(64, 175, 255, 0.4)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                  boxShadow: '0 0 25px rgba(64, 175, 255, 0.8)'
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '10%',
+                  width: '80%',
+                  height: '1px',
+                  background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.7), transparent)',
+                  boxShadow: '0 0 15px rgba(64, 175, 255, 0.5)'
+                }
               }}
             >
               <Typography variant="h5" gutterBottom sx={{
                 mb: 2,
-                color: 'primary.main',
+                color: '#40afff',
                 fontFamily: 'monospace',
                 letterSpacing: '0.1em',
-                textShadow: '0 0 5px rgba(0, 120, 255, 0.5)',
+                textShadow: '0 0 15px rgba(64, 175, 255, 0.8)',
                 textAlign: 'center',
                 position: 'relative',
+                fontWeight: 'bold',
                 '&::before': {
                   content: '""',
                   position: 'absolute',
                   height: '2px',
-                  width: '60px',
-                  background: 'linear-gradient(90deg, transparent, #0088ff, transparent)',
+                  width: '80px',
+                  background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                  boxShadow: '0 0 15px rgba(64, 175, 255, 0.8)',
                   bottom: '-5px',
-                  left: 'calc(50% - 30px)'
+                  left: 'calc(50% - 40px)'
                 }
               }}>
                 SYSTEM CALENDAR • {dayjs().format('YYYY')}
@@ -840,12 +860,14 @@ export default function Dashboard() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(145deg, rgba(0,0,0,0.02) 0%, rgba(0,120,255,0.05) 100%)',
+                background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.4) 0%, rgba(17, 34, 64, 0.6) 100%)',
+                backdropFilter: 'blur(4px)',
                 borderRadius: 2,
                 p: 2,
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: 'inset 0 0 15px rgba(0, 120, 255, 0.1)',
+                boxShadow: 'inset 0 0 30px rgba(64, 175, 255, 0.3)',
+                border: '1px solid rgba(64, 175, 255, 0.3)',
                 '&::before': {
                   content: '""',
                   position: 'absolute',
@@ -853,7 +875,8 @@ export default function Dashboard() {
                   left: 0,
                   right: 0,
                   height: '1px',
-                  background: 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.5), transparent)'
+                  background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                  boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
                 },
                 '&::after': {
                   content: '""',
@@ -862,7 +885,8 @@ export default function Dashboard() {
                   left: 0,
                   right: 0,
                   height: '1px',
-                  background: 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.5), transparent)'
+                  background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                  boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
                 }
               }}>
                 <Box sx={{
@@ -873,30 +897,47 @@ export default function Dashboard() {
                   px: 2,
                   py: 1,
                   borderRadius: 1,
-                  background: 'linear-gradient(90deg, rgba(0,0,0,0.02) 0%, rgba(0,120,255,0.1) 100%)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  background: 'linear-gradient(90deg, rgba(17, 34, 64, 0.5) 0%, rgba(64, 175, 255, 0.3) 100%)',
+                  backdropFilter: 'blur(4px)',
+                  boxShadow: '0 2px 15px rgba(64, 175, 255, 0.4)',
+                  border: '1px solid rgba(64, 175, 255, 0.4)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.9), transparent)',
+                    boxShadow: '0 0 15px rgba(64, 175, 255, 0.7)'
+                  }
                 }}>
                   <Typography variant="h4" sx={{
                     fontFamily: 'monospace',
                     fontWeight: 'bold',
-                    color: 'primary.main'
+                    color: '#64ffda',
+                    textShadow: '0 0 15px rgba(100, 255, 218, 0.8)',
+                    letterSpacing: '0.05em'
                   }}>
                     {dayjs().locale('zh-tw').format('MM/DD')}
                   </Typography>
                   <Typography variant="h6" sx={{
                     fontFamily: 'monospace',
-                    color: 'text.secondary',
+                    color: '#e6f1ff',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    textShadow: '0 0 10px rgba(230, 241, 255, 0.6)'
                   }}>
                     <Box component="span" sx={{
                       width: 8,
                       height: 8,
                       borderRadius: '50%',
-                      bgcolor: 'success.main',
+                      bgcolor: '#64ffda',
                       display: 'inline-block',
                       mr: 1,
-                      boxShadow: '0 0 5px rgba(0,200,0,0.5)'
+                      boxShadow: '0 0 8px rgba(100, 255, 218, 0.7)'
                     }}/>
                     {dayjs().locale('zh-tw').format('dddd')}
                   </Typography>
@@ -923,10 +964,11 @@ export default function Dashboard() {
                     <Box key={day} sx={{
                       textAlign: 'center',
                       fontWeight: 'bold',
-                      color: 'primary.main',
+                      color: '#64ffda',
                       fontSize: '0.75rem',
                       fontFamily: 'monospace',
-                      py: 0.5
+                      py: 0.5,
+                      textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
                     }}>
                       {day}
                     </Box>
@@ -942,17 +984,19 @@ export default function Dashboard() {
                           textAlign: 'center',
                           p: 0.5,
                           borderRadius: 1,
-                          bgcolor: isToday ? 'primary.main' : isCurrentMonth ? 'rgba(0,120,255,0.03)' : 'transparent',
-                          color: isToday ? 'white' : isCurrentMonth ? 'text.primary' : 'text.disabled',
+                          bgcolor: isToday ? 'rgba(64, 175, 255, 0.8)' : isCurrentMonth ? 'rgba(17, 34, 64, 0.5)' : 'transparent',
+                          color: isToday ? 'white' : isCurrentMonth ? '#e6f1ff' : 'rgba(230, 241, 255, 0.4)',
                           fontWeight: isToday ? 'bold' : 'normal',
                           fontFamily: 'monospace',
                           fontSize: '0.875rem',
-                          border: isToday ? 'none' : isCurrentMonth ? '1px solid rgba(0,120,255,0.1)' : 'none',
-                          boxShadow: isToday ? '0 0 10px rgba(0,120,255,0.5)' : 'none',
+                          border: isToday ? 'none' : isCurrentMonth ? '1px solid rgba(64, 175, 255, 0.3)' : 'none',
+                          boxShadow: isToday ? '0 0 15px rgba(64, 175, 255, 0.7)' : 'none',
+                          textShadow: isToday ? '0 0 8px rgba(255, 255, 255, 0.8)' : isCurrentMonth ? '0 0 5px rgba(230, 241, 255, 0.5)' : 'none',
                           transition: 'all 0.2s',
                           '&:hover': {
-                            bgcolor: isToday ? 'primary.dark' : 'rgba(0,120,255,0.1)',
-                            transform: 'scale(1.05)'
+                            bgcolor: isToday ? 'rgba(64, 175, 255, 0.9)' : 'rgba(64, 175, 255, 0.3)',
+                            transform: 'scale(1.05)',
+                            boxShadow: '0 0 10px rgba(64, 175, 255, 0.5)'
                           }
                         }}
                       >
@@ -970,334 +1014,27 @@ export default function Dashboard() {
                   px: 1
                 }}>
                   <Typography variant="caption" sx={{
-                    color: 'text.secondary',
+                    color: '#e6f1ff',
                     fontFamily: 'monospace',
-                    fontSize: '0.7rem'
+                    fontSize: '0.7rem',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
+                    letterSpacing: '0.05em'
                   }}>
                     SYS.TIME: {dayjs().format('HH:mm:ss')}
                   </Typography>
                   <Typography variant="caption" sx={{
-                    color: 'success.main',
+                    color: '#64ffda',
                     fontFamily: 'monospace',
-                    fontSize: '0.7rem'
+                    fontSize: '0.7rem',
+                    textShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
+                    letterSpacing: '0.05em',
+                    fontWeight: 'bold'
                   }}>
                     STATUS: ONLINE
                   </Typography>
                 </Box>
               </Box>
             </Paper>
-          </Grid>
-
-          {/* 右側統計面板 */}
-          <Grid sx={{ width: { xs: '100%', md: '25%' }, p: 1.5 }}>
-            <Stack spacing={3}>
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 180,
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '2px',
-                    background: 'linear-gradient(90deg, transparent, rgba(25, 118, 210, 0.5), transparent)'
-                  }
-                }}
-              >
-                <Typography variant="h6" gutterBottom sx={{
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.05em',
-                  fontSize: '0.9rem',
-                  color: 'primary.main'
-                }}>
-                  POPULAR FILES
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: 1 }}>
-                  <Typography variant="body2" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <Box component="span" sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'primary.main',
-                      display: 'inline-block',
-                      mr: 1
-                    }}/>
-                    CO02P.DBF
-                  </Typography>
-                  <Typography variant="body2" color="primary.main" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold'
-                  }}>42%</Typography>
-                </Box>
-                <Box sx={{
-                  width: '100%',
-                  bgcolor: 'rgba(0,0,0,0.05)',
-                  height: 6,
-                  borderRadius: 5,
-                  mb: 2,
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  <Box sx={{
-                    width: '42%',
-                    bgcolor: 'primary.main',
-                    height: 6,
-                    borderRadius: 5,
-                    boxShadow: '0 0 5px rgba(25, 118, 210, 0.5)',
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '5px',
-                      height: '100%',
-                      background: 'rgba(255,255,255,0.5)'
-                    }
-                  }} />
-                </Box>
-                
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <Box component="span" sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'success.main',
-                      display: 'inline-block',
-                      mr: 1
-                    }}/>
-                    CO03L.DBF
-                  </Typography>
-                  <Typography variant="body2" color="success.main" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold'
-                  }}>28%</Typography>
-                </Box>
-                <Box sx={{
-                  width: '100%',
-                  bgcolor: 'rgba(0,0,0,0.05)',
-                  height: 6,
-                  borderRadius: 5,
-                  mb: 2,
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  <Box sx={{
-                    width: '28%',
-                    bgcolor: 'success.main',
-                    height: 6,
-                    borderRadius: 5,
-                    boxShadow: '0 0 5px rgba(76, 175, 80, 0.5)',
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '5px',
-                      height: '100%',
-                      background: 'rgba(255,255,255,0.5)'
-                    }
-                  }} />
-                </Box>
-                
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <Box component="span" sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'warning.main',
-                      display: 'inline-block',
-                      mr: 1
-                    }}/>
-                    OTHER FILES
-                  </Typography>
-                  <Typography variant="body2" color="warning.main" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold'
-                  }}>30%</Typography>
-                </Box>
-                <Box sx={{
-                  width: '100%',
-                  bgcolor: 'rgba(0,0,0,0.05)',
-                  height: 6,
-                  borderRadius: 5,
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  <Box sx={{
-                    width: '30%',
-                    bgcolor: 'warning.main',
-                    height: 6,
-                    borderRadius: 5,
-                    boxShadow: '0 0 5px rgba(255, 152, 0, 0.5)',
-                    position: 'relative',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '5px',
-                      height: '100%',
-                      background: 'rgba(255,255,255,0.5)'
-                    }
-                  }} />
-                </Box>
-              </Paper>
-
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 160,
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '2px',
-                    background: 'linear-gradient(90deg, transparent, rgba(25, 118, 210, 0.5), transparent)'
-                  }
-                }}
-              >
-                <Typography variant="h6" gutterBottom sx={{
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.05em',
-                  fontSize: '0.9rem',
-                  color: 'primary.main',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <span>NOTIFICATIONS</span>
-                  <Box component="span" sx={{
-                    fontSize: '0.7rem',
-                    color: 'warning.main',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    2 PENDING
-                  </Box>
-                </Typography>
-                
-                <Box sx={{
-                  p: 1.5,
-                  bgcolor: 'rgba(25, 118, 210, 0.08)',
-                  borderRadius: 1,
-                  mb: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  border: '1px solid rgba(25, 118, 210, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: '3px',
-                    bgcolor: 'primary.main',
-                    boxShadow: '0 0 8px rgba(25, 118, 210, 0.8)'
-                  }
-                }}>
-                  <Box sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: 'primary.main',
-                    mr: 1,
-                    boxShadow: '0 0 5px rgba(25, 118, 210, 0.8)'
-                  }} />
-                  <Typography variant="body2" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%'
-                  }}>
-                    <span>SYSTEM MAINTENANCE</span>
-                    <span style={{ opacity: 0.7 }}>14:00</span>
-                  </Typography>
-                </Box>
-                
-                <Box sx={{
-                  p: 1.5,
-                  bgcolor: 'rgba(255, 152, 0, 0.08)',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  border: '1px solid rgba(255, 152, 0, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: '3px',
-                    bgcolor: 'warning.main',
-                    boxShadow: '0 0 8px rgba(255, 152, 0, 0.8)'
-                  }
-                }}>
-                  <Box sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: 'warning.main',
-                    mr: 1,
-                    boxShadow: '0 0 5px rgba(255, 152, 0, 0.8)'
-                  }} />
-                  <Typography variant="body2" sx={{
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%'
-                  }}>
-                    <span>DATABASE BACKUP</span>
-                    <span style={{ opacity: 0.7 }}>18:30</span>
-                  </Typography>
-                </Box>
-              </Paper>
-            </Stack>
           </Grid>
         </Grid>
       </Box>

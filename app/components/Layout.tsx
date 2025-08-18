@@ -36,12 +36,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
         {children}
       </main>
-
-      <footer className="bg-gray-100 py-4 mt-8">
-        <div className="container mx-auto px-4 text-center text-gray-600">
-          <p>DBF 檔案瀏覽器 &copy; {new Date().getFullYear()}</p>
-        </div>
-      </footer>
     </div>
   );
 };

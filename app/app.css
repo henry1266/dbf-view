@@ -181,10 +181,10 @@ pre {
 /* 暗模式支持 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #121212;
-    --color-surface: #1e1e1e;
-    --color-text-primary: #e0e0e0;
-    --color-text-secondary: #b0b0b0;
+    --color-background: #0a192f;
+    --color-surface: #112240;
+    --color-text-primary: #e6f1ff;
+    --color-text-secondary: #8892b0;
   }
   
   html, body {
