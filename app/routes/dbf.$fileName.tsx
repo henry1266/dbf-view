@@ -26,7 +26,8 @@ interface DbfRecordsResponse {
 }
 
 export default function DbfFile() {
-  const { fileName } = useParams<{ fileName: string }>();
+  const params = useParams<{ fileName: string }>();
+  const fileName = params.fileName ? decodeURIComponent(params.fileName) : '';
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get('page') || '1');
   const pageSize = parseInt(searchParams.get('pageSize') || '20');

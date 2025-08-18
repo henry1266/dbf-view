@@ -24,7 +24,8 @@ export const fetchDbfFiles = async () => {
 // 獲取特定 DBF 檔案的記錄
 export const fetchDbfRecords = async (fileName: string, page = 1, pageSize = 20, search = '', field = '') => {
   try {
-    const response = await api.get(`/dbf/${fileName}`, {
+    const encodedFileName = encodeURIComponent(fileName);
+    const response = await api.get(`/dbf/${encodedFileName}`, {
       params: { page, pageSize, search, field },
     });
     return response.data;
@@ -37,7 +38,8 @@ export const fetchDbfRecords = async (fileName: string, page = 1, pageSize = 20,
 // 獲取特定記錄
 export const fetchDbfRecord = async (fileName: string, recordNo: number) => {
   try {
-    const response = await api.get(`/dbf/${fileName}/${recordNo}`);
+    const encodedFileName = encodeURIComponent(fileName);
+    const response = await api.get(`/dbf/${encodedFileName}/${recordNo}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching ${fileName} record #${recordNo}:`, error);
@@ -48,7 +50,8 @@ export const fetchDbfRecord = async (fileName: string, recordNo: number) => {
 // KCSTMR 查詢
 export const fetchKcstmrRecords = async (value: string) => {
   try {
-    const response = await api.get(`/KCSTMR/${value}`);
+    const encodedValue = encodeURIComponent(value);
+    const response = await api.get(`/KCSTMR/${encodedValue}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching KCSTMR=${value} records:`, error);
@@ -59,7 +62,8 @@ export const fetchKcstmrRecords = async (value: string) => {
 // KDRUG 查詢
 export const fetchKdrugRecords = async (value: string, startDate = '', endDate = '') => {
   try {
-    const response = await api.get(`/KDRUG/${value}`, {
+    const encodedValue = encodeURIComponent(value);
+    const response = await api.get(`/KDRUG/${encodedValue}`, {
       params: { startDate, endDate },
     });
     return response.data;

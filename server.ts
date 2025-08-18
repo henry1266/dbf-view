@@ -13,7 +13,7 @@ dotenv.config();
 
 // 創建 Express 應用
 const app = express();
-const port = process.env.API_PORT || 3001;
+const port = process.env.API_PORT || 7001; // 確保使用.env中設置的API_PORT，預設為7001
 
 // 設定中間件
 app.use(express.json());

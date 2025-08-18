@@ -78,7 +78,7 @@ export default function DbfFiles() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
-                          to={`/dbf/${file.fileName}`}
+                          to={`/dbf/${encodeURIComponent(file.fileName)}`}
                           className="text-blue-600 hover:text-blue-900 mr-4"
                         >
                           瀏覽資料

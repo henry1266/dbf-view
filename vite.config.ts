@@ -24,5 +24,8 @@ export default defineConfig({
       overlay: false
     }
   },
-  assetsInclude: ['**/*.css']
+    // 處理SSR中的CSS文件
+  ssr: {
+    noExternal: ['@mui/x-data-grid', '@mui/material', '@emotion/react', '@emotion/styled']
+  }
 });

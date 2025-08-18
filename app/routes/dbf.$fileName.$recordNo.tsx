@@ -14,7 +14,9 @@ interface DbfRecord {
 }
 
 export default function DbfRecordDetail() {
-  const { fileName, recordNo } = useParams<{ fileName: string; recordNo: string }>();
+  const params = useParams<{ fileName: string; recordNo: string }>();
+  const fileName = params.fileName ? decodeURIComponent(params.fileName) : '';
+  const recordNo = params.recordNo || '';
   const [record, setRecord] = useState<DbfRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export default function DbfRecordDetail() {
                 記錄詳情
               </h2>
               <Link
-                to={`/dbf/${fileName}`}
+                to={`/dbf/${encodeURIComponent(fileName)}`}
                 className="text-blue-600 hover:text-blue-900 text-sm font-medium"
               >
                 返回列表
@@ -145,14 +147,14 @@ export default function DbfRecordDetail() {
             {fileName?.toUpperCase() === 'CO02P.DBF' && record.data.KCSTMR && (
               <div className="mt-6 flex flex-wrap gap-2">
                 <Link
-                  to={`/kcstmr/${record.data.KCSTMR}`}
+                  to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                 >
                   查看 KCSTMR: {record.data.KCSTMR}
                 </Link>
                 {record.data.KDRUG && (
                   <Link
-                    to={`/kdrug/${record.data.KDRUG}`}
+                    to={`/kdrug/${encodeURIComponent(record.data.KDRUG)}`}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700"
                   >
                     查看 KDRUG: {record.data.KDRUG}
@@ -165,7 +167,7 @@ export default function DbfRecordDetail() {
             {fileName?.toUpperCase() === 'CO03L.DBF' && record.data.KCSTMR && (
               <div className="mt-6">
                 <Link
-                  to={`/kcstmr/${record.data.KCSTMR}`}
+                  to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                 >
                   查看 KCSTMR: {record.data.KCSTMR}
