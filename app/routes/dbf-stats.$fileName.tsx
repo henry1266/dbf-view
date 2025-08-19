@@ -4,6 +4,8 @@ import { Layout } from '../components/Layout';
 import { fetchDbfRecords } from '../services/api';
 import { Box, Button, Grid } from '@mui/material';
 import TechBackground from '../components/TechBackground';
+import A99StatsDisplay from '../components/A99StatsDisplay';
+import A2StatsDisplay from '../components/A2StatsDisplay';
 
 interface DbfRecord {
   _id: string;
@@ -45,6 +47,11 @@ interface A99Stats {
   valueGroups: Record<string, number>; // 每個值出現的次數，例如 {"75": 3, "65": 3}
 }
 
+// A2欄位的統計接口
+interface A2Stats {
+  totalSum: number; // A2欄位的總和
+}
+
 export default function DbfStats() {
   const { fileName } = useParams<{ fileName: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,6 +61,7 @@ export default function DbfStats() {
   const [data, setData] = useState<DbfRecordsResponse | null>(null);
   const [stats, setStats] = useState<LdruStats | null>(null);
   const [a99Stats, setA99Stats] = useState<A99Stats | null>(null);
+  const [a2Stats, setA2Stats] = useState<A2Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({ startDate, endDate });
@@ -293,6 +301,35 @@ export default function DbfStats() {
     return stats;
   };
 
+  // 計算 A2 欄位統計數據
+  const calculateA2Stats = (records: DbfRecord[]): A2Stats => {
+    const stats: A2Stats = {
+      totalSum: 0
+    };
+
+    // 檢查是否有A2欄位
+    const hasA2Field = records.some(record => record.data.A2 !== undefined);
+    
+    // 如果沒有A2欄位，直接返回默認值
+    if (!hasA2Field) {
+      console.log('沒有找到A2欄位數據');
+      return stats;
+    }
+
+    records.forEach(record => {
+      // 獲取A2欄位的值，如果不存在則默認為0
+      const a2Value = record.data.A2 !== undefined ? Number(record.data.A2) : 0;
+      
+      // 確保a2Value是數字
+      if (!isNaN(a2Value)) {
+        // 增加總和
+        stats.totalSum += a2Value;
+      }
+    });
+
+    return stats;
+  };
+
   // 將民國年日期轉換為格式化字串 (YYYMMDD)
   const formatMinguoDate = (date: Date): string => {
     const year = date.getFullYear() - 1911; // 西元年轉民國年
@@ -375,6 +412,10 @@ export default function DbfStats() {
         // 計算A99欄位統計
         const a99StatsResult = calculateA99Stats(result.records);
         setA99Stats(a99StatsResult);
+        
+        // 計算A2欄位統計
+        const a2StatsResult = calculateA2Stats(result.records);
+        setA2Stats(a2StatsResult);
         
         setError(null);
       } catch (err) {
@@ -710,184 +751,12 @@ export default function DbfStats() {
               <StatValue value={stats.totalO} />
             </Box>
             
-            {/* 其他 */}
-            <Box sx={{
-              flex: 1,
-              minWidth: '200px',
-              bgcolor: 'rgba(17, 34, 64, 0.6)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              p: 2,
-              height: '100%',
-              boxShadow: '0 4px 30px rgba(100, 255, 218, 0.3)',
-              border: '1px solid rgba(100, 255, 218, 0.3)',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                boxShadow: '0 8px 35px rgba(100, 255, 218, 0.4)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '3px',
-                background: 'linear-gradient(90deg, #4caf78ff, #81c784)',
-                boxShadow: '0 0 25px #4caf78ff'
-              }
-            }}>
-              <Box sx={{
-                fontFamily: 'monospace',
-                letterSpacing: '0.05em',
-                color: '#e6f1ff',
-                fontSize: '0.9rem',
-                mb: 1
-              }}>
-                其他值
-              </Box>
-              <StatValue value={stats.totalOther} />
-            </Box>
+            {/* A2總和 */}
+            <A2StatsDisplay stats={a2Stats} />
           </Box>
 
-          {/* A99欄位統計 */}
-          {a99Stats && (
-            <Box sx={{
-              bgcolor: 'rgba(17, 34, 64, 0.6)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              overflow: 'hidden',
-              boxShadow: '0 4px 30px rgba(255, 193, 7, 0.3)',
-              border: '1px solid rgba(255, 193, 7, 0.3)',
-              position: 'relative',
-              mb: 3
-            }}>
-              <Box sx={{
-                p: 2,
-                borderBottom: '1px solid rgba(255, 193, 7, 0.3)',
-                bgcolor: 'rgba(0, 30, 60, 0.3)',
-              }}>
-                <Box sx={{
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.05em',
-                  color: '#e6f1ff',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
-                }}>
-                  A99 欄位分組統計
-                </Box>
-              </Box>
-              
-              <Box sx={{ p: 2 }}>
-                {/* A99 總和 */}
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 2,
-                  p: 1.5,
-                  bgcolor: 'rgba(255, 193, 7, 0.1)',
-                  borderRadius: 1,
-                  border: '1px solid rgba(255, 193, 7, 0.2)'
-                }}>
-                  <Box sx={{
-                    fontFamily: 'monospace',
-                    color: '#e6f1ff',
-                    fontSize: '1rem'
-                  }}>
-                    A99 欄位總和:
-                  </Box>
-                  <Box sx={{
-                    fontFamily: 'monospace',
-                    fontWeight: 'bold',
-                    fontSize: '1.2rem',
-                    color: '#ffc107',
-                    textShadow: '0 0 10px rgba(255, 193, 7, 0.5)'
-                  }}>
-                    {a99Stats.totalSum}
-                  </Box>
-                </Box>
-                
-                {/* A99 分組統計 */}
-                <Box sx={{
-                  fontFamily: 'monospace',
-                  color: '#e6f1ff',
-                  fontSize: '1rem',
-                  mb: 1
-                }}>
-                  分組統計:
-                </Box>
-                
-                <Box sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1.5
-                }}>
-                  {Object.entries(a99Stats.valueGroups)
-                    .sort(([valueA], [valueB]) => Number(valueB) - Number(valueA)) // 按值降序排序
-                    .map(([value, count]) => (
-                      <Box key={value} sx={{
-                        bgcolor: 'rgba(255, 193, 7, 0.15)',
-                        borderRadius: 1,
-                        p: 1,
-                        border: '1px solid rgba(255, 193, 7, 0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        transition: 'all 0.3s',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 4px 15px rgba(255, 193, 7, 0.3)',
-                        }
-                      }}>
-                        <Box sx={{
-                          fontFamily: 'monospace',
-                          fontSize: '0.9rem',
-                          color: '#ffc107',
-                          fontWeight: 'bold'
-                        }}>
-                          {count} × {value}
-                        </Box>
-                      </Box>
-                    ))
-                  }
-                </Box>
-                
-                {/* 格式化顯示 */}
-                <Box sx={{
-                  mt: 2,
-                  p: 1.5,
-                  bgcolor: 'rgba(255, 193, 7, 0.1)',
-                  borderRadius: 1,
-                  border: '1px solid rgba(255, 193, 7, 0.2)'
-                }}>
-                  <Box sx={{
-                    fontFamily: 'monospace',
-                    color: '#e6f1ff',
-                    fontSize: '0.9rem',
-                    mb: 1
-                  }}>
-                    格式化顯示:
-                  </Box>
-                  <Box sx={{
-                    fontFamily: 'monospace',
-                    fontWeight: 'bold',
-                    fontSize: '1.1rem',
-                    color: '#ffc107',
-                    textShadow: '0 0 10px rgba(255, 193, 7, 0.3)',
-                    wordBreak: 'break-all'
-                  }}>
-                    {Object.entries(a99Stats.valueGroups)
-                      .sort(([valueA], [valueB]) => Number(valueB) - Number(valueA)) // 按值降序排序
-                      .map(([value, count]) => `${count}*${value}`)
-                      .join(' ')}
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          )}
+          {/* A99統計區域 */}
+          {a99Stats && <A99StatsDisplay stats={a99Stats} />}
 
           {/* 按日期統計表格 */}
           <Box sx={{
