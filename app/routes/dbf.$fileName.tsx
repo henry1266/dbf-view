@@ -197,28 +197,54 @@ export default function DbfFile() {
     // 標記為已應用初始排序
     initialSortApplied.current = true;
     
-    // 強制設置為PDATE降序排序，不管URL中是否已有排序參數
-    console.log('強制設置排序參數: PDATE 降序');
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('sortField', 'PDATE');
-    newParams.set('sortDirection', 'desc');
+    // 檢查URL中是否已有排序參數
+    const urlSortField = searchParams.get('sortField');
+    const urlSortDirection = searchParams.get('sortDirection');
     
-    // 直接設置內部狀態
-    setOrder('desc');
-    setOrderBy('PDATE');
-    
-    // 更新URL參數
-    setSearchParams(newParams);
-    
-    console.log('排序參數已設置:', {
-      sortField: 'PDATE',
-      sortDirection: 'desc',
-      order: 'desc',
-      orderBy: 'PDATE'
-    });
-    
-    // 強制加載數據，確保使用正確的排序參數
-    loadData();
+    // 只有在URL中沒有排序參數時，才設置默認排序
+    if (!urlSortField || !urlSortDirection) {
+      console.log('URL中沒有排序參數，設置默認排序');
+      
+      // 根據檔案名稱設置不同的默認排序
+      let defaultSortField = 'PDATE';
+      let defaultSortDirection = 'desc';
+      
+      // 如果是CO03L.DBF，則默認按_recordNo排序
+      if (fileName.toUpperCase() === 'CO03L.DBF') {
+        defaultSortField = '_recordNo';
+        console.log('檔案是CO03L.DBF，默認按記錄編號排序');
+      }
+      
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('sortField', defaultSortField);
+      newParams.set('sortDirection', defaultSortDirection);
+      
+      // 直接設置內部狀態
+      setOrder(defaultSortDirection as 'asc' | 'desc');
+      setOrderBy(defaultSortField);
+      
+      // 更新URL參數
+      setSearchParams(newParams);
+      
+      console.log('排序參數已設置:', {
+        sortField: defaultSortField,
+        sortDirection: defaultSortDirection,
+        order: defaultSortDirection,
+        orderBy: defaultSortField
+      });
+      
+      // 強制加載數據，確保使用正確的排序參數
+      loadData();
+    } else {
+      console.log('使用URL中的排序參數:', {
+        sortField: urlSortField,
+        sortDirection: urlSortDirection
+      });
+      
+      // 直接設置內部狀態，與URL參數保持一致
+      setOrder(urlSortDirection as 'asc' | 'desc');
+      setOrderBy(urlSortField);
+    }
   }, []); // 空依賴數組，確保只在組件首次加載時執行一次
 
   // 加載數據
@@ -432,28 +458,7 @@ export default function DbfFile() {
 
                   {/* 數據表格 */}
                   {data && (
-                    <Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '1%' }}>
-                        <Typography variant="body2" sx={{ color: '#e6f1ff' }}>
-                          共 {data.pagination.total} 筆記錄 | 第 {data.pagination.currentPage} / {data.pagination.totalPages} 頁
-                        </Typography>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={handleSortByDate}
-                          sx={{
-                            color: '#64ffda',
-                            borderColor: 'rgba(100, 255, 218, 0.3)',
-                            '&:hover': {
-                              borderColor: '#64ffda',
-                              bgcolor: 'rgba(100, 255, 218, 0.1)',
-                            },
-                          }}
-                        >
-                          依日期排序 (最新優先)
-                        </Button>
-                      </Box>
-                      
+                    <Box>      
                       <Paper sx={{
                         width: '100%',
                         overflow: 'hidden',
@@ -462,7 +467,7 @@ export default function DbfFile() {
                         border: '1px solid rgba(100, 255, 218, 0.1)',
                       }}>
                         <TableContainer sx={{
-                          maxHeight: 'calc(80vh - 240px)',
+                          maxHeight: 'calc(80vh - 220px)',
                           overflowY: 'auto',
                           '&::-webkit-scrollbar': {
                             width: '0px',
@@ -471,7 +476,7 @@ export default function DbfFile() {
                           msOverflowStyle: 'none',
                           scrollbarWidth: 'none'
                         }}>
-                          <Table stickyHeader aria-label="數據表格" size="small">
+                          <Table stickyHeader aria-label="數據表格" size="medium">
                             <TableHead>
                               <TableRow>
                                 {columns.map((column) => (
@@ -483,6 +488,10 @@ export default function DbfFile() {
                                       bgcolor: 'rgba(10, 25, 47, 0.9)',
                                       color: '#e6f1ff',
                                       borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
+                                      // 調整表頭字體
+                                      fontSize: '1.05rem',
+                                      fontWeight: 600,
+                                      padding: '12px 16px',
                                     }}
                                   >
                                     {column.id !== 'actions' ? (
@@ -502,7 +511,7 @@ export default function DbfFile() {
                                       >
                                         {column.label}
                                         {column.id === 'PDATE' && (
-                                          <span style={{ marginLeft: '4px', fontSize: '0.7rem', color: '#64ffda' }}>
+                                          <span style={{ marginLeft: '4px', fontSize: '0.8rem', color: '#64ffda' }}>
                                             (民國年)
                                           </span>
                                         )}
@@ -529,6 +538,8 @@ export default function DbfFile() {
                                       '&:nth-of-type(odd)': {
                                         bgcolor: 'rgba(0, 0, 0, 0.1)',
                                       },
+                                      // 增加列高
+                                      height: '40px',
                                     }}
                                   >
                                     {columns.map((column) => {
@@ -543,6 +554,10 @@ export default function DbfFile() {
                                             sx={{
                                               color: '#e6f1ff',
                                               borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
+                                              // 調整字體大小和行高
+                                              fontSize: '1rem',
+                                              padding: '10px 16px',
+                                              fontWeight: 500,
                                             }}
                                           >
                                             <Link
@@ -567,6 +582,10 @@ export default function DbfFile() {
                                           sx={{
                                             color: '#e6f1ff',
                                             borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
+                                            // 調整字體大小和行高
+                                            fontSize: '1rem',
+                                            padding: '10px 16px',
+                                            fontWeight: 500,
                                           }}
                                         >
                                           {column.format ? column.format(value) : value}

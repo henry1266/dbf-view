@@ -99,12 +99,13 @@ app.get('/api/dbf-files', async (req: Request, res: Response) => {
 // 獲取特定 DBF 檔案的記錄
 app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   const { fileName } = req.params;
-  const {
+  // 獲取查詢參數
+  let {
     page = '1',
     pageSize = '20',
     search = '',
     field = '',
-    sortField = 'PDATE',  // 默認按 PDATE 排序
+    sortField,
     sortDirection = 'desc'  // 默認降序排序（最新優先）
   } = req.query as {
     page?: string;
@@ -114,6 +115,17 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     sortField?: string;
     sortDirection?: string;
   };
+  
+  // 根據檔案名稱設置默認排序欄位
+  const baseName = path.basename(fileName, path.extname(fileName)).toLowerCase();
+  if (!sortField) {
+    if (baseName === 'co03l') {
+      sortField = '_recordNo';  // CO03L.DBF 默認按紀錄編號排序
+      console.log(`使用 ${fileName} 特殊排序: 按紀錄編號排序`);
+    } else {
+      sortField = 'PDATE';  // 其他檔案默認按 PDATE 排序
+    }
+  }
   const skip = (parseInt(page) - 1) * parseInt(pageSize);
   
   try {
@@ -172,6 +184,9 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
                 $and: [
                   { $ne: ["$data.PDATE", null] },
                   { $ne: ["$data.PDATE", ""] },
+                  // 確保 PDATE 是字串類型
+                  { $eq: [{ $type: "$data.PDATE" }, "string"] },
+                  // 確保字串長度為 7
                   { $eq: [{ $strLenCP: "$data.PDATE" }, 7] },
                   // 確保前三位是數字
                   { $regexMatch: { input: { $substrCP: ["$data.PDATE", 0, 3] }, regex: /^\d+$/ } },

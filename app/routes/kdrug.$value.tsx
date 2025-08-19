@@ -80,8 +80,136 @@ export default function KdrugQuery() {
     setSearchParams(newParams);
   };
 
+  // 可重用的統計數值顯示組件
+  const StatValue = ({ value }: { value: string | number }) => (
+    <Box sx={{
+      fontFamily: 'monospace',
+      fontWeight: 'bold',
+      fontSize: '1.8rem',
+      color: '#64ffda',
+      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+    }}>
+      {value}
+    </Box>
+  );
+
+  // 創建科技風格的麵包屑導航
+  const TechBreadcrumb = () => (
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      mb: 3,
+      position: 'relative',
+      zIndex: 1
+    }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(17, 34, 64, 0.7)',
+        backdropFilter: 'blur(8px)',
+        borderRadius: '20px',
+        p: '4px 16px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+        border: '1px solid rgba(64, 175, 255, 0.3)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(90deg, rgba(64, 175, 255, 0.1), transparent)',
+          zIndex: -1
+        }
+      }}>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <Box sx={{
+            color: '#e6f1ff',
+            fontFamily: 'monospace',
+            fontSize: '0.9rem',
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'all 0.3s',
+            '&:hover': {
+              color: '#64ffda'
+            }
+          }}>
+            <Box component="span" sx={{ mr: 1 }}>🏠</Box>
+            <Box component="span">首頁</Box>
+          </Box>
+        </Link>
+        
+        <Box sx={{
+          mx: 1,
+          color: 'rgba(100, 255, 218, 0.7)',
+          fontSize: '1.2rem',
+          lineHeight: 1,
+          transform: 'translateY(-1px)'
+        }}>
+          /
+        </Box>
+        
+        <Link to="/dbf-files" style={{ textDecoration: 'none' }}>
+          <Box sx={{
+            color: '#e6f1ff',
+            fontFamily: 'monospace',
+            fontSize: '0.9rem',
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'all 0.3s',
+            '&:hover': {
+              color: '#64ffda'
+            }
+          }}>
+            <Box component="span" sx={{ mr: 1 }}>📁</Box>
+            <Box component="span">檔案</Box>
+          </Box>
+        </Link>
+        
+        <Box sx={{
+          mx: 1,
+          color: 'rgba(100, 255, 218, 0.7)',
+          fontSize: '1.2rem',
+          lineHeight: 1,
+          transform: 'translateY(-1px)'
+        }}>
+          /
+        </Box>
+        
+        <Box sx={{
+          color: '#64ffda',
+          fontFamily: 'monospace',
+          fontSize: '0.9rem',
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          textShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
+        }}>
+          <Box component="span" sx={{ mr: 1 }}>🔍</Box>
+          <Box component="span">KDRUG: {value || ''}</Box>
+        </Box>
+      </Box>
+      
+      {/* 裝飾元素 - 發光點 */}
+      <Box sx={{
+        position: 'absolute',
+        right: '-5px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        backgroundColor: '#64ffda',
+        boxShadow: '0 0 10px #64ffda, 0 0 20px #64ffda',
+        animation: 'pulse 2s infinite'
+      }} />
+    </Box>
+  );
+
   return (
-    <Layout title={`KDRUG: ${value || ''}`}>
+    <Layout title="">
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -93,6 +221,7 @@ export default function KdrugQuery() {
         </div>
       ) : data ? (
         <TechBackground>
+          <TechBreadcrumb />
           {/* 日期範圍篩選表單 */}
           <Box sx={{
             bgcolor: 'rgba(17, 34, 64, 0.6)',
@@ -210,7 +339,7 @@ export default function KdrugQuery() {
               transition: 'all 0.3s',
               '&:hover': {
                 transform: 'translateY(-5px)',
-                boxShadow: '0 8px 35px rgba(64, 175, 255, 0.4)',
+                boxShadow: '0 8px 35px rgba(197, 229, 255, 0.4)',
               },
               '&::before': {
                 content: '""',
@@ -219,8 +348,8 @@ export default function KdrugQuery() {
                 left: 0,
                 width: '100%',
                 height: '3px',
-                background: 'linear-gradient(90deg, #1976d2, #4791db)',
-                boxShadow: '0 0 25px #1976d2'
+                background: 'linear-gradient(90deg, #d2e6faff, #d4eaffff)',
+                boxShadow: '0 0 25px #d2e6faff'
               }
             }}>
               <Box sx={{
@@ -232,15 +361,7 @@ export default function KdrugQuery() {
               }}>
                 總記錄數
               </Box>
-              <Box sx={{
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                fontSize: '1.8rem',
-                color: '#64ffda',
-                textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-              }}>
-                {data.totalRecords}
-              </Box>
+              <StatValue value={data.totalRecords} />
             </Box>
             <Box sx={{
               flex: 1,
@@ -266,8 +387,8 @@ export default function KdrugQuery() {
                 left: 0,
                 width: '100%',
                 height: '3px',
-                background: 'linear-gradient(90deg, #4caf50, #81c784)',
-                boxShadow: '0 0 25px #4caf50'
+                background: 'linear-gradient(90deg, #4caf78ff, #81c784)',
+                boxShadow: '0 0 25px #4caf78ff'
               }
             }}>
               <Box sx={{
@@ -279,15 +400,7 @@ export default function KdrugQuery() {
               }}>
                 加總 PTQTY
               </Box>
-              <Box sx={{
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                fontSize: '1.8rem',
-                color: '#64ffda',
-                textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-              }}>
-                {data.totalPTQTY.toFixed(1)}
-              </Box>
+              <StatValue value={data.totalPTQTY.toFixed(1)} />
             </Box>
             {/* 已調劑 */}
             <Box sx={{
@@ -314,8 +427,8 @@ export default function KdrugQuery() {
                 left: 0,
                 width: '100%',
                 height: '3px',
-                background: 'linear-gradient(90deg, #3f51b5, #7986cb)',
-                boxShadow: '0 0 25px #3f51b5'
+                background: 'linear-gradient(90deg, #3f68b5ff, #7981cbff)',
+                boxShadow: '0 0 25px #3f68b5ff'
               }
             }}>
               <Box sx={{
@@ -327,15 +440,8 @@ export default function KdrugQuery() {
               }}>
                 LDRU=I 已調劑
               </Box>
-              <Box sx={{
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                fontSize: '1.8rem',
-                color: '#64ffda',
-                textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-              }}>
-                {data.totalPTQTY_I.toFixed(1)}
-              </Box>
+              {/* 字體顏色 */}
+              <StatValue value={data.totalPTQTY_I.toFixed(1)} />
             </Box>
             {/* 未調劑 */}
             <Box sx={{
@@ -375,15 +481,8 @@ export default function KdrugQuery() {
               }}>
                 LDRU=O 未調劑
               </Box>
-              <Box sx={{
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                fontSize: '1.8rem',
-                color: '#64ffda',
-                textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-              }}>
-                {data.totalPTQTY_O.toFixed(1)}
-              </Box>
+              {/* 字體顏色 */}
+              <StatValue value={data.totalPTQTY_O.toFixed(1)} />
             </Box>
           </Box>
 
