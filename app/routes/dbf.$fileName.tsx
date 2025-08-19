@@ -44,7 +44,7 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
     {
       id: 'recordNo',
       label: '記錄編號',
-      minWidth: 100,
+      minWidth: 80,
       align: 'left'
     }
   ];
@@ -53,7 +53,7 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
   const priorityColumns = priorityFields.map(field => ({
     id: field,
     label: field,
-    minWidth: 150,
+    minWidth: 100,
     align: 'left' as const
   }));
   
@@ -61,7 +61,7 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
   const actionColumn = {
     id: 'actions',
     label: '操作',
-    minWidth: 100,
+    minWidth: 60,
     align: 'center' as const
   };
   
@@ -470,7 +470,8 @@ export default function DbfFile() {
                           <Table
                             stickyHeader
                             aria-label="數據表格"
-                            size="medium"
+                            size="small"
+                            sx={{ tableLayout: 'fixed' }}
                           >
                             <TableHead>
                               <TableRow>
@@ -481,11 +482,11 @@ export default function DbfFile() {
                                     style={{ minWidth: column.minWidth }}
                                     sx={{
                                       bgcolor: 'rgba(10, 25, 47, 0.9)',
-                                      color: '#e6f1ff',
+                                      color: 'rgba(230, 241, 255, 0.8);',
                                       borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
                                       // 調整表頭字體
                                       fontSize: '1rem',
-                                      padding: '12px 16px',
+                                      padding: '11px',
                                     }}
                                   >
                                     {column.id !== 'actions' ? (
@@ -573,8 +574,8 @@ export default function DbfFile() {
                                             borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
                                             // 調整字體大小和行高
                                             fontSize: '1rem',
-                                            padding: '15px 15px',
-                                            fontWeight: 500,
+                                            padding: '12px',
+                                            fontFamily: 'monospace',
                                           }}
                                         >
                                           {column.format ? column.format(value) : value}

@@ -171,7 +171,7 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     
     // 特別處理 PDATE 欄位的排序（民國年日期格式）
     if (sortField.toUpperCase() === 'PDATE') {
-      console.log('使用 PDATE 特殊排序邏輯（民國年轉西元年）');
+      //console.log('使用 PDATE 特殊排序邏輯（民國年轉西元年）');
       
       // 添加轉換欄位，將 PDATE 字串轉換為可排序的日期物件
       aggregationPipeline.push({
@@ -251,7 +251,7 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
       });
     } else {
       // 其他欄位使用標準排序
-      console.log(`使用標準排序: ${sortField} ${sortDirection}`);
+      //console.log(`使用標準排序: ${sortField} ${sortDirection}`);
       
       // 如果是排序資料欄位，需要加上 data. 前綴
       const sortKey = sortField.startsWith('_') ? sortField : `data.${sortField}`;

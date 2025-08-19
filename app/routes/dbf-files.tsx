@@ -170,7 +170,7 @@ export default function DbfFiles() {
                             fontSize: '0.9rem'
                           }}>
                             <Link
-                              to={`/dbf/${encodeURIComponent(file.fileName)}`}
+                              to={`/dbf/${encodeURIComponent(file.fileName)}?sortField=${file.fileName.toUpperCase() === 'CO03L.DBF' ? '_recordNo' : 'PDATE'}&sortDirection=desc&page=1`}
                               style={{
                                 color: '#64ffda',
                                 textDecoration: 'none',
@@ -178,7 +178,7 @@ export default function DbfFiles() {
                               }}
                               className="hover:text-[#64ffda] hover:text-shadow-[0_0_8px_rgba(100,255,218,0.8)]"
                             >
-                              瀏覽資料12345
+                              瀏覽資料
                             </Link>
                           </td>
                         </tr>
