@@ -106,7 +106,10 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     search = '',
     field = '',
     sortField,
-    sortDirection = 'desc'  // 默認降序排序（最新優先）
+    sortDirection = 'desc',  // 默認降序排序（最新優先）
+    startDate = '',          // 添加開始日期參數
+    endDate = '',            // 添加結束日期參數
+    statsPage = 'false'      // 添加統計頁面標記參數
   } = req.query as {
     page?: string;
     pageSize?: string;
@@ -114,6 +117,9 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     field?: string;
     sortField?: string;
     sortDirection?: string;
+    startDate?: string;      // 添加開始日期參數類型
+    endDate?: string;        // 添加結束日期參數類型
+    statsPage?: string;      // 添加統計頁面標記參數類型
   };
   
   // 根據檔案名稱設置默認排序欄位
@@ -140,6 +146,8 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     
     // 構建查詢條件
     let query: any = {};
+    
+    // 處理搜尋條件
     if (search && field) {
       // 如果指定了欄位，則在該欄位中搜尋
       query[`data.${field}`] = { $regex: search, $options: 'i' };
@@ -152,6 +160,41 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
             [`data.${field}`]: { $regex: search, $options: 'i' }
           }));
       }
+    }
+    
+    // 處理日期範圍篩選
+    if (startDate || endDate) {
+      // 根據檔案類型選擇適當的日期欄位
+      let dateField = 'data.PDATE';  // 默認使用 PDATE 欄位
+      
+      // 如果是 CO03L.DBF，則使用 DATE 欄位
+      if (baseName.toUpperCase() === 'CO03L') {
+        dateField = 'data.DATE';
+        console.log(`使用 ${fileName} 特殊日期欄位: DATE`);
+      }
+      
+      // 構建日期範圍條件
+      if (!query[dateField]) {
+        query[dateField] = {};
+      }
+      
+      if (startDate && endDate) {
+        query[dateField] = { $gte: startDate, $lte: endDate };
+        console.log(`日期範圍篩選: ${dateField} 從 ${startDate} 到 ${endDate}`);
+      } else if (startDate) {
+        query[dateField] = { $gte: startDate };
+        console.log(`日期範圍篩選: ${dateField} >= ${startDate}`);
+      } else if (endDate) {
+        query[dateField] = { $lte: endDate };
+        console.log(`日期範圍篩選: ${dateField} <= ${endDate}`);
+      }
+    }
+    
+    // 為 CO03L.DBF 添加 LPID=A 的篩選條件
+    if (baseName.toUpperCase() === 'CO03L' && statsPage === 'true') {
+      // 檢查是否來自統計頁面的請求
+      console.log(`為 ${fileName} 添加 LPID=A 的篩選條件`);
+      query['data.LPID'] = 'A';
     }
     
     // 獲取總記錄數
@@ -281,6 +324,12 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
       sortApplied: {
         field: sortField,
         direction: sortDirection
+      },
+      filters: {
+        search,
+        field,
+        startDate,
+        endDate
       }
     });
   } catch (err) {

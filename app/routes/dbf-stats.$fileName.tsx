@@ -255,12 +255,58 @@ export default function DbfStats() {
     return stats;
   };
 
+  // 將民國年日期轉換為格式化字串 (YYYMMDD)
+  const formatMinguoDate = (date: Date): string => {
+    const year = date.getFullYear() - 1911; // 西元年轉民國年
+    const month = date.getMonth() + 1; // 月份從0開始
+    const day = date.getDate();
+    
+    // 格式化為 YYYMMDD
+    return `${year}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
+  };
+  
+  // 獲取當月的第一天和最後一天（民國年格式）
+  const getCurrentMonthRange = (): { start: string, end: string } => {
+    const now = new Date();
+    
+    // 當月第一天
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const firstDayStr = formatMinguoDate(firstDay);
+    
+    // 當月最後一天
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const lastDayStr = formatMinguoDate(lastDay);
+    
+    return { start: firstDayStr, end: lastDayStr };
+  };
+  
+  // 檢查URL參數，如果沒有日期範圍參數，則自動添加當月的日期範圍參數
+  useEffect(() => {
+    // 只對 CO03L.DBF 文件執行自動日期範圍
+    if (fileName && fileName.toUpperCase() === 'CO03L.DBF' && !startDate && !endDate) {
+      const { start, end } = getCurrentMonthRange();
+      console.log('自動設置當月日期範圍:', { start, end });
+      
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('startDate', start);
+      newParams.set('endDate', end);
+      setSearchParams(newParams);
+    }
+  }, [fileName, searchParams, startDate, endDate, setSearchParams]);
+
   useEffect(() => {
     const loadData = async () => {
       if (!fileName) return;
 
       try {
         setLoading(true);
+        
+        // 輸出調試信息
+        console.log('LDRU統計分析 - 請求參數:', {
+          fileName,
+          startDate,
+          endDate
+        });
         
         // 獲取所有記錄（不分頁）
         const result = await fetchDbfRecords(
@@ -274,6 +320,12 @@ export default function DbfStats() {
           startDate,
           endDate
         );
+        
+        // 輸出調試信息
+        console.log('LDRU統計分析 - 返回結果:', {
+          recordCount: result.records.length,
+          pagination: result.pagination
+        });
         
         setData(result);
         
@@ -293,21 +345,45 @@ export default function DbfStats() {
     loadData();
   }, [fileName, startDate, endDate]);
 
+  // 驗證日期格式是否為民國年格式（YYYMMDD）
+  const isValidDateFormat = (date: string): boolean => {
+    // 檢查是否為7位數字
+    return /^\d{7}$/.test(date);
+  };
+
   const handleDateRangeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newParams = new URLSearchParams(searchParams);
     
+    // 驗證開始日期
     if (dateRange.startDate) {
-      newParams.set('startDate', dateRange.startDate);
+      if (isValidDateFormat(dateRange.startDate)) {
+        newParams.set('startDate', dateRange.startDate);
+      } else {
+        alert('開始日期格式不正確，請使用7位數字格式（民國年YYYMMDD），例如：1130827');
+        return;
+      }
     } else {
       newParams.delete('startDate');
     }
     
+    // 驗證結束日期
     if (dateRange.endDate) {
-      newParams.set('endDate', dateRange.endDate);
+      if (isValidDateFormat(dateRange.endDate)) {
+        newParams.set('endDate', dateRange.endDate);
+      } else {
+        alert('結束日期格式不正確，請使用7位數字格式（民國年YYYMMDD），例如：1130827');
+        return;
+      }
     } else {
       newParams.delete('endDate');
     }
+    
+    // 輸出調試信息
+    console.log('提交日期範圍:', {
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate
+    });
     
     setSearchParams(newParams);
   };
@@ -327,13 +403,13 @@ export default function DbfStats() {
         <TechBackground>
           <TechBreadcrumb />
           
-          {/* 日期範圍篩選表單 */}
+          {/* 日期範圍篩選表單 - 精簡版 */}
           <Box sx={{
             bgcolor: 'rgba(17, 34, 64, 0.6)',
             backdropFilter: 'blur(8px)',
             borderRadius: 2,
-            p: 3,
-            mb: 3,
+            p: 1.5,
+            mb: 2,
             boxShadow: '0 4px 30px rgba(64, 175, 255, 0.3)',
             border: '1px solid rgba(64, 175, 255, 0.3)',
             position: 'relative',
@@ -344,60 +420,99 @@ export default function DbfStats() {
               top: 0,
               left: 0,
               width: '100%',
-              height: '3px',
+              height: '2px',
               background: 'linear-gradient(90deg, #1976d2, #4791db)',
               boxShadow: '0 0 25px #1976d2'
             }
           }}>
-            <Box sx={{
-              fontFamily: 'monospace',
-              letterSpacing: '0.05em',
-              color: '#e6f1ff',
-              fontSize: '1.2rem',
-              mb: 2,
-              fontWeight: 'bold',
-              textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
-            }}>
-              日期範圍
-            </Box>
+            {/* 顯示當前篩選狀態 */}
+            {(startDate || endDate) && (
+              <Box sx={{
+                mb: 1,
+                px: 1,
+                py: 0.5,
+                bgcolor: 'rgba(100, 255, 218, 0.1)',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <Box sx={{ color: '#64ffda', fontSize: '0.8rem' }}>
+                  當前篩選: {startDate && `從 ${startDate}`} {endDate && `至 ${endDate}`}
+                </Box>
+                <Box
+                  sx={{
+                    color: '#e6f1ff',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    '&:hover': { color: '#64ffda' }
+                  }}
+                  onClick={() => {
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('startDate');
+                    newParams.delete('endDate');
+                    setSearchParams(newParams);
+                    setDateRange({ startDate: '', endDate: '' });
+                  }}
+                >
+                  清除篩選
+                </Box>
+              </Box>
+            )}
             <form onSubmit={handleDateRangeSubmit}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'flex-end' }}>
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 1, color: '#e6f1ff' }}>開始</Box>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5, alignItems: 'center' }}>
+                <Box sx={{
+                  fontFamily: 'monospace',
+                  letterSpacing: '0.05em',
+                  color: '#e6f1ff',
+                  fontSize: '0.9rem',
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                  mr: 0.5
+                }}>
+                  <Box component="span" sx={{ mr: 0.5 }}>日期範圍:</Box>
+                  <Box component="span" sx={{ fontSize: '0.7rem', color: 'rgba(100, 255, 218, 0.7)' }}>(篩選DATE欄位，格式為民國年)</Box>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                  <Box sx={{ color: '#e6f1ff', fontSize: '0.8rem', mr: 0.5 }}>從</Box>
                   <input
                     type="text"
                     id="startDate"
                     value={dateRange.startDate}
                     onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
                     style={{
-                      width: '90%',
-                      padding: '8px 12px',
+                      width: '100%',
+                      padding: '4px 8px',
                       backgroundColor: 'rgba(0, 30, 60, 0.5)',
                       border: '1px solid rgba(64, 175, 255, 0.3)',
                       borderRadius: '4px',
                       color: '#e6f1ff',
-                      outline: 'none'
+                      outline: 'none',
+                      fontSize: '0.85rem',
+                      height: '28px'
                     }}
-                    placeholder="YYYYMMDD"
+                    placeholder="例: 1130827"
                   />
                 </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 1, color: '#e6f1ff' }}>結束</Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                  <Box sx={{ color: '#e6f1ff', fontSize: '0.8rem', mr: 0.5 }}>至</Box>
                   <input
                     type="text"
                     id="endDate"
                     value={dateRange.endDate}
                     onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
                     style={{
-                      width: '90%',
-                      padding: '8px 12px',
+                      width: '100%',
+                      padding: '4px 8px',
                       backgroundColor: 'rgba(0, 30, 60, 0.5)',
                       border: '1px solid rgba(64, 175, 255, 0.3)',
                       borderRadius: '4px',
                       color: '#e6f1ff',
-                      outline: 'none'
+                      outline: 'none',
+                      fontSize: '0.85rem',
+                      height: '28px'
                     }}
-                    placeholder="YYYYMMDD"
+                    placeholder="例: 1130827"
                   />
                 </Box>
                 <Box sx={{
@@ -408,8 +523,7 @@ export default function DbfStats() {
                   <button
                     type="submit"
                     style={{
-                      width: '100%',
-                      padding: '8px 16px',
+                      padding: '4px 12px',
                       backgroundColor: 'rgba(64, 175, 255, 0.3)',
                       border: '1px solid rgba(64, 175, 255, 0.5)',
                       borderRadius: '4px',
@@ -417,7 +531,9 @@ export default function DbfStats() {
                       fontWeight: 'bold',
                       cursor: 'pointer',
                       transition: 'all 0.3s',
-                      boxShadow: '0 0 10px rgba(64, 175, 255, 0.2)'
+                      boxShadow: '0 0 10px rgba(64, 175, 255, 0.2)',
+                      fontSize: '0.85rem',
+                      height: '28px'
                     }}
                   >
                     篩選
