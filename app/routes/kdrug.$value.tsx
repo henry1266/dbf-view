@@ -359,7 +359,7 @@ export default function KdrugQuery() {
                 fontSize: '0.9rem',
                 mb: 1
               }}>
-                總記錄數
+                總數
               </Box>
               <StatValue value={data.totalRecords} />
             </Box>

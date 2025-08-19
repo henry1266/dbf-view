@@ -779,7 +779,7 @@ export default function DbfStats() {
                       letterSpacing: '0.05em',
                       borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
                     }}>
-                      總記錄數
+                      總數
                     </th>
                     <th style={{
                       padding: '12px 16px',

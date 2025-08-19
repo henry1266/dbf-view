@@ -596,7 +596,7 @@ const LDRUStatsDisplay: React.FC<LDRUStatsDisplayProps> = ({ stats }) => {
               }}>
                 TOTAL
               </Box>
-              總記錄數
+              總數
             </Box>
             
             <Box sx={{
