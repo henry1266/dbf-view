@@ -6,6 +6,11 @@ import { Box, Button, Grid } from '@mui/material';
 import TechBackground from '../components/TechBackground';
 import A99StatsDisplay from '../components/A99StatsDisplay';
 import A2StatsDisplay from '../components/A2StatsDisplay';
+import A97StatsDisplay from '../components/A97StatsDisplay';
+import TOTStatsDisplay from '../components/TOTStatsDisplay';
+import LDRUStatsDisplay from '../components/LDRUStatsDisplay';
+import MoneyStatsDisplay from '../components/MoneyStatsDisplay';
+import A99GroupStatsDisplay from '../components/A99GroupStatsDisplay';
 
 interface DbfRecord {
   _id: string;
@@ -52,6 +57,16 @@ interface A2Stats {
   totalSum: number; // A2欄位的總和
 }
 
+// A97欄位的統計接口
+interface A97Stats {
+  totalSum: number; // A97欄位的總和
+}
+
+// TOT欄位的統計接口
+interface TOTStats {
+  totalSum: number; // TOT欄位的總和
+}
+
 export default function DbfStats() {
   const { fileName } = useParams<{ fileName: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +77,8 @@ export default function DbfStats() {
   const [stats, setStats] = useState<LdruStats | null>(null);
   const [a99Stats, setA99Stats] = useState<A99Stats | null>(null);
   const [a2Stats, setA2Stats] = useState<A2Stats | null>(null);
+  const [a97Stats, setA97Stats] = useState<A97Stats | null>(null);
+  const [totStats, setTotStats] = useState<TOTStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({ startDate, endDate });
@@ -330,6 +347,64 @@ export default function DbfStats() {
     return stats;
   };
 
+  // 計算 A97 欄位統計數據
+  const calculateA97Stats = (records: DbfRecord[]): A97Stats => {
+    const stats: A97Stats = {
+      totalSum: 0
+    };
+
+    // 檢查是否有A97欄位
+    const hasA97Field = records.some(record => record.data.A97 !== undefined);
+    
+    // 如果沒有A97欄位，直接返回默認值
+    if (!hasA97Field) {
+      console.log('沒有找到A97欄位數據');
+      return stats;
+    }
+
+    records.forEach(record => {
+      // 獲取A97欄位的值，如果不存在則默認為0
+      const a97Value = record.data.A97 !== undefined ? Number(record.data.A97) : 0;
+      
+      // 確保a97Value是數字
+      if (!isNaN(a97Value)) {
+        // 增加總和
+        stats.totalSum += a97Value;
+      }
+    });
+
+    return stats;
+  };
+
+  // 計算 TOT 欄位統計數據
+  const calculateTOTStats = (records: DbfRecord[]): TOTStats => {
+    const stats: TOTStats = {
+      totalSum: 0
+    };
+
+    // 檢查是否有TOT欄位
+    const hasTOTField = records.some(record => record.data.TOT !== undefined);
+    
+    // 如果沒有TOT欄位，直接返回默認值
+    if (!hasTOTField) {
+      console.log('沒有找到TOT欄位數據');
+      return stats;
+    }
+
+    records.forEach(record => {
+      // 獲取TOT欄位的值，如果不存在則默認為0
+      const totValue = record.data.TOT !== undefined ? Number(record.data.TOT) : 0;
+      
+      // 確保totValue是數字
+      if (!isNaN(totValue)) {
+        // 增加總和
+        stats.totalSum += totValue;
+      }
+    });
+
+    return stats;
+  };
+
   // 將民國年日期轉換為格式化字串 (YYYMMDD)
   const formatMinguoDate = (date: Date): string => {
     const year = date.getFullYear() - 1911; // 西元年轉民國年
@@ -416,6 +491,14 @@ export default function DbfStats() {
         // 計算A2欄位統計
         const a2StatsResult = calculateA2Stats(result.records);
         setA2Stats(a2StatsResult);
+        
+        // 計算A97欄位統計
+        const a97StatsResult = calculateA97Stats(result.records);
+        setA97Stats(a97StatsResult);
+        
+        // 計算TOT欄位統計
+        const totStatsResult = calculateTOTStats(result.records);
+        setTotStats(totStatsResult);
         
         setError(null);
       } catch (err) {
@@ -627,136 +710,22 @@ export default function DbfStats() {
             </form>
           </Box>
 
-          {/* 統計信息 - 水平排列 */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-            <Box sx={{
-              flex: 1,
-              minWidth: '200px',
-              bgcolor: 'rgba(17, 34, 64, 0.6)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              p: 2,
-              height: '100%',
-              boxShadow: '0 4px 30px rgba(64, 175, 255, 0.3)',
-              border: '1px solid rgba(64, 175, 255, 0.3)',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                boxShadow: '0 8px 35px rgba(197, 229, 255, 0.4)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '3px',
-                background: 'linear-gradient(90deg, #d2e6faff, #d4eaffff)',
-                boxShadow: '0 0 25px #d2e6faff'
-              }
-            }}>
-              <Box sx={{
-                fontFamily: 'monospace',
-                letterSpacing: '0.05em',
-                color: '#e6f1ff',
-                fontSize: '0.9rem',
-                mb: 1
-              }}>
-                總記錄數
-              </Box>
-              <StatValue value={stats.totalRecords} />
-            </Box>
+          {/* 三等分布局 */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            {/* 第一部分：LDRU統計 */}
+            <LDRUStatsDisplay stats={stats} />
             
-            {/* 已調劑 */}
-            <Box sx={{
-              flex: 1,
-              minWidth: '200px',
-              bgcolor: 'rgba(17, 34, 64, 0.6)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              p: 2,
-              height: '100%',
-              boxShadow: '0 4px 30px rgba(63, 81, 181, 0.3)',
-              border: '1px solid rgba(63, 81, 181, 0.3)',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                boxShadow: '0 8px 35px rgba(63, 81, 181, 0.4)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '3px',
-                background: 'linear-gradient(90deg, #3f68b5ff, #7981cbff)',
-                boxShadow: '0 0 25px #3f68b5ff'
-              }
-            }}>
-              <Box sx={{
-                fontFamily: 'monospace',
-                letterSpacing: '0.05em',
-                color: '#e6f1ff',
-                fontSize: '0.9rem',
-                mb: 1
-              }}>
-                LDRU=I 已調劑
-              </Box>
-              <StatValue value={stats.totalI} />
-            </Box>
+            {/* 第二部分：A99欄位分組統計明細 */}
+            {a99Stats && <A99GroupStatsDisplay stats={a99Stats} />}
             
-            {/* 未調劑 */}
-            <Box sx={{
-              flex: 1,
-              minWidth: '200px',
-              bgcolor: 'rgba(17, 34, 64, 0.6)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              p: 2,
-              height: '100%',
-              boxShadow: '0 4px 30px rgba(156, 39, 176, 0.3)',
-              border: '1px solid rgba(156, 39, 176, 0.3)',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                boxShadow: '0 8px 35px rgba(176, 39, 123, 0.4)',
-              },
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '3px',
-                background: 'linear-gradient(90deg, #b02767ff, #c868abff)',
-                boxShadow: '0 0 25px #b02767ff'
-              }
-            }}>
-              <Box sx={{
-                fontFamily: 'monospace',
-                letterSpacing: '0.05em',
-                color: '#e6f1ff',
-                fontSize: '0.9rem',
-                mb: 1
-              }}>
-                LDRU=O 未調劑
-              </Box>
-              <StatValue value={stats.totalO} />
-            </Box>
-            
-            {/* A2總和 */}
-            <A2StatsDisplay stats={a2Stats} />
+            {/* 第三部分：金額統計 */}
+            <MoneyStatsDisplay
+              a2Stats={a2Stats}
+              a97Stats={a97Stats}
+              a99Stats={a99Stats}
+              totStats={totStats}
+            />
           </Box>
-
-          {/* A99統計區域 */}
-          {a99Stats && <A99StatsDisplay stats={a99Stats} />}
 
           {/* 按日期統計表格 */}
           <Box sx={{

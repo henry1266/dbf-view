@@ -331,9 +331,9 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     aggregationPipeline.push({ $skip: skip });
     aggregationPipeline.push({ $limit: parseInt(pageSize) });
     
-    // 如果是統計頁面請求，添加一個步驟來確保A2欄位存在
+    // 如果是統計頁面請求，添加一個步驟來確保A2、A97和TOT欄位存在
     if (statsPage === 'true') {
-      // 添加一個步驟來確保A2欄位存在，如果不存在則設置為0
+      // 添加一個步驟來確保A2、A97和TOT欄位存在，如果不存在則設置為0
       aggregationPipeline.push({
         $addFields: {
           "data.A2": {
@@ -347,10 +347,34 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
               then: 0,  // 如果A2欄位不存在或為空，則設置為0
               else: { $toDouble: { $ifNull: ["$data.A2", 0] } }  // 否則將其轉換為數字
             }
+          },
+          "data.A97": {
+            $cond: {
+              if: { $or: [
+                { $eq: ["$data.A97", null] },
+                { $eq: ["$data.A97", ""] },
+                { $eq: ["$data.A97", " "] },
+                { $not: [{ $ifNull: ["$data.A97", false] }] }
+              ]},
+              then: 0,  // 如果A97欄位不存在或為空，則設置為0
+              else: { $toDouble: { $ifNull: ["$data.A97", 0] } }  // 否則將其轉換為數字
+            }
+          },
+          "data.TOT": {
+            $cond: {
+              if: { $or: [
+                { $eq: ["$data.TOT", null] },
+                { $eq: ["$data.TOT", ""] },
+                { $eq: ["$data.TOT", " "] },
+                { $not: [{ $ifNull: ["$data.TOT", false] }] }
+              ]},
+              then: 0,  // 如果TOT欄位不存在或為空，則設置為0
+              else: { $toDouble: { $ifNull: ["$data.TOT", 0] } }  // 否則將其轉換為數字
+            }
           }
         }
       });
-      console.log('為統計頁面請求添加A2欄位處理');
+      console.log('為統計頁面請求添加A2、A97和TOT欄位處理');
     }
 
     // 執行聚合查詢

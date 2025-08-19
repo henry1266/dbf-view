@@ -37,47 +37,7 @@ const A99StatsDisplay: React.FC<A99StatsDisplayProps> = ({ stats }) => {
       gap: 2,
       mb: 3
     }}>
-      {/* A99總和卡片 */}
-      <Box sx={{
-        width: '350px',
-        bgcolor: 'rgba(17, 34, 64, 0.6)',
-        backdropFilter: 'blur(8px)',
-        borderRadius: 2,
-        p: 2,
-        height: 'fit-content',
-        boxShadow: '0 4px 30px rgba(255, 193, 7, 0.3)',
-        border: '1px solid rgba(255, 193, 7, 0.3)',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.3s',
-        '&:hover': {
-          transform: 'translateY(-5px)',
-          boxShadow: '0 8px 35px rgba(255, 193, 7, 0.4)',
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '3px',
-          background: 'linear-gradient(90deg, #ffc107, #ffeb3b)',
-          boxShadow: '0 0 25px #ffc107'
-        }
-      }}>
-        <Box sx={{
-          fontFamily: 'monospace',
-          letterSpacing: '0.05em',
-          color: '#e6f1ff',
-          fontSize: '0.9rem',
-          mb: 1
-        }}>
-          A99 總和
-        </Box>
-        <StatValue value={stats.totalSum} />
-      </Box>
-      
-      {/* A99欄位分組統計明細 */}
+      {/* A99欄位分組統計明細 - 左側 */}
       <Box sx={{
         flex: 1,
         bgcolor: 'rgba(17, 34, 64, 0.6)',
@@ -101,7 +61,7 @@ const A99StatsDisplay: React.FC<A99StatsDisplayProps> = ({ stats }) => {
             fontWeight: 'bold',
             textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
           }}>
-            A99 欄位分組統計明細
+            A99 欄位分組統計明細22
           </Box>
         </Box>
         
@@ -193,6 +153,47 @@ const A99StatsDisplay: React.FC<A99StatsDisplayProps> = ({ stats }) => {
             })()}
           </Box>
         </Box>
+      </Box>
+      
+      {/* A99總和卡片 - 右側 */}
+      <Box sx={{
+        flex: 1,
+        minWidth: '200px',
+        bgcolor: 'rgba(17, 34, 64, 0.6)',
+        backdropFilter: 'blur(8px)',
+        borderRadius: 2,
+        p: 2,
+        height: 'fit-content',
+        boxShadow: '0 4px 30px rgba(255, 193, 7, 0.3)',
+        border: '1px solid rgba(255, 193, 7, 0.3)',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'all 0.3s',
+        '&:hover': {
+          transform: 'translateY(-5px)',
+          boxShadow: '0 8px 35px rgba(255, 193, 7, 0.4)',
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '3px',
+          background: 'linear-gradient(90deg, #ffc107, #ffeb3b)',
+          boxShadow: '0 0 25px #ffc107'
+        }
+      }}>
+        <Box sx={{
+          fontFamily: 'monospace',
+          letterSpacing: '0.05em',
+          color: '#e6f1ff',
+          fontSize: '0.9rem',
+          mb: 1
+        }}>
+          A99 總和
+        </Box>
+        <StatValue value={stats.totalSum} />
       </Box>
     </Box>
   );
