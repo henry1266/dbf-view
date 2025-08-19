@@ -63,7 +63,7 @@ const A2StatsDisplay: React.FC<A2StatsDisplayProps> = ({ stats }) => {
         fontSize: '0.9rem',
         mb: 1
       }}>
-        A2 總和
+        A2 藥費總和
       </Box>
       {stats ? (
         <StatValue value={stats.totalSum} />

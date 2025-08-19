@@ -213,6 +213,9 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
         }
       ];
       
+      // 確保 A2 欄位也被返回
+      console.log(`為 ${fileName} 確保 A2 欄位被返回`);
+      
       // 輸出詳細的查詢條件，以便調試
       console.log('詳細查詢條件:', JSON.stringify(query, null, 2));
     }
@@ -328,6 +331,28 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
     aggregationPipeline.push({ $skip: skip });
     aggregationPipeline.push({ $limit: parseInt(pageSize) });
     
+    // 如果是統計頁面請求，添加一個步驟來確保A2欄位存在
+    if (statsPage === 'true') {
+      // 添加一個步驟來確保A2欄位存在，如果不存在則設置為0
+      aggregationPipeline.push({
+        $addFields: {
+          "data.A2": {
+            $cond: {
+              if: { $or: [
+                { $eq: ["$data.A2", null] },
+                { $eq: ["$data.A2", ""] },
+                { $eq: ["$data.A2", " "] },
+                { $not: [{ $ifNull: ["$data.A2", false] }] }
+              ]},
+              then: 0,  // 如果A2欄位不存在或為空，則設置為0
+              else: { $toDouble: { $ifNull: ["$data.A2", 0] } }  // 否則將其轉換為數字
+            }
+          }
+        }
+      });
+      console.log('為統計頁面請求添加A2欄位處理');
+    }
+
     // 執行聚合查詢
     console.log('執行聚合查詢:', JSON.stringify(aggregationPipeline, null, 2));
     const records = await collection.aggregate(aggregationPipeline).toArray();

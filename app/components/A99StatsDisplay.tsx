@@ -39,7 +39,7 @@ const A99StatsDisplay: React.FC<A99StatsDisplayProps> = ({ stats }) => {
     }}>
       {/* A99總和卡片 */}
       <Box sx={{
-        width: '250px',
+        width: '350px',
         bgcolor: 'rgba(17, 34, 64, 0.6)',
         backdropFilter: 'blur(8px)',
         borderRadius: 2,
@@ -191,37 +191,6 @@ const A99StatsDisplay: React.FC<A99StatsDisplayProps> = ({ stats }) => {
                   );
                 });
             })()}
-          </Box>
-          
-          {/* 格式化顯示 */}
-          <Box sx={{
-            mt: 2,
-            p: 1.5,
-            bgcolor: 'rgba(255, 193, 7, 0.1)',
-            borderRadius: 1,
-            border: '1px solid rgba(255, 193, 7, 0.2)'
-          }}>
-            <Box sx={{
-              fontFamily: 'monospace',
-              color: '#e6f1ff',
-              fontSize: '0.9rem',
-              mb: 1
-            }}>
-              格式化顯示:
-            </Box>
-            <Box sx={{
-              fontFamily: 'monospace',
-              fontWeight: 'bold',
-              fontSize: '1.1rem',
-              color: '#ffc107',
-              textShadow: '0 0 10px rgba(255, 193, 7, 0.3)',
-              wordBreak: 'break-all'
-            }}>
-              {Object.entries(stats.valueGroups)
-                .sort(([valueA], [valueB]) => Number(valueB) - Number(valueA)) // 按值降序排序
-                .map(([value, count]) => `${count}*${value}`)
-                .join(' ')}
-            </Box>
           </Box>
         </Box>
       </Box>
