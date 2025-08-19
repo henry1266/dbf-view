@@ -190,16 +190,28 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
       }
     }
     
-    // 為 CO03L.DBF 添加 LPID 不為空值的篩選條件
+    // 為 CO03L.DBF 添加 LPID 和 LISRS 不為空值的篩選條件
     if (baseName.toUpperCase() === 'CO03L' && statsPage === 'true') {
       // 檢查是否來自統計頁面的請求
-      console.log(`為 ${fileName} 添加 LPID 不為空值的篩選條件`);
+      console.log(`為 ${fileName} 添加 LPID 和 LISRS 不為空值的篩選條件`);
       
-      // 添加 LPID 不為空值的條件
-      query['data.LPID'] = {
-        $exists: true,  // 欄位必須存在
-        $nin: [null, '', ' ']  // 不能為 null、空字符串或只有空格
-      };
+      // 使用 $and 運算符組合多個條件
+      query['$and'] = [
+        // LPID 不為空值的條件
+        {
+          'data.LPID': {
+            $exists: true,  // 欄位必須存在
+            $nin: [null, '', ' ']  // 不能為 null、空字符串或只有空格
+          }
+        },
+        // LISRS 不為空值的條件
+        {
+          'data.LISRS': {
+            $exists: true,  // 欄位必須存在
+            $nin: [null, '', ' ']  // 不能為 null、空字符串或只有空格
+          }
+        }
+      ];
       
       // 輸出詳細的查詢條件，以便調試
       console.log('詳細查詢條件:', JSON.stringify(query, null, 2));

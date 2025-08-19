@@ -7,7 +7,7 @@ const StatisticsCards = () => {
     <Grid container>
       <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' }, p: 1.5 }}>
         <DashboardCard 
-          title="總檔案數" 
+          title="人次" 
           value="128" 
           icon="📁" 
           color="primary"

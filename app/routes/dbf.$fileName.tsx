@@ -96,7 +96,7 @@ export default function DbfFile() {
     if (fileName.toUpperCase() === 'CO02P.DBF') {
       return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
-      return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'A97', 'TOT'];
+      return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LISRS' , 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'A97', 'TOT'];
     }
     return [];
   };

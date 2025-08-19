@@ -39,6 +39,12 @@ interface LdruStats {
   }>;
 }
 
+// A99欄位的統計接口
+interface A99Stats {
+  totalSum: number; // A99欄位的總和
+  valueGroups: Record<string, number>; // 每個值出現的次數，例如 {"75": 3, "65": 3}
+}
+
 export default function DbfStats() {
   const { fileName } = useParams<{ fileName: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,6 +53,7 @@ export default function DbfStats() {
 
   const [data, setData] = useState<DbfRecordsResponse | null>(null);
   const [stats, setStats] = useState<LdruStats | null>(null);
+  const [a99Stats, setA99Stats] = useState<A99Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({ startDate, endDate });
@@ -319,7 +326,7 @@ export default function DbfStats() {
           'desc',
           startDate,
           endDate,
-          'true' // 標記為統計頁面請求，只返回 LPID 不為空值的記錄
+          'true' // 標記為統計頁面請求，只返回 LPID 和 LISRS 不為空值的記錄
         );
         
         // 輸出調試信息
