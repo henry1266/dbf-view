@@ -57,16 +57,6 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
     align: 'left' as const
   }));
   
-  // 其他欄位
-  const otherColumns = availableFields
-    .filter(field => !priorityFields.includes(field))
-    .map(field => ({
-      id: field,
-      label: field,
-      minWidth: 150,
-      align: 'left' as const
-    }));
-  
   // 操作列
   const actionColumn = {
     id: 'actions',
@@ -75,7 +65,8 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
     align: 'center' as const
   };
   
-  return [...baseColumns, ...priorityColumns, ...otherColumns, actionColumn];
+  // 只返回基本列、優先欄位和操作列，不包含其他欄位
+  return [...baseColumns, ...priorityColumns, actionColumn];
 }
 
 export default function DbfFile() {
@@ -105,7 +96,7 @@ export default function DbfFile() {
     if (fileName.toUpperCase() === 'CO02P.DBF') {
       return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
-      return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'];
+      return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'A97', 'TOT'];
     }
     return [];
   };
@@ -582,7 +573,7 @@ export default function DbfFile() {
                                             borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
                                             // 調整字體大小和行高
                                             fontSize: '1rem',
-                                            padding: '5px 15px',
+                                            padding: '15px 15px',
                                             fontWeight: 500,
                                           }}
                                         >
