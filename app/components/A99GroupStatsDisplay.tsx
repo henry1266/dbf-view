@@ -17,12 +17,12 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
     <Box sx={{
       flex: 1,
       width: '33.33%',
-      bgcolor: 'rgba(15, 30, 55, 0.65)',
+      bgcolor: 'rgba(15, 30, 55, 0.55)',
       backdropFilter: 'blur(12px)',
       borderRadius: 3,
       overflow: 'hidden',
-      boxShadow: '0 8px 32px rgba(255, 193, 7, 0.3)',
-      border: '1px solid rgba(255, 193, 7, 0.25)',
+      boxShadow: '0 8px 32px rgba(255, 193, 7, 0.4)',
+      border: '1px solid rgba(255, 193, 7, 0.35)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
@@ -44,7 +44,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
         left: '-50px',
         width: '200px',
         height: '200px',
-        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.1) 0%, rgba(10, 25, 50, 0) 70%)',
+        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.2) 0%, rgba(10, 25, 50, 0) 70%)',
         zIndex: 0,
         borderRadius: '50%',
         filter: 'blur(20px)'
@@ -58,7 +58,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
         transform: 'translate(-50%, -50%)',
         width: '80%',
         height: '80%',
-        background: 'radial-gradient(ellipse, rgba(100, 255, 218, 0.03) 0%, rgba(10, 25, 50, 0) 70%)',
+        background: 'radial-gradient(ellipse, rgba(100, 255, 218, 0.08) 0%, rgba(10, 25, 50, 0) 70%)',
         zIndex: 0,
         borderRadius: '50%',
         filter: 'blur(30px)'
@@ -71,7 +71,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
         right: '-30px',
         width: '150px',
         height: '150px',
-        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.08) 0%, rgba(10, 25, 50, 0) 70%)',
+        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.15) 0%, rgba(10, 25, 50, 0) 70%)',
         zIndex: 0,
         borderRadius: '50%',
         filter: 'blur(15px)'
@@ -222,17 +222,17 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                           borderRadius: '6px',
                           position: 'relative',
                           overflow: 'hidden',
-                          boxShadow: `0 2px 15px rgba(${glowColor}, 0.25)`,
-                          border: `1px solid rgba(${glowColor}, 0.3)`,
+                          boxShadow: `0 2px 20px rgba(${glowColor}, 0.5)`,
+                          border: `1px solid rgba(${glowColor}, 0.5)`,
                           backdropFilter: 'blur(5px)',
-                          bgcolor: 'rgba(15, 30, 55, 0.6)',
+                          bgcolor: 'rgba(15, 30, 55, 0.5)',
                           '&::before': {
                             content: '""',
                             position: 'absolute',
                             top: 0,
                             width: '100%',
                             height: '100%',
-                            background: `linear-gradient(90deg, rgba(${glowColor}, 0.2), rgba(${glowColor}, 0.05))`,
+                            background: `linear-gradient(90deg, rgba(${glowColor}, 0.4), rgba(${glowColor}, 0.1))`,
                             zIndex: 1
                           },
                           '&::after': {
@@ -240,16 +240,16 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                             position: 'absolute',
                             top: 0,
                             width: '100%',
-                            height: '2px',
+                            height: '3px',
                             background: `linear-gradient(90deg, rgba(${glowColor}, 1), transparent)`,
                             zIndex: 2,
-                            boxShadow: `0 0 10px rgba(${glowColor}, 1)`
+                            boxShadow: `0 0 15px rgba(${glowColor}, 1)`
                           },
                           animation: 'pulse 2s infinite',
                           '@keyframes pulse': {
-                            '0%': { boxShadow: `0 2px 15px rgba(${glowColor}, 0.25)` },
-                            '50%': { boxShadow: `0 2px 20px rgba(${glowColor}, 0.4)` },
-                            '100%': { boxShadow: `0 2px 15px rgba(${glowColor}, 0.25)` }
+                            '0%': { boxShadow: `0 2px 20px rgba(${glowColor}, 0.5)` },
+                            '50%': { boxShadow: `0 2px 25px rgba(${glowColor}, 0.7)` },
+                            '100%': { boxShadow: `0 2px 20px rgba(${glowColor}, 0.5)` }
                           }
                         }}>
                           {/* 裝飾點 */}
@@ -262,7 +262,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                             height: '4px',
                             borderRadius: '50%',
                             bgcolor: 'rgba(255, 255, 255, 0.8)',
-                            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
+                            boxShadow: '0 0 8px rgba(255, 255, 255, 1)',
                             zIndex: 2
                           }} />
                         </Box>
@@ -280,10 +280,10 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                         zIndex: 3,
                         gap: 0.3,
                         borderRadius: 1,
-                        border: `1px solid rgba(${glowColor}, 0.3)`,
-                        background: 'rgba(15, 30, 55, 0.7)',
+                        border: `1px solid rgba(${glowColor}, 0.5)`,
+                        background: 'rgba(15, 30, 55, 0.6)',
                         backdropFilter: 'blur(4px)',
-                        boxShadow: `0 0 8px rgba(${glowColor}, 0.2)`,
+                        boxShadow: `0 0 12px rgba(${glowColor}, 0.4)`,
                         position: 'relative',
                         ml: 1, // 左側間距
                         '&::before': {
@@ -303,7 +303,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                             'linear-gradient(90deg, #64ffda, #40afff)',
                           backgroundClip: 'text',
                           color: 'transparent',
-                          textShadow: `0 0 8px rgba(${glowColor}, 0.5)`,
+                          textShadow: `0 0 10px rgba(${glowColor}, 0.7)`,
                           letterSpacing: '0.05em',
                           position: 'relative',
                           whiteSpace: 'nowrap',

@@ -374,11 +374,11 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
           }
         }
       });
-      console.log('為統計頁面請求添加A2、A97和TOT欄位處理');
+      //console.log('為統計頁面請求添加A2、A97和TOT欄位處理');
     }
 
     // 執行聚合查詢
-    console.log('執行聚合查詢:', JSON.stringify(aggregationPipeline, null, 2));
+    //console.log('執行聚合查詢:', JSON.stringify(aggregationPipeline, null, 2));
     const records = await collection.aggregate(aggregationPipeline).toArray();
     
     res.json({
