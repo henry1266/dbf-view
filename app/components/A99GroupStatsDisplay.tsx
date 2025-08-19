@@ -166,7 +166,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                   }}>
                     {/* 標籤 - 從左邊開始 */}
                     <Box sx={{
-                      width: '110px',
+                      width: '60px',
                       fontFamily: '"Roboto Mono", monospace',
                       fontSize: '0.9rem',
                       color: '#e6f1ff',
@@ -197,21 +197,21 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                       </Box>
                     </Box>
                     
-                    {/* 中間長條和右側數值容器 */}
+                    {/* 數值和長條圖容器 - 重新設計 */}
                     <Box sx={{
                       flex: 1,
                       display: 'flex',
                       alignItems: 'center',
                       position: 'relative'
                     }}>
+                      
                       {/* 中間長條容器 */}
                       <Box sx={{
                         flex: 1,
                         height: '28px',
                         position: 'relative',
                         display: 'flex',
-                        alignItems: 'center',
-                        mx: 1 // 左右間距
+                        alignItems: 'center'
                       }}>
                         {/* 長條 */}
                         <Box sx={{
@@ -230,7 +230,6 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                             content: '""',
                             position: 'absolute',
                             top: 0,
-                            left: 0,
                             width: '100%',
                             height: '100%',
                             background: `linear-gradient(90deg, rgba(${glowColor}, 0.2), rgba(${glowColor}, 0.05))`,
@@ -240,7 +239,6 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                             content: '""',
                             position: 'absolute',
                             top: 0,
-                            left: 0,
                             width: '100%',
                             height: '2px',
                             background: `linear-gradient(90deg, rgba(${glowColor}, 1), transparent)`,
@@ -278,7 +276,6 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                         justifyContent: 'center',
                         alignItems: 'center',
                         fontFamily: '"Roboto Mono", monospace',
-                        fontSize: '0.85rem',
                         fontWeight: 'bold',
                         zIndex: 3,
                         gap: 0.3,
@@ -288,6 +285,7 @@ const A99GroupStatsDisplay: React.FC<A99GroupStatsDisplayProps> = ({ stats }) =>
                         backdropFilter: 'blur(4px)',
                         boxShadow: `0 0 8px rgba(${glowColor}, 0.2)`,
                         position: 'relative',
+                        ml: 1, // 左側間距
                         '&::before': {
                           content: '""',
                           position: 'absolute',
