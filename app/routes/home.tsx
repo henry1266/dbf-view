@@ -4,16 +4,16 @@ import { Layout } from '../components/Layout';
 
 export function meta() {
   return [
-    { title: "DBF 檔案瀏覽器" },
+    { title: "處方瀏覽系統" },
     { name: "description", content: "瀏覽和查詢 DBF 檔案的記錄" },
   ];
 }
 
 export default function Home() {
   return (
-    <Layout title="歡迎使用 DBF 檔案瀏覽器">
+    <Layout title="歡迎使用處方瀏覽系統">
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">關於 DBF 檔案瀏覽器</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">關於處方瀏覽系統</h2>
         <p className="text-gray-600 mb-4">
           DBF 檔案瀏覽器是一個用於瀏覽和查詢 DBF 檔案記錄的工具。您可以瀏覽所有可用的 DBF 檔案，
           查看每個檔案的記錄，並使用 KCSTMR 或 KDRUG 值進行查詢。

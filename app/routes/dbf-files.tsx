@@ -197,7 +197,7 @@ export default function DbfFiles() {
 
 export function meta() {
   return [
-    { title: "DBF 檔案列表 - DBF 檔案瀏覽器" },
+    { title: "DBF 檔案列表 - 處方瀏覽系統" },
     { name: "description", content: "瀏覽所有可用的 DBF 檔案" },
   ];
 }

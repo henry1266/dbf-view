@@ -318,7 +318,8 @@ export default function DbfStats() {
           '_recordNo',
           'desc',
           startDate,
-          endDate
+          endDate,
+          'true' // 標記為統計頁面請求，只返回 LPID 不為空值的記錄
         );
         
         // 輸出調試信息
