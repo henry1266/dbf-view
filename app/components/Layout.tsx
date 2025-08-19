@@ -230,6 +230,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
           ml: { md: `${DRAWER_WIDTH}px` },
           mt: { xs: 7, md: 0 }, // 移動端頂部留出空間給漢堡菜單
+          height: '100vh', // 設置高度為視口高度
+          overflowY: 'auto', // 允許內容區域垂直滾動
         }}
       >
         {!isMobile && (

@@ -13,7 +13,6 @@ DBF Viewer 是一個用於瀏覽和查詢 DBF 檔案的網頁應用程序。它�
 - 🚀 服務器端渲染
 - 🔄 數據加載和變更
 - 🔒 TypeScript 支持
-- 🎨 TailwindCSS 樣式
 
 ## 系統要求
 
