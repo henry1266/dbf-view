@@ -29,7 +29,9 @@ export const fetchDbfRecords = async (
   search = '',
   field = '',
   sortField = '',
-  sortDirection = ''
+  sortDirection = '',
+  startDate = '',
+  endDate = ''
 ) => {
   try {
     const encodedFileName = encodeURIComponent(fileName);
@@ -40,7 +42,9 @@ export const fetchDbfRecords = async (
         search,
         field,
         sortField,
-        sortDirection
+        sortDirection,
+        startDate,
+        endDate
       },
     });
     return response.data;

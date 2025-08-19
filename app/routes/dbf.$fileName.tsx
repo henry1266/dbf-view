@@ -367,8 +367,27 @@ export default function DbfFile() {
                 </Box>
               ) : (
                 <>
-                  {/* 搜尋表單 */}
+                  {/* 搜尋表單和統計按鈕 */}
                   <Box sx={{ mb: '2%', p: '1%', bgcolor: 'rgba(0, 0, 0, 0.2)', borderRadius: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      {fileName.toUpperCase() === 'CO03L.DBF' && (
+                        <Button
+                          component={Link}
+                          to={`/dbf-stats/${fileName}`}
+                          variant="contained"
+                          sx={{
+                            bgcolor: 'rgba(100, 255, 218, 0.1)',
+                            color: '#64ffda',
+                            border: '1px solid rgba(100, 255, 218, 0.3)',
+                            '&:hover': {
+                              bgcolor: 'rgba(100, 255, 218, 0.2)',
+                            },
+                          }}
+                        >
+                          LDRU 統計分析
+                        </Button>
+                      )}
+                    </Box>
                     <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
                       <TextField
                         id="searchValue"

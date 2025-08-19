@@ -29,5 +29,9 @@ export default [
   {
     path: "/kdrug/:value",
     file: "routes/kdrug.$value.tsx"
+  },
+  {
+    path: "/dbf-stats/:fileName",
+    file: "routes/dbf-stats.$fileName.tsx"
   }
 ] satisfies RouteConfig;
