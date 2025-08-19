@@ -467,7 +467,7 @@ export default function DbfFile() {
                         border: '1px solid rgba(100, 255, 218, 0.1)',
                       }}>
                         <TableContainer sx={{
-                          maxHeight: 'calc(80vh - 220px)',
+                          maxHeight: 'calc(85vh - 250px)',
                           overflowY: 'auto',
                           '&::-webkit-scrollbar': {
                             width: '0px',
@@ -476,7 +476,11 @@ export default function DbfFile() {
                           msOverflowStyle: 'none',
                           scrollbarWidth: 'none'
                         }}>
-                          <Table stickyHeader aria-label="數據表格" size="medium">
+                          <Table
+                            stickyHeader
+                            aria-label="數據表格"
+                            size="medium"
+                          >
                             <TableHead>
                               <TableRow>
                                 {columns.map((column) => (
@@ -489,8 +493,7 @@ export default function DbfFile() {
                                       color: '#e6f1ff',
                                       borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
                                       // 調整表頭字體
-                                      fontSize: '1.05rem',
-                                      fontWeight: 600,
+                                      fontSize: '1rem',
                                       padding: '12px 16px',
                                     }}
                                   >
@@ -538,8 +541,7 @@ export default function DbfFile() {
                                       '&:nth-of-type(odd)': {
                                         bgcolor: 'rgba(0, 0, 0, 0.1)',
                                       },
-                                      // 增加列高
-                                      height: '40px',
+
                                     }}
                                   >
                                     {columns.map((column) => {
@@ -553,11 +555,7 @@ export default function DbfFile() {
                                             align={column.align}
                                             sx={{
                                               color: '#e6f1ff',
-                                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                                              // 調整字體大小和行高
-                                              fontSize: '1rem',
-                                              padding: '10px 16px',
-                                              fontWeight: 500,
+                                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)'
                                             }}
                                           >
                                             <Link
@@ -584,7 +582,7 @@ export default function DbfFile() {
                                             borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
                                             // 調整字體大小和行高
                                             fontSize: '1rem',
-                                            padding: '10px 16px',
+                                            padding: '5px 15px',
                                             fontWeight: 500,
                                           }}
                                         >
