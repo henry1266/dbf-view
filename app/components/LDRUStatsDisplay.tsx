@@ -35,16 +35,26 @@ const LDRUStatsDisplay: React.FC<LDRUStatsDisplayProps> = ({ stats }) => {
     <Box sx={{
       flex: 1,
       width: '33.33%',
-      bgcolor: 'rgba(10, 25, 50, 0.7)',
+      bgcolor: 'rgba(15, 30, 55, 0.65)',
       backdropFilter: 'blur(12px)',
       borderRadius: 3,
       p: 2.5,
-      boxShadow: '0 8px 32px rgba(64, 175, 255, 0.25)',
-      border: '1px solid rgba(64, 175, 255, 0.2)',
+      boxShadow: '0 8px 32px rgba(64, 175, 255, 0.3)',
+      border: '1px solid rgba(64, 175, 255, 0.25)',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(135deg, rgba(64, 175, 255, 0.05) 0%, rgba(10, 25, 50, 0) 50%, rgba(100, 255, 218, 0.05) 100%)',
+        zIndex: 0
+      },
       '&::after': {
         content: '""',
         position: 'absolute',
@@ -52,11 +62,37 @@ const LDRUStatsDisplay: React.FC<LDRUStatsDisplayProps> = ({ stats }) => {
         right: 0,
         width: '150px',
         height: '150px',
-        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.15) 0%, rgba(10, 25, 50, 0) 70%)',
+        background: 'radial-gradient(circle, rgba(64, 175, 255, 0.2) 0%, rgba(10, 25, 50, 0) 70%)',
         zIndex: 0,
         borderRadius: '50%'
       }
     }}>
+      {/* 霧面光效果 - 左下角 */}
+      <Box sx={{
+        position: 'absolute',
+        bottom: '-50px',
+        left: '-50px',
+        width: '200px',
+        height: '200px',
+        background: 'radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, rgba(10, 25, 50, 0) 70%)',
+        zIndex: 0,
+        borderRadius: '50%',
+        filter: 'blur(20px)'
+      }} />
+      
+      {/* 霧面光效果 - 中央 */}
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '80%',
+        height: '80%',
+        background: 'radial-gradient(ellipse, rgba(64, 175, 255, 0.03) 0%, rgba(10, 25, 50, 0) 70%)',
+        zIndex: 0,
+        borderRadius: '50%',
+        filter: 'blur(30px)'
+      }} />
       {/* 標題區塊 - 更現代化的設計 */}
       <Box sx={{
         display: 'flex',

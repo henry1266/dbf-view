@@ -31,19 +31,19 @@ const TOTStatsDisplay: React.FC<TOTStatsDisplayProps> = ({ stats }) => {
     <Box sx={{
       flex: 1,
       minWidth: '200px',
-      bgcolor: 'rgba(15, 30, 60, 0.6)',
+      bgcolor: 'rgba(15, 30, 55, 0.65)',
       backdropFilter: 'blur(10px)',
       borderRadius: 2.5,
       p: 2,
       height: '120px',
-      boxShadow: '0 4px 20px rgba(0, 188, 212, 0.2)',
-      border: '1px solid rgba(0, 188, 212, 0.2)',
+      boxShadow: '0 4px 20px rgba(0, 188, 212, 0.25)',
+      border: '1px solid rgba(0, 188, 212, 0.25)',
       position: 'relative',
       overflow: 'hidden',
       transition: 'all 0.3s ease-out',
       '&:hover': {
         transform: 'translateY(-5px)',
-        boxShadow: '0 8px 30px rgba(0, 188, 212, 0.3)',
+        boxShadow: '0 8px 30px rgba(0, 188, 212, 0.35)',
       },
       '&::before': {
         content: '""',
@@ -62,11 +62,37 @@ const TOTStatsDisplay: React.FC<TOTStatsDisplayProps> = ({ stats }) => {
         right: 0,
         width: '120px',
         height: '120px',
-        background: 'radial-gradient(circle, rgba(0, 188, 212, 0.1) 0%, rgba(10, 25, 50, 0) 70%)',
+        background: 'radial-gradient(circle, rgba(0, 188, 212, 0.15) 0%, rgba(10, 25, 50, 0) 70%)',
         zIndex: 0,
         borderRadius: '50%'
       }
     }}>
+      {/* 霧面光效果 */}
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '90%',
+        height: '90%',
+        background: 'radial-gradient(ellipse, rgba(0, 188, 212, 0.05) 0%, rgba(10, 25, 50, 0) 70%)',
+        zIndex: 0,
+        borderRadius: '50%',
+        filter: 'blur(15px)'
+      }} />
+      
+      {/* 左上角光效果 */}
+      <Box sx={{
+        position: 'absolute',
+        top: '-20px',
+        left: '-20px',
+        width: '100px',
+        height: '100px',
+        background: 'radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, rgba(10, 25, 50, 0) 70%)',
+        zIndex: 0,
+        borderRadius: '50%',
+        filter: 'blur(10px)'
+      }} />
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
