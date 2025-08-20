@@ -9,12 +9,23 @@ import SystemStatus from '../components/dashboard/SystemStatus';
 import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
+/**
+ * @function meta
+ * @description 定義儀表板頁面的元數據，包括標題和描述
+ * @returns {Array<Object>} 頁面元數據陣列
+ */
 export function meta() {
   return [
     { title: "儀表板 - 處方瀏覽器" },
     { name: "description", content: "DBF 檔案瀏覽器的儀表板頁面" },
   ];
 }
+
+/**
+ * @component Dashboard
+ * @description 儀表板頁面組件，顯示系統概覽、統計數據和日曆
+ * @returns {JSX.Element} 渲染的儀表板頁面
+ */
 export default function Dashboard() {
   return (
     <Layout title="科技儀表板">

@@ -10,6 +10,11 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
+/**
+ * @function links
+ * @description 定義應用程序的全局鏈接，包括字體和樣式表
+ * @returns {Array<Object>} 鏈接配置陣列
+ */
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -23,6 +28,13 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+/**
+ * @component Layout
+ * @description 應用程序的根佈局組件，提供HTML結構和全局腳本
+ * @param {Object} props - 組件屬性
+ * @param {React.ReactNode} props.children - 子組件
+ * @returns {JSX.Element} 渲染的HTML結構
+ */
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -41,10 +53,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * @component App
+ * @description 應用程序的根組件，使用React Router的Outlet渲染當前路由
+ * @returns {JSX.Element} 渲染的應用程序根組件
+ */
 export default function App() {
   return <Outlet />;
 }
 
+/**
+ * @component ErrorBoundary
+ * @description 錯誤邊界組件，捕獲並顯示應用程序中的錯誤
+ * @param {Object} props - 組件屬性
+ * @param {Error} props.error - 捕獲的錯誤對象
+ * @returns {JSX.Element} 渲染的錯誤頁面
+ */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";

@@ -6,6 +6,12 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
 import MenuIcon from '@mui/icons-material/Menu';
 
+/**
+ * @interface LayoutProps
+ * @description Layout組件的屬性接口
+ * @property {React.ReactNode} children - 子組件，將在主內容區域渲染
+ * @property {string} title - 頁面標題
+ */
 interface LayoutProps {
   children: React.ReactNode;
   title: string;
@@ -14,12 +20,23 @@ interface LayoutProps {
 // 側邊欄寬度
 const DRAWER_WIDTH = 240;
 
+/**
+ * @component Layout
+ * @description 應用程序的主要佈局組件，提供響應式側邊欄和內容區域
+ * @param {LayoutProps} props - 組件屬性
+ * @returns {JSX.Element} 渲染的佈局組件
+ */
 export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  /**
+   * @function handleDrawerToggle
+   * @description 切換移動端側邊欄的開關狀態
+   * @returns {void}
+   */
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };

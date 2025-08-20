@@ -26,7 +26,18 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// 定義記錄類型
+/**
+ * @interface DbfRecord
+ * @description DBF檔案記錄的資料結構
+ * @property {string} _id - MongoDB文檔ID
+ * @property {number} _recordNo - 記錄編號
+ * @property {string} _file - 來源檔案名稱
+ * @property {string} hash - 記錄的雜湊值，用於識別唯一性
+ * @property {Record<string, any>} data - 記錄的實際資料，鍵值對形式
+ * @property {string} _created - 記錄創建時間
+ * @property {string} _updated - 記錄最後更新時間
+ * @property {boolean} [_truncated] - 記錄是否被截斷
+ */
 interface DbfRecord {
   _id: string;
   _recordNo: number;
@@ -42,13 +53,23 @@ interface DbfRecord {
 let db: Db | null = null;
 let dbfRecordsCollections: Record<string, Collection<DbfRecord>> = {};
 
+/**
+ * @async
+ * @function connectMongo
+ * @description 連接到MongoDB數據庫並初始化DBF檔案集合引用
+ * @returns {Promise<Db>} 返回MongoDB數據庫實例
+ * @throws {Error} 如果連接失敗則拋出錯誤
+ */
 async function connectMongo(): Promise<Db> {
+  // 如果已經連接，直接返回數據庫實例
   if (db) return db;
   
   try {
+    // 創建MongoDB客戶端並連接
     const mongoClient = new MongoClient(process.env.MONGO_URI || '');
     await mongoClient.connect();
     
+    // 獲取數據庫實例
     db = mongoClient.db(process.env.MONGO_DB);
     
     // 獲取所有集合
@@ -72,7 +93,13 @@ async function connectMongo(): Promise<Db> {
 
 // API 路由
 
-// 獲取所有 DBF 檔案列表
+/**
+ * @route GET /api/dbf-files
+ * @description 獲取所有可用的DBF檔案列表
+ * @access Public
+ * @returns {Object[]} 檔案列表，每個檔案包含fileName、baseName和collectionName
+ * @throws {Error} 如果獲取檔案列表失敗則返回500錯誤
+ */
 app.get('/api/dbf-files', async (req: Request, res: Response) => {
   try {
     await connectMongo();
@@ -96,7 +123,23 @@ app.get('/api/dbf-files', async (req: Request, res: Response) => {
   }
 });
 
-// 獲取特定 DBF 檔案的記錄
+/**
+ * @route GET /api/dbf/:fileName
+ * @description 獲取特定DBF檔案的記錄，支持分頁、搜索、排序和日期範圍篩選
+ * @access Public
+ * @param {string} req.params.fileName - DBF檔案名稱
+ * @param {string} [req.query.page=1] - 頁碼
+ * @param {string} [req.query.pageSize=20] - 每頁記錄數
+ * @param {string} [req.query.search] - 搜索關鍵字
+ * @param {string} [req.query.field] - 搜索的欄位名稱
+ * @param {string} [req.query.sortField] - 排序欄位
+ * @param {string} [req.query.sortDirection=desc] - 排序方向 (asc/desc)
+ * @param {string} [req.query.startDate] - 開始日期
+ * @param {string} [req.query.endDate] - 結束日期
+ * @param {string} [req.query.statsPage=false] - 是否為統計頁面請求
+ * @returns {Object} 包含記錄數據和分頁信息的對象
+ * @throws {Error} 如果獲取記錄失敗則返回500錯誤，如果找不到檔案則返回404錯誤
+ */
 app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   const { fileName } = req.params;
   // 獲取查詢參數
