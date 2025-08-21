@@ -1,8 +1,35 @@
 import React from 'react';
 import { Card, CardContent, Box, Typography } from '@mui/material';
 
-// 儀表板卡片組件
-const DashboardCard = ({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) => (
+/**
+ * @interface DashboardCardProps
+ * @description 儀表板卡片組件的屬性接口
+ * @property {string} title - 卡片標題
+ * @property {string} value - 卡片顯示的數值
+ * @property {React.ReactNode} icon - 卡片圖標
+ * @property {string} color - 卡片顏色主題 ('primary', 'success', 'warning', 'info')
+ */
+interface DashboardCardProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  color: string;
+}
+
+/**
+ * @component DashboardCard
+ * @description 儀表板卡片組件，用於顯示統計數據和信息，具有現代科技風格的 UI 設計
+ * @param {DashboardCardProps} props - 組件屬性
+ * @returns {JSX.Element} 渲染的儀表板卡片組件
+ * @example
+ * <DashboardCard
+ *   title="總處方數"
+ *   value="1,234"
+ *   icon={<DocumentIcon />}
+ *   color="primary"
+ * />
+ */
+const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color }) => (
   <Card sx={{
     height: '100%',
     bgcolor: 'rgba(17, 34, 64, 0.6)',

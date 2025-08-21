@@ -1,20 +1,40 @@
 import React from 'react';
 import { Box } from '@mui/material';
 
+/**
+ * @interface A2Stats
+ * @description A2 藥費統計數據接口
+ * @property {number} totalSum - A2 藥費總和
+ */
 interface A2Stats {
   totalSum: number;
 }
 
+/**
+ * @interface StatValueProps
+ * @description 統計數值顯示組件的屬性接口
+ * @property {string | number} value - 要顯示的統計數值
+ */
 interface StatValueProps {
   value: string | number;
 }
 
+/**
+ * @interface A2StatsDisplayProps
+ * @description A2 統計顯示組件的屬性接口
+ * @property {A2Stats | null} stats - A2 藥費統計數據，如果為 null 則顯示無數據提示
+ */
 interface A2StatsDisplayProps {
   stats: A2Stats | null;
 }
 
-// 可重用的統計數值顯示組件
-const StatValue = ({ value }: StatValueProps) => (
+/**
+ * @component StatValue
+ * @description 可重用的統計數值顯示組件，用於以特定樣式顯示數值
+ * @param {StatValueProps} props - 組件屬性
+ * @returns {JSX.Element} 渲染的統計數值顯示組件
+ */
+const StatValue: React.FC<StatValueProps> = ({ value }) => (
   <Box sx={{
     fontFamily: 'monospace',
     fontWeight: 'bold',
@@ -26,6 +46,14 @@ const StatValue = ({ value }: StatValueProps) => (
   </Box>
 );
 
+/**
+ * @component A2StatsDisplay
+ * @description A2 藥費統計顯示組件，用於顯示 A2 藥費總和，具有現代科技風格的 UI 設計
+ * @param {A2StatsDisplayProps} props - 組件屬性
+ * @returns {JSX.Element} 渲染的 A2 藥費統計顯示組件
+ * @example
+ * <A2StatsDisplay stats={{ totalSum: 12345 }} />
+ */
 const A2StatsDisplay: React.FC<A2StatsDisplayProps> = ({ stats }) => {
   return (
     <Box sx={{

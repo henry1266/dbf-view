@@ -2,7 +2,9 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:7001/api';
 
-// 創建 axios 實例
+/**
+ * @description 創建 axios 實例，配置基本 URL 和請求頭
+ */
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -10,7 +12,15 @@ const api = axios.create({
   },
 });
 
-// 獲取所有 DBF 檔案列表
+/**
+ * @function fetchDbfFiles
+ * @description 獲取所有 DBF 檔案列表
+ * @returns {Promise<Array<string>>} 包含所有 DBF 檔案名稱的數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const dbfFiles = await fetchDbfFiles();
+ * console.log(dbfFiles); // ['file1.dbf', 'file2.dbf', ...]
+ */
 export const fetchDbfFiles = async () => {
   try {
     const response = await api.get('/dbf-files');
@@ -21,7 +31,26 @@ export const fetchDbfFiles = async () => {
   }
 };
 
-// 獲取特定 DBF 檔案的記錄
+/**
+ * @function fetchDbfRecords
+ * @description 獲取特定 DBF 檔案的記錄，支持分頁、搜索、排序和日期過濾
+ * @param {string} fileName - DBF 檔案名稱
+ * @param {number} [page=1] - 頁碼，默認為 1
+ * @param {number} [pageSize=20] - 每頁記錄數，默認為 20
+ * @param {string} [search=''] - 搜索關鍵字
+ * @param {string} [field=''] - 搜索的欄位名稱
+ * @param {string} [sortField=''] - 排序的欄位名稱
+ * @param {string} [sortDirection=''] - 排序方向 ('asc' 或 'desc')
+ * @param {string} [startDate=''] - 開始日期過濾 (YYYY-MM-DD 格式)
+ * @param {string} [endDate=''] - 結束日期過濾 (YYYY-MM-DD 格式)
+ * @param {string} [statsPage='false'] - 是否為統計頁面 ('true' 或 'false')
+ * @returns {Promise<{records: Array<any>, totalCount: number}>} 包含記錄數組和總記錄數的對象
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const result = await fetchDbfRecords('patients.dbf', 1, 10, 'John', 'name');
+ * console.log(result.records); // 記錄數組
+ * console.log(result.totalCount); // 總記錄數
+ */
 export const fetchDbfRecords = async (
   fileName: string,
   page = 1,
@@ -56,7 +85,17 @@ export const fetchDbfRecords = async (
   }
 };
 
-// 獲取特定記錄
+/**
+ * @function fetchDbfRecord
+ * @description 獲取特定 DBF 檔案中的特定記錄
+ * @param {string} fileName - DBF 檔案名稱
+ * @param {number} recordNo - 記錄編號
+ * @returns {Promise<any>} 包含記錄詳情的對象
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const record = await fetchDbfRecord('patients.dbf', 123);
+ * console.log(record); // 記錄詳情
+ */
 export const fetchDbfRecord = async (fileName: string, recordNo: number) => {
   try {
     const encodedFileName = encodeURIComponent(fileName);
@@ -68,7 +107,16 @@ export const fetchDbfRecord = async (fileName: string, recordNo: number) => {
   }
 };
 
-// KCSTMR 查詢
+/**
+ * @function fetchKcstmrRecords
+ * @description 執行 KCSTMR 查詢，根據指定值獲取相關記錄
+ * @param {string} value - 查詢值
+ * @returns {Promise<Array<any>>} 包含查詢結果的數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const records = await fetchKcstmrRecords('12345');
+ * console.log(records); // 查詢結果數組
+ */
 export const fetchKcstmrRecords = async (value: string) => {
   try {
     const encodedValue = encodeURIComponent(value);
@@ -80,7 +128,18 @@ export const fetchKcstmrRecords = async (value: string) => {
   }
 };
 
-// KDRUG 查詢
+/**
+ * @function fetchKdrugRecords
+ * @description 執行 KDRUG 查詢，根據指定值和日期範圍獲取相關記錄
+ * @param {string} value - 查詢值
+ * @param {string} [startDate=''] - 開始日期過濾 (YYYY-MM-DD 格式)
+ * @param {string} [endDate=''] - 結束日期過濾 (YYYY-MM-DD 格式)
+ * @returns {Promise<Array<any>>} 包含查詢結果的數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const records = await fetchKdrugRecords('A12345', '2023-01-01', '2023-12-31');
+ * console.log(records); // 查詢結果數組
+ */
 export const fetchKdrugRecords = async (value: string, startDate = '', endDate = '') => {
   try {
     const encodedValue = encodeURIComponent(value);

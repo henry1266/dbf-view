@@ -3,7 +3,14 @@ import { Box, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
 
-const DashboardHeader = () => {
+/**
+ * @component DashboardHeader
+ * @description 儀表板頁面的頂部組件，顯示標題和當前日期，具有現代科技風格的 UI 設計
+ * @returns {JSX.Element} 渲染的儀表板頂部組件
+ * @example
+ * <DashboardHeader />
+ */
+const DashboardHeader: React.FC = () => {
   return (
     <Box sx={{
       display: 'flex',
