@@ -145,7 +145,7 @@ docker run -p 7001:7001 -p 5173:5173 dbf-viewer
 ## 最佳實踐建議
 
 ### 代碼質量與架構
-- **單元測試** - 添加 Jest 或 Vitest 進行單元測試，提高代碼可靠性
+- **單元測試** - 添加 Vitest 進行單元測試，提高代碼可靠性
 - **端到端測試** - 考慮使用 Cypress 或 Playwright 進行 E2E 測試
 - **API 文檔** - 使用 Swagger/OpenAPI 為後端 API 生成文檔
 - **狀態管理優化** - 考慮使用 React Query 或 SWR 進行數據獲取和緩存

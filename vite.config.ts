@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "node:path";
+import { configDefaults } from "vitest/config";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,11 +11,11 @@ export default defineConfig({
   plugins: [
     // Tailwind CSS 支援
     tailwindcss(),
-    // React Router 支援
-    reactRouter(),
+    // React Router 支援 (在測試環境中禁用)
+    process.env.VITEST ? [] : reactRouter(),
     // 支援 tsconfig.json 中的路徑別名
     tsconfigPaths()
-  ],
+  ].filter(Boolean),
 
   // --- CSS 相關設定 ---
   css: {
@@ -89,5 +90,35 @@ export default defineConfig({
   // 處理 SSR 中的 CSS 文件
   ssr: {
     noExternal: ['@mui/x-data-grid', '@mui/material', '@emotion/react', '@emotion/styled']
+  },
+
+  // --- Vitest 測試配置 ---
+  test: {
+    // 啟用全局變量，如 describe, it, expect
+    globals: true,
+    // 使用 jsdom 模擬瀏覽器環境
+    environment: 'jsdom',
+    // 測試前運行的設置文件
+    setupFiles: ['./vitest.setup.ts'],
+    // 包含 CSS 處理
+    css: true,
+    // 排除測試的文件和目錄
+    exclude: [...configDefaults.exclude, 'e2e/*'],
+    // 代碼覆蓋率配置
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'app/welcome/',
+        'public/',
+        '**/*.d.ts',
+        '**/*.config.ts',
+        '**/types.ts',
+        'test/'
+      ],
+    },
+    // 測試超時時間
+    testTimeout: 10000,
   }
 });
