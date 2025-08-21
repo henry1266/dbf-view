@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { MongoClient, Collection, Db } from 'mongodb';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { setupSwagger } from './swagger-ui';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,11 +95,28 @@ async function connectMongo(): Promise<Db> {
 // API 路由
 
 /**
- * @route GET /api/dbf-files
- * @description 獲取所有可用的DBF檔案列表
- * @access Public
- * @returns {Object[]} 檔案列表，每個檔案包含fileName、baseName和collectionName
- * @throws {Error} 如果獲取檔案列表失敗則返回500錯誤
+ * @openapi
+ * /api/dbf-files:
+ *   get:
+ *     summary: 獲取所有可用的DBF檔案列表
+ *     description: 返回系統中所有可用的DBF檔案列表，包含檔案名稱、基本名稱和集合名稱
+ *     tags:
+ *       - DBF 檔案
+ *     responses:
+ *       200:
+ *         description: 成功獲取檔案列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/DbfFile'
+ *       500:
+ *         description: 伺服器錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 app.get('/api/dbf-files', async (req: Request, res: Response) => {
   try {
@@ -124,21 +142,119 @@ app.get('/api/dbf-files', async (req: Request, res: Response) => {
 });
 
 /**
- * @route GET /api/dbf/:fileName
- * @description 獲取特定DBF檔案的記錄，支持分頁、搜索、排序和日期範圍篩選
- * @access Public
- * @param {string} req.params.fileName - DBF檔案名稱
- * @param {string} [req.query.page=1] - 頁碼
- * @param {string} [req.query.pageSize=20] - 每頁記錄數
- * @param {string} [req.query.search] - 搜索關鍵字
- * @param {string} [req.query.field] - 搜索的欄位名稱
- * @param {string} [req.query.sortField] - 排序欄位
- * @param {string} [req.query.sortDirection=desc] - 排序方向 (asc/desc)
- * @param {string} [req.query.startDate] - 開始日期
- * @param {string} [req.query.endDate] - 結束日期
- * @param {string} [req.query.statsPage=false] - 是否為統計頁面請求
- * @returns {Object} 包含記錄數據和分頁信息的對象
- * @throws {Error} 如果獲取記錄失敗則返回500錯誤，如果找不到檔案則返回404錯誤
+ * @openapi
+ * /api/dbf/{fileName}:
+ *   get:
+ *     summary: 獲取特定DBF檔案的記錄
+ *     description: 獲取特定DBF檔案的記錄，支持分頁、搜索、排序和日期範圍篩選
+ *     tags:
+ *       - DBF 記錄
+ *     parameters:
+ *       - in: path
+ *         name: fileName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: DBF檔案名稱
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: 頁碼
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: 每頁記錄數
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: 搜索關鍵字
+ *       - in: query
+ *         name: field
+ *         schema:
+ *           type: string
+ *         description: 搜索的欄位名稱
+ *       - in: query
+ *         name: sortField
+ *         schema:
+ *           type: string
+ *         description: 排序欄位
+ *       - in: query
+ *         name: sortDirection
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: 排序方向
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *         description: 開始日期 (格式：YYMMDD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *         description: 結束日期 (格式：YYMMDD)
+ *       - in: query
+ *         name: statsPage
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *           default: 'false'
+ *         description: 是否為統計頁面請求
+ *     responses:
+ *       200:
+ *         description: 成功獲取記錄
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 fileName:
+ *                   type: string
+ *                   description: DBF檔案名稱
+ *                 records:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DbfRecord'
+ *                   description: 記錄數據
+ *                 pagination:
+ *                   $ref: '#/components/schemas/Pagination'
+ *                 sortApplied:
+ *                   type: object
+ *                   properties:
+ *                     field:
+ *                       type: string
+ *                     direction:
+ *                       type: string
+ *                 filters:
+ *                   type: object
+ *                   properties:
+ *                     search:
+ *                       type: string
+ *                     field:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                     endDate:
+ *                       type: string
+ *       404:
+ *         description: 找不到檔案
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: 伺服器錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   const { fileName } = req.params;
@@ -450,7 +566,47 @@ app.get('/api/dbf/:fileName', async (req: Request, res: Response) => {
   }
 });
 
-// 獲取特定記錄
+/**
+ * @openapi
+ * /api/dbf/{fileName}/{recordNo}:
+ *   get:
+ *     summary: 獲取特定記錄
+ *     description: 根據檔案名稱和記錄編號獲取特定記錄的詳細信息
+ *     tags:
+ *       - DBF 記錄
+ *     parameters:
+ *       - in: path
+ *         name: fileName
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: DBF檔案名稱
+ *       - in: path
+ *         name: recordNo
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 記錄編號
+ *     responses:
+ *       200:
+ *         description: 成功獲取記錄
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DbfRecord'
+ *       404:
+ *         description: 找不到檔案或記錄
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: 伺服器錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 app.get('/api/dbf/:fileName/:recordNo', async (req: Request, res: Response) => {
   const { fileName, recordNo } = req.params;
   
@@ -477,7 +633,54 @@ app.get('/api/dbf/:fileName/:recordNo', async (req: Request, res: Response) => {
   }
 });
 
-// KCSTMR 查詢
+/**
+ * @openapi
+ * /api/KCSTMR/{value}:
+ *   get:
+ *     summary: KCSTMR 查詢
+ *     description: 根據 KCSTMR 值查詢相關記錄
+ *     tags:
+ *       - 特殊查詢
+ *     parameters:
+ *       - in: path
+ *         name: value
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: KCSTMR 值
+ *     responses:
+ *       200:
+ *         description: 成功獲取查詢結果
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 kcstmrValue:
+ *                   type: string
+ *                   description: 查詢的 KCSTMR 值
+ *                 recordsByFile:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: object
+ *                     properties:
+ *                       records:
+ *                         type: array
+ *                         items:
+ *                           $ref: '#/components/schemas/DbfRecord'
+ *                       count:
+ *                         type: integer
+ *                   description: 按檔案分組的記錄
+ *                 totalRecords:
+ *                   type: integer
+ *                   description: 總記錄數
+ *       500:
+ *         description: 伺服器錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 app.get('/api/KCSTMR/:value', async (req: Request, res: Response) => {
   const { value } = req.params;
   
@@ -517,7 +720,83 @@ app.get('/api/KCSTMR/:value', async (req: Request, res: Response) => {
   }
 });
 
-// KDRUG 查詢
+/**
+ * @openapi
+ * /api/KDRUG/{value}:
+ *   get:
+ *     summary: KDRUG 查詢
+ *     description: 根據 KDRUG 值查詢相關記錄，支持日期範圍篩選
+ *     tags:
+ *       - 特殊查詢
+ *     parameters:
+ *       - in: path
+ *         name: value
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: KDRUG 值
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *         description: 開始日期 (格式：YYMMDD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *         description: 結束日期 (格式：YYMMDD)
+ *     responses:
+ *       200:
+ *         description: 成功獲取查詢結果
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 kdrugValue:
+ *                   type: string
+ *                   description: 查詢的 KDRUG 值
+ *                 records:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DbfRecord'
+ *                   description: 查詢結果記錄
+ *                 totalRecords:
+ *                   type: integer
+ *                   description: 總記錄數
+ *                 totalPTQTY:
+ *                   type: number
+ *                   description: PTQTY 總和
+ *                 totalPTQTY_I:
+ *                   type: number
+ *                   description: LDRU 為 I 的 PTQTY 總和
+ *                 totalPTQTY_O:
+ *                   type: number
+ *                   description: LDRU 為 O 的 PTQTY 總和
+ *                 startDate:
+ *                   type: string
+ *                   description: 查詢的開始日期
+ *                 endDate:
+ *                   type: string
+ *                   description: 查詢的結束日期
+ *                 allDates:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: 所有不重複的日期
+ *       404:
+ *         description: 找不到相關集合
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: 伺服器錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 app.get('/api/KDRUG/:value', async (req: Request, res: Response) => {
   const { value } = req.params;
   const { startDate = '', endDate = '' } = req.query as { startDate?: string; endDate?: string };
@@ -648,6 +927,9 @@ app.get('/api/KDRUG/:value', async (req: Request, res: Response) => {
     res.status(500).json({ error: `查詢 KDRUG=${value} 時發生錯誤` });
   }
 });
+
+// 設置 Swagger UI
+setupSwagger(app);
 
 // 啟動伺服器
 app.listen(port, () => {
