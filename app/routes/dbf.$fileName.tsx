@@ -34,7 +34,7 @@ interface Column {
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
-  format?: (value: any) => string;
+  format?: (value: any, record?: any) => string;
 }
 
 // 計算表格的列定義
@@ -50,12 +50,42 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
   
   // 優先顯示欄位
   const priorityColumns = priorityFields.map(field => {
-    // 為 MPERSONID 欄位設置更寬的寬度
+    // 為 MPERSONID 欄位設置寬度
     if (field === 'MPERSONID') {
       return {
         id: field,
         label: field,
         align: 'left' as const
+      };
+    }
+    
+    // 為 LLDCN_LLDTT 合併欄位設置特殊處理
+    if (field === 'LLDCN_LLDTT') {
+      return {
+        id: field,
+        label: 'LLDCN/LLDTT', // 顯示名稱
+        align: 'left' as const,
+        format: (value: any, record: DbfRecord) => {
+          if (!record) return '';
+          const lldcn = record.data.LLDCN || '';
+          const lldtt = record.data.LLDTT || '';
+          return `${lldcn}/${lldtt}`;
+        }
+      };
+    }
+    
+    // 為 DATA_TIME 合併欄位設置特殊處理
+    if (field === 'DATA_TIME') {
+      return {
+        id: field,
+        label: 'DATA/TIME', // 顯示名稱
+        align: 'left' as const,
+        format: (value: any, record: DbfRecord) => {
+          if (!record) return '';
+          const date = record.data.DATE || '';
+          const time = record.data.TIME || '';
+          return `${date}/${time}`;
+        }
       };
     }
     
@@ -106,7 +136,7 @@ export default function DbfFile() {
     } else if (fileName.toUpperCase() === 'CO02P.DBF') {
       return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
-      return ['KCSTMR', 'LNAME', 'MPERSONID', 'DATE', 'TIME', 'LPID', 'LISRS' , 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'A97', 'TOT'];
+      return ['KCSTMR', 'LNAME', 'MPERSONID', 'DATA_TIME', 'LPID', 'LISRS' , 'LCS', 'DAYQTY', 'LDRU', 'LLDCN_LLDTT', 'A2', 'A99', 'A97', 'TOT'];
     }
     return [];
   };
@@ -609,7 +639,7 @@ export default function DbfFile() {
                                             fontFamily: 'monospace',
                                           }}
                                         >
-                                          {column.format ? column.format(value) : value}
+                                          {column.format ? column.format(value, record) : value}
                                         </TableCell>
                                       );
                                     })}
