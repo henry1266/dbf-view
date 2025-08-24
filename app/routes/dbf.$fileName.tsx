@@ -1,319 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
-import { fetchDbfRecords, fetchMatchingCO02PRecords } from '../services/api';
-import { TextField, Select, MenuItem, Button, Box, InputLabel, FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TableSortLabel, Typography, Collapse, IconButton } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
-// 引入組件
+import { fetchDbfRecords } from '../services/api';
+import { Button, Box, Typography, Paper } from '@mui/material';
 import TechBackground from '../components/TechBackground';
 
-// 配對記錄顯示組件
-interface MatchingCO02PRecordsProps {
-  co03lRecord: DbfRecord;
-}
+// 引入型別定義
+import type { DbfRecordsResponse } from '../types/dbf.types';
 
-function MatchingCO02PRecords({ co03lRecord }: MatchingCO02PRecordsProps) {
-  const [open, setOpen] = useState(false);
-  const [matchingRecords, setMatchingRecords] = useState<DbfRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// 引入工具函數
+import { getColumns, getPriorityFields } from '../utils/dbf-table.utils';
 
-  // 獲取配對的 CO02P 記錄
-  const fetchMatchingRecords = async () => {
-    if (!co03lRecord || !co03lRecord.data) return;
+// 引入元件
+import DbfSearchForm from '../components/dbf/DbfSearchForm';
+import DbfTable from '../components/dbf/DbfTable';
+import DbfPagination from '../components/dbf/DbfPagination';
 
-    const kcstmr = co03lRecord.data.KCSTMR;
-    const date = co03lRecord.data.DATE;
-    const time = co03lRecord.data.TIME;
-
-    if (!kcstmr || !date || !time) {
-      setError('缺少必要的配對欄位：KCSTMR、DATE 或 TIME');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const records = await fetchMatchingCO02PRecords(kcstmr, date, time);
-      setMatchingRecords(records);
-      setError(null);
-    } catch (err) {
-      console.error('獲取配對記錄失敗:', err);
-      setError('無法獲取配對的 CO02P 記錄');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 當展開面板時獲取配對記錄
-  useEffect(() => {
-    if (open && matchingRecords.length === 0 && !loading) {
-      fetchMatchingRecords();
-    }
-  }, [open]);
-
-  // 定義 CO02P 表格的列
-  const co02pColumns = [
-    { id: 'recordNo', label: '#', align: 'left' as const },
-    { id: 'KCSTMR', label: 'KCSTMR', align: 'left' as const },
-    { id: 'PDATE', label: 'PDATE', align: 'left' as const },
-    { id: 'PTIME', label: 'PTIME', align: 'left' as const },
-    { id: 'PLM', label: 'PLM', align: 'left' as const },
-    { id: 'PRMK', label: 'PRMK', align: 'left' as const },
-    { id: 'KDRUG', label: 'KDRUG', align: 'left' as const },
-    { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
-    { id: 'actions', label: '操作', align: 'center' as const }
-  ];
-
-  return (
-    <Box sx={{ mt: 1, mb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(100, 255, 218, 0.05)', p: 1, borderRadius: 1 }}>
-        <IconButton
-          aria-label="展開配對記錄"
-          size="small"
-          onClick={() => setOpen(!open)}
-          sx={{ color: '#64ffda' }}
-        >
-          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </IconButton>
-        <Typography variant="subtitle1" sx={{ ml: 1, color: '#64ffda' }}>
-          配對的 CO02P 記錄
-        </Typography>
-      </Box>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <Box sx={{ mt: 1, bgcolor: 'rgba(0, 0, 0, 0.2)', p: 1, borderRadius: 1 }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </Box>
-          ) : error ? (
-            <Box sx={{ bgcolor: 'rgba(255, 0, 0, 0.1)', p: 1, borderRadius: 1, color: '#ff6b6b' }}>
-              <Typography variant="body2">{error}</Typography>
-            </Box>
-          ) : matchingRecords.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#e6f1ff', p: 1 }}>
-              沒有找到配對的 CO02P 記錄
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} sx={{
-              maxHeight: '300px',
-              bgcolor: 'rgba(10, 25, 47, 0.7)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(100, 255, 218, 0.1)',
-            }}>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    {co02pColumns.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        sx={{
-                          bgcolor: 'rgba(10, 25, 47, 0.9)',
-                          color: 'rgba(230, 241, 255, 0.8);',
-                          borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
-                          fontSize: '0.9rem',
-                          padding: '8px',
-                        }}
-                      >
-                        {column.label}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {matchingRecords.map((record) => (
-                    <TableRow
-                      key={record._id}
-                      hover
-                      sx={{
-                        '&:hover': {
-                          bgcolor: 'rgba(100, 255, 218, 0.05) !important',
-                        },
-                        '&:nth-of-type(odd)': {
-                          bgcolor: 'rgba(0, 0, 0, 0.1)',
-                        },
-                      }}
-                    >
-                      {co02pColumns.map((column) => {
-                        let value;
-                        if (column.id === 'recordNo') {
-                          value = record._recordNo;
-                        } else if (column.id === 'actions') {
-                          return (
-                            <TableCell
-                              key={column.id}
-                              align={column.align}
-                              sx={{
-                                color: '#e6f1ff',
-                                borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                                fontSize: '0.9rem',
-                                padding: '8px',
-                              }}
-                            >
-                              <Link
-                                to={`/dbf/CO02P.DBF/${record._recordNo}`}
-                                style={{
-                                  color: '#64ffda',
-                                  textDecoration: 'none',
-                                }}
-                              >
-                                詳情
-                              </Link>
-                            </TableCell>
-                          );
-                        } else {
-                          value = record.data[column.id];
-                        }
-
-                        return (
-                          <TableCell
-                            key={column.id}
-                            align={column.align}
-                            sx={{
-                              color: '#e6f1ff',
-                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                              fontSize: '0.9rem',
-                              padding: '8px',
-                              fontFamily: 'monospace',
-                            }}
-                          >
-                            {value}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Box>
-      </Collapse>
-    </Box>
-  );
-}
-
-interface DbfRecord {
-  _id: string;
-  _recordNo: number;
-  _file: string;
-  hash: string;
-  data: Record<string, any>;
-  _created: string;
-  _updated: string;
-}
-
-interface DbfRecordsResponse {
-  fileName: string;
-  records: DbfRecord[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    total: number;
-    pageSize: number;
-  };
-}
-
-// 定義列的接口
-interface Column {
-  id: string;
-  label: string;
-  minWidth?: number;
-  align?: 'right' | 'left' | 'center';
-  format?: (value: any, record?: any) => string;
-}
-
-// 計算表格的列定義
-function getColumns(priorityFields: string[], availableFields: string[], fileName: string): Column[] {
-  // 基本列定義
-  const baseColumns: Column[] = [
-    {
-      id: 'recordNo',
-      label: '#',
-      align: 'left'
-    }
-  ];
-  
-  // 優先顯示欄位
-  const priorityColumns = priorityFields.map(field => {
-    // 為 MPERSONID 欄位設置寬度
-    if (field === 'MPERSONID') {
-      return {
-        id: field,
-        label: field,
-        align: 'left' as const
-      };
-    }
-    
-    // 為 LLDCN_LLDTT 合併欄位設置特殊處理
-    if (field === 'LLDCN_LLDTT') {
-      return {
-        id: field,
-        label: 'LLDCN/LLDTT', // 顯示名稱
-        align: 'left' as const,
-        format: (value: any, record: DbfRecord) => {
-          if (!record) return '';
-          const lldcn = record.data.LLDCN || '';
-          const lldtt = record.data.LLDTT || '';
-          return `${lldcn}/${lldtt}`;
-        }
-      };
-    }
-    
-    // 為 DATA_TIME 合併欄位設置特殊處理
-    if (field === 'DATA_TIME') {
-      return {
-        id: field,
-        label: 'DATA/TIME', // 顯示名稱
-        align: 'left' as const,
-        format: (value: any, record: DbfRecord) => {
-          if (!record) return '';
-          const date = record.data.DATE || '';
-          const time = record.data.TIME || '';
-          return `${date}/${time}`;
-        }
-      };
-    }
-    
-    // 為 LPID_LDRU 合併欄位設置特殊處理
-    if (field === 'LPID_LDRU') {
-      return {
-        id: field,
-        label: 'LPID/LDRU', // 顯示名稱
-        align: 'left' as const,
-        format: (value: any, record: DbfRecord) => {
-          if (!record) return '';
-          const lpid = record.data.LPID || '';
-          const ldru = record.data.LDRU || '';
-          return `${lpid}/${ldru}`;
-        }
-      };
-    }
-    
-    return {
-      id: field,
-      label: field,
-      align: 'left' as const
-    };
-  });
-  
-  // 操作列
-  const actionColumn = {
-    id: 'actions',
-    label: '操作',
-    align: 'center' as const
-  };
-  
-  // 只返回基本列、優先欄位和操作列，不包含其他欄位
-  return [...baseColumns, ...priorityColumns, actionColumn];
-}
-
+/**
+ * DBF 檔案瀏覽元件
+ * 顯示 DBF 檔案的記錄列表
+ */
 export default function DbfFile() {
+  // 路由參數
   const params = useParams<{ fileName: string }>();
   const fileName = params.fileName ? decodeURIComponent(params.fileName) : '';
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // URL 參數
   const page = parseInt(searchParams.get('page') || '1');
   const pageSize = parseInt(searchParams.get('pageSize') || '20');
   const search = searchParams.get('search') || '';
@@ -322,35 +35,87 @@ export default function DbfFile() {
   const sortField = searchParams.get('sortField') || 'PDATE';
   const sortDirection = searchParams.get('sortDirection') || 'desc';
 
+  // 狀態
   const [data, setData] = useState<DbfRecordsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchValue, setSearchValue] = useState(search);
-  const [searchField, setSearchField] = useState(field);
   const [availableFields, setAvailableFields] = useState<string[]>([]);
-  
-  // 記錄是否正在加載數據
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  // 排序相關狀態
+  const [order, setOrder] = useState<'asc' | 'desc'>(sortDirection as 'asc' | 'desc' || 'desc');
+  const [orderBy, setOrderBy] = useState<string>(sortField || 'PDATE');
 
   // 設置優先顯示欄位
-  const getPriorityFields = (fileName: string) => {
-    if (fileName.toUpperCase() === 'CO01M.DBF') {
-      return ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'MSEX'];
-    } else if (fileName.toUpperCase() === 'CO02P.DBF') {
-      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
-    } else if (fileName.toUpperCase() === 'CO03L.DBF') {
-      return ['KCSTMR', 'LNAME', 'MPERSONID', 'DATA_TIME', 'LPID_LDRU', 'LISRS' , 'LCS', 'DAYQTY', 'LLDCN_LLDTT', 'A2', 'A99', 'A97', 'TOT'];
-    }
-    return [];
-  };
-
   const priorityFields = fileName ? getPriorityFields(fileName) : [];
   
-  // 在組件頂層計算列定義，確保 hooks 調用一致性
+  // 計算列定義
   const columns = React.useMemo(
     () => getColumns(priorityFields, availableFields, fileName),
     [priorityFields, availableFields, fileName]
   );
+
+  // 使用 ref 來防止無限循環
+  const initialSortApplied = React.useRef(false);
+  
+  // 初始化排序參數 - 只在組件首次加載時執行一次
+  useEffect(() => {
+    // 如果已經應用過初始排序，則不再執行
+    if (initialSortApplied.current) return;
+    
+    // 標記為已應用初始排序
+    initialSortApplied.current = true;
+    
+    // 檢查URL中是否已有排序參數
+    const urlSortField = searchParams.get('sortField');
+    const urlSortDirection = searchParams.get('sortDirection');
+    
+    // 只有在URL中沒有排序參數時，才設置默認排序
+    if (!urlSortField || !urlSortDirection) {
+      console.log('URL中沒有排序參數，設置默認排序');
+      
+      // 根據檔案名稱設置不同的默認排序
+      let defaultSortField = 'PDATE';
+      let defaultSortDirection = 'desc';
+      
+      // 如果是CO03L.DBF，則默認按_recordNo排序
+      if (fileName.toUpperCase() === 'CO03L.DBF') {
+        defaultSortField = '_recordNo';
+        console.log('檔案是CO03L.DBF，默認按記錄編號排序');
+      }
+      
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('sortField', defaultSortField);
+      newParams.set('sortDirection', defaultSortDirection);
+      
+      // 直接設置內部狀態
+      setOrder(defaultSortDirection as 'asc' | 'desc');
+      setOrderBy(defaultSortField);
+      
+      // 更新URL參數
+      setSearchParams(newParams);
+      
+      console.log('排序參數已設置:', {
+        sortField: defaultSortField,
+        sortDirection: defaultSortDirection,
+        order: defaultSortDirection,
+        orderBy: defaultSortField
+      });
+      
+      // 強制加載數據，確保使用正確的排序參數
+      loadData();
+    } else {
+      console.log('使用URL中的排序參數:', {
+        sortField: urlSortField,
+        sortDirection: urlSortDirection
+      });
+      
+      // 直接設置內部狀態，與URL參數保持一致
+      setOrder(urlSortDirection as 'asc' | 'desc');
+      setOrderBy(urlSortField);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空依賴數組，確保只在組件首次加載時執行一次
 
   // 加載數據的函數
   const loadData = async (): Promise<void> => {
@@ -420,86 +185,12 @@ export default function DbfFile() {
     }
   };
 
-  // 使用 ref 來防止無限循環
-  const initialSortApplied = React.useRef(false);
-  
-  // 初始化排序參數 - 只在組件首次加載時執行一次
-  useEffect(() => {
-    // 如果已經應用過初始排序，則不再執行
-    if (initialSortApplied.current) return;
-    
-    // 標記為已應用初始排序
-    initialSortApplied.current = true;
-    
-    // 檢查URL中是否已有排序參數
-    const urlSortField = searchParams.get('sortField');
-    const urlSortDirection = searchParams.get('sortDirection');
-    
-    // 只有在URL中沒有排序參數時，才設置默認排序
-    if (!urlSortField || !urlSortDirection) {
-      console.log('URL中沒有排序參數，設置默認排序');
-      
-      // 根據檔案名稱設置不同的默認排序
-      let defaultSortField = 'PDATE';
-      let defaultSortDirection = 'desc';
-      
-      // 如果是CO03L.DBF，則默認按_recordNo排序
-      if (fileName.toUpperCase() === 'CO03L.DBF') {
-        defaultSortField = '_recordNo';
-        console.log('檔案是CO03L.DBF，默認按記錄編號排序');
-      }
-      
-      const newParams = new URLSearchParams(searchParams);
-      newParams.set('sortField', defaultSortField);
-      newParams.set('sortDirection', defaultSortDirection);
-      
-      // 直接設置內部狀態
-      setOrder(defaultSortDirection as 'asc' | 'desc');
-      setOrderBy(defaultSortField);
-      
-      // 更新URL參數
-      setSearchParams(newParams);
-      
-      console.log('排序參數已設置:', {
-        sortField: defaultSortField,
-        sortDirection: defaultSortDirection,
-        order: defaultSortDirection,
-        orderBy: defaultSortField
-      });
-      
-      // 強制加載數據，確保使用正確的排序參數
-      loadData();
-    } else {
-      console.log('使用URL中的排序參數:', {
-        sortField: urlSortField,
-        sortDirection: urlSortDirection
-      });
-      
-      // 直接設置內部狀態，與URL參數保持一致
-      setOrder(urlSortDirection as 'asc' | 'desc');
-      setOrderBy(urlSortField);
-    }
-  }, []); // 空依賴數組，確保只在組件首次加載時執行一次
-
   // 加載數據
   useEffect(() => {
     loadData();
   }, [fileName, page, pageSize, search, field, sortField, sortDirection]);
 
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('page', '1');
-    newParams.set('search', searchValue);
-    if (searchField) {
-      newParams.set('field', searchField);
-    } else {
-      newParams.delete('field');
-    }
-    setSearchParams(newParams);
-  };
-
+  // 處理頁碼變更
   const handlePageChange = (newPage: number, newPageSize?: number) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', newPage.toString());
@@ -508,12 +199,6 @@ export default function DbfFile() {
     }
     setSearchParams(newParams);
   };
-
-  // 這些函數已經不再需要，因為我們完全使用後端排序和分頁
-
-  // 排序相關狀態 - 默認按PDATE降序排序
-  const [order, setOrder] = useState<'asc' | 'desc'>(sortDirection as 'asc' | 'desc' || 'desc');
-  const [orderBy, setOrderBy] = useState<string>(sortField || 'PDATE');
   
   // 處理排序變化
   const handleRequestSort = (property: string) => {
@@ -599,101 +284,23 @@ export default function DbfFile() {
           </Typography>
           
           <Box sx={{ bgcolor: 'rgba(255, 255, 255, 0.05)', p: '1%', borderRadius: 2, backdropFilter: 'blur(10px)' }}>
-
-              {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                </Box>
-              ) : error ? (
-                <Box sx={{ bgcolor: 'rgba(255, 0, 0, 0.1)', p: 1, borderRadius: 1, color: '#ff6b6b' }}>
-                  <Typography variant="body1">{error}</Typography>
-                </Box>
-              ) : (
-                <>
-                  {/* 搜尋表單和統計按鈕 */}
-                  <Box sx={{ mb: '2%', p: '1%', bgcolor: 'rgba(0, 0, 0, 0.2)', borderRadius: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      {fileName.toUpperCase() === 'CO03L.DBF' && (
-                        <Button
-                          component={Link}
-                          to={`/dbf-stats/${fileName}`}
-                          variant="contained"
-                          sx={{
-                            bgcolor: 'rgba(100, 255, 218, 0.1)',
-                            color: '#64ffda',
-                            border: '1px solid rgba(100, 255, 218, 0.3)',
-                            '&:hover': {
-                              bgcolor: 'rgba(100, 255, 218, 0.2)',
-                            },
-                          }}
-                        >
-                          LDRU 統計分析
-                        </Button>
-                      )}
-                    </Box>
-                    <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
-                      <TextField
-                        id="searchValue"
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        placeholder="輸入搜尋值"
-                        size="small"
-                        fullWidth
-                        sx={{
-                          flexGrow: 1,
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderColor: 'rgba(100, 255, 218, 0.3)',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'rgba(100, 255, 218, 0.5)',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#64ffda',
-                            },
-                          },
-                          '& .MuiInputBase-input': {
-                            color: '#e6f1ff',
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: '#e6f1ff',
-                          },
-                        }}
-                      />
-                      <FormControl sx={{ minWidth: 180 }} size="small">
-                        <InputLabel id="search-field-label" sx={{ color: '#e6f1ff' }}>欄位</InputLabel>
-                        <Select
-                          labelId="search-field-label"
-                          id="searchField"
-                          value={searchField}
-                          onChange={(e) => setSearchField(e.target.value as string)}
-                          label="欄位"
-                          sx={{
-                            color: '#e6f1ff',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(100, 255, 218, 0.3)',
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(100, 255, 218, 0.5)',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: '#64ffda',
-                            },
-                            '& .MuiSvgIcon-root': {
-                              color: '#e6f1ff',
-                            },
-                          }}
-                        >
-                          <MenuItem value="">所有欄位</MenuItem>
-                          {availableFields.map((field) => (
-                            <MenuItem key={field} value={field}>
-                              {field}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              </Box>
+            ) : error ? (
+              <Box sx={{ bgcolor: 'rgba(255, 0, 0, 0.1)', p: 1, borderRadius: 1, color: '#ff6b6b' }}>
+                <Typography variant="body1">{error}</Typography>
+              </Box>
+            ) : (
+              <>
+                {/* 搜尋表單和統計按鈕 */}
+                <Box sx={{ mb: '2%', p: '1%', bgcolor: 'rgba(0, 0, 0, 0.2)', borderRadius: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    {fileName.toUpperCase() === 'CO03L.DBF' && (
                       <Button
-                        type="submit"
+                        component={Link}
+                        to={`/dbf-stats/${fileName}`}
                         variant="contained"
                         sx={{
                           bgcolor: 'rgba(100, 255, 218, 0.1)',
@@ -704,188 +311,47 @@ export default function DbfFile() {
                           },
                         }}
                       >
-                        搜尋
+                        LDRU 統計分析
                       </Button>
-                    </form>
+                    )}
                   </Box>
+                  
+                  {/* 搜尋表單元件 */}
+                  <DbfSearchForm 
+                    availableFields={availableFields}
+                    initialSearch={search}
+                    initialField={field}
+                  />
+                </Box>
 
-                  {/* 數據表格 */}
-                  {data && (
-                    <Box>      
-                      <Paper sx={{
-                        width: '100%',
-                        overflow: 'hidden',
-                        bgcolor: 'rgba(10, 25, 47, 0.7)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(100, 255, 218, 0.1)',
-                      }}>
-                        <TableContainer sx={{
-                          maxHeight: 'calc(85vh - 250px)',
-                          overflowY: 'auto',
-                          '&::-webkit-scrollbar': {
-                            width: '0px',
-                            background: 'transparent'
-                          },
-                          msOverflowStyle: 'none',
-                          scrollbarWidth: 'none'
-                        }}>
-                          <Table
-                            stickyHeader
-                            aria-label="數據表格"
-                            size="small"
-                            sx={{ tableLayout: 'auto' }} // 改為 auto，讓列寬可以根據內容自動調整
-                          >
-                            <TableHead>
-                              <TableRow>
-                                {columns.map((column) => (
-                                  <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                    sx={{
-                                      bgcolor: 'rgba(10, 25, 47, 0.9)',
-                                      color: 'rgba(230, 241, 255, 0.8);',
-                                      borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
-                                      // 調整表頭字體
-                                      fontSize: '1rem',
-                                      padding: '11px',
-                                    }}
-                                  >
-                                    {column.id !== 'actions' ? (
-                                      <TableSortLabel
-                                        active={orderBy === column.id}
-                                        direction={orderBy === column.id ? order : 'asc'}
-                                        onClick={() => handleRequestSort(column.id)}
-                                        sx={{
-                                          color: '#e6f1ff !important',
-                                          '&.Mui-active': {
-                                            color: '#64ffda !important',
-                                          },
-                                          '& .MuiTableSortLabel-icon': {
-                                            color: 'inherit !important',
-                                          },
-                                        }}
-                                      >
-                                        {column.label}
-                                        {column.id === 'PDATE' && (
-                                          <span style={{ marginLeft: '4px', fontSize: '0.8rem', color: '#64ffda' }}>
-                                            (民國年)
-                                          </span>
-                                        )}
-                                      </TableSortLabel>
-                                    ) : (
-                                      column.label
-                                    )}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {(data?.records || []).map((record) => {
-                                return (
-                                  <TableRow
-                                    hover
-                                    role="checkbox"
-                                    tabIndex={-1}
-                                    key={record._id}
-                                    sx={{
-                                      '&:hover': {
-                                        bgcolor: 'rgba(100, 255, 218, 0.05) !important',
-                                      },
-                                      '&:nth-of-type(odd)': {
-                                        bgcolor: 'rgba(0, 0, 0, 0.1)',
-                                      },
-
-                                    }}
-                                  >
-                                    {columns.map((column) => {
-                                      let value;
-                                      if (column.id === 'recordNo') {
-                                        value = record._recordNo;
-                                      } else if (column.id === 'actions') {
-                                        return (
-                                          <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                            sx={{
-                                              color: '#e6f1ff',
-                                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)'
-                                            }}
-                                          >
-                                            <Link
-                                              to={`/dbf/${fileName}/${record._recordNo}`}
-                                              style={{
-                                                color: '#64ffda',
-                                                textDecoration: 'none',
-                                              }}
-                                            >
-                                              詳情
-                                            </Link>
-                                          </TableCell>
-                                        );
-                                      } else {
-                                        value = record.data[column.id];
-                                      }
-                                      
-
-                                      
-                                      return (
-                                        <TableCell
-                                          key={column.id}
-                                          align={column.align}
-                                          sx={{
-                                            color: '#e6f1ff',
-                                            borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                                            // 調整字體大小和行高
-                                            fontSize: '1rem',
-                                            padding: '12px',
-                                            fontFamily: 'monospace',
-                                          }}
-                                        >
-                                          {column.format ? column.format(value, record) : value}
-                                        </TableCell>
-                                      );
-                                    })}
-                                  </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                        <TablePagination
-                          rowsPerPageOptions={[10, 20, 50, 100]}
-                          component="div"
-                          count={data?.pagination.total || 0}
-                          rowsPerPage={pageSize}
-                          page={page - 1}
-                          onPageChange={(event, newPage) => handlePageChange(newPage + 1)}
-                          onRowsPerPageChange={(event) => {
-                            handlePageChange(1, parseInt(event.target.value, 10));
-                          }}
-                          labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
-                          labelRowsPerPage="每頁筆數:"
-                          sx={{
-                            color: '#e6f1ff',
-                            '.MuiTablePagination-select': {
-                              color: '#e6f1ff',
-                            },
-                            '.MuiTablePagination-selectIcon': {
-                              color: '#e6f1ff',
-                            },
-                            '.MuiTablePagination-actions': {
-                              color: '#64ffda',
-                            },
-                          }}
-                        />
-                      </Paper>
-                    </Box>
-                  )}
-                </>
-              )}
-            </Box>
+                {/* 數據表格 */}
+                {data && (
+                  <Box>      
+                    {/* 表格元件 */}
+                    <DbfTable 
+                      data={data}
+                      columns={columns}
+                      fileName={fileName}
+                      orderBy={orderBy}
+                      order={order}
+                      onRequestSort={handleRequestSort}
+                    />
+                    
+                    {/* 分頁元件 */}
+                    <DbfPagination 
+                      total={data?.pagination.total || 0}
+                      page={page}
+                      pageSize={pageSize}
+                      onPageChange={handlePageChange}
+                    />
+                  </Box>
+                )}
+              </>
+            )}
           </Box>
-        </TechBackground>
-      </Layout>
+        </Box>
+      </TechBackground>
+    </Layout>
   );
 }
 
