@@ -392,6 +392,33 @@ router.get('/:fileName', async (req: Request, res: Response) => {
     // 執行聚合查詢
     const records = await collection.aggregate(aggregationPipeline).toArray();
     
+    // 如果是 CO03L.DBF，在應用層面添加 MPERSONID 欄位
+    if (baseName.toUpperCase() === 'CO03L') {
+      // 獲取 CO01M 集合
+      const co01mCollection = getCollection('co01m');
+      
+      if (co01mCollection) {
+        // 從 CO01M 集合中獲取 KCSTMR -> MPERSONID 的映射
+        const co01mRecords = await co01mCollection.find({}, { projection: { 'data.KCSTMR': 1, 'data.MPERSONID': 1 } }).toArray();
+        
+        // 建立 KCSTMR -> MPERSONID 的映射
+        const kcstmrToMpersonid: Record<string, string> = {};
+        for (const record of co01mRecords) {
+          if (record.data && record.data.KCSTMR && record.data.MPERSONID) {
+            kcstmrToMpersonid[record.data.KCSTMR.trim()] = record.data.MPERSONID.trim();
+          }
+        }
+        
+        // 在應用層面為每條記錄添加 MPERSONID 欄位
+        for (const record of records) {
+          if (record.data && record.data.KCSTMR) {
+            const kcstmr = record.data.KCSTMR.trim();
+            record.data.MPERSONID = kcstmrToMpersonid[kcstmr] || '';
+          }
+        }
+      }
+    }
+    
     const response: DbfRecordsResponse = {
       fileName,
       records,
