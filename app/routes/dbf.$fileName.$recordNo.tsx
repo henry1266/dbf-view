@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
+import { Box, Typography } from '@mui/material';
 
 // 引入型別定義
 import type { DbfRecord } from '../types/dbf.types';
 
 // 引入元件
-import MatchingCO02PRecords from '../components/dbf/MatchingCO02PRecords';
+import MatchingCO02PRecordsNoCollapse from '../components/dbf/MatchingCO02PRecordsNoCollapse';
+import MainFields from '../components/dbf/MainFields';
+import CollapsibleFields from '../components/dbf/CollapsibleFields';
 
 export default function DbfRecordDetail() {
   const params = useParams<{ fileName: string; recordNo: string }>();
@@ -79,14 +82,6 @@ export default function DbfRecordDetail() {
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="bg-gray-50 p-3 rounded">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">記錄編號</h3>
-                <p className="text-gray-900">{record._recordNo}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">檔案名稱</h3>
-                <p className="text-gray-900">{record._file}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded">
                 <h3 className="text-sm font-medium text-gray-500 mb-2">建立時間</h3>
                 <p className="text-gray-900">{new Date(record._created).toLocaleString()}</p>
               </div>
@@ -96,52 +91,23 @@ export default function DbfRecordDetail() {
               </div>
             </div>
 
-            <h3 className="text-lg font-medium text-gray-700 mb-3">記錄資料</h3>
+            {/* 第一區：主要欄位 */}
+            <MainFields
+              record={record}
+              fields={['_recordNo', 'KCSTMR', 'LNAME', 'MPERSONID', 'DATE', 'LISRS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT']}
+              title="主要欄位"
+            />
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      欄位
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      值
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {/* 優先顯示欄位 */}
-                  {priorityFields.map((field) => (
-                    <tr key={field} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {field}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {record.data[field] || ''}
-                      </td>
-                    </tr>
-                  ))}
-                  {/* 其他欄位 */}
-                  {Object.entries(record.data)
-                    .filter(([key]) => !priorityFields.includes(key))
-                    .map(([key, value]) => (
-                      <tr key={key} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {key}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {value || ''}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+            {/* 第三區：剩餘欄位（摺疊） */}
+            <CollapsibleFields
+              record={record}
+              excludeFields={['KCSTMR', 'LNAME', 'MPERSONID', 'DATE', 'LISRS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT']}
+              title="其他欄位"
+            />
 
             {/* 特殊處理：如果是 co02p.DBF 記錄，提供 KCSTMR 和 KDRUG 的快速鏈接 */}
             {fileName?.toUpperCase() === 'CO02P.DBF' && record.data.KCSTMR && (
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-6 mb-6 flex flex-wrap gap-2">
                 <Link
                   to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
@@ -159,23 +125,21 @@ export default function DbfRecordDetail() {
               </div>
             )}
 
-            {/* 特殊處理：如果是 CO03L.DBF 記錄，提供 KCSTMR 的快速鏈接和配對資料 */}
+            {/* 特殊處理：如果是 CO03L.DBF 記錄，提供 KCSTMR 的快速鏈接 */}
+            {fileName?.toUpperCase() === 'CO03L.DBF' && record.data.KCSTMR && (
+              <div className="mt-6 mb-6">
+                <Link
+                  to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  查看 KCSTMR: {record.data.KCSTMR}
+                </Link>
+              </div>
+            )}
+            
+            {/* 第二區：配對資料（如果是 CO03L.DBF 記錄） */}
             {fileName?.toUpperCase() === 'CO03L.DBF' && (
-              <>
-                {record.data.KCSTMR && (
-                  <div className="mt-6">
-                    <Link
-                      to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      查看 KCSTMR: {record.data.KCSTMR}
-                    </Link>
-                  </div>
-                )}
-                
-                {/* 添加配對資料顯示區塊 */}
-                <MatchingCO02PRecords co03lRecord={record} />
-              </>
+              <MatchingCO02PRecordsNoCollapse co03lRecord={record} />
             )}
           </div>
         </div>
