@@ -1,9 +1,14 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid,
-  Paper
+import {
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableContainer,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material';
 import type { DbfRecord } from '../../types/dbf.types';
 
@@ -18,13 +23,13 @@ interface MainFieldsGridProps {
 }
 
 /**
- * 主要欄位網格顯示元件
- * 以網格布局顯示記錄中的主要欄位
+ * 主要欄位表格顯示元件
+ * 以表格形式顯示記錄中的主要欄位
  */
-function MainFieldsGrid({ 
-  record, 
-  fields, 
-  title = '主要欄位' 
+function MainFieldsGrid({
+  record,
+  fields,
+  title = '主要欄位'
 }: MainFieldsGridProps) {
   // 獲取欄位值
   const getFieldValue = (key: string, isMetadata = false) => {
@@ -37,56 +42,83 @@ function MainFieldsGrid({
 
   return (
     <Box sx={{ mt: 4, mb: 2 }}>
-      <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, border: '1px solid #e0e0e0' }}>
-        <Typography variant="h5" sx={{ mb: 2, color: '#1976d2', fontWeight: 'bold' }}>
+      <Box sx={{
+        bgcolor: 'rgba(248, 249, 250, 0.2)',
+        p: 2.5,
+        borderRadius: 2,
+        border: '1px solid rgba(224, 224, 224, 0.8)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+      }}>
+        <Typography variant="h5" sx={{
+          mb: 2.5,
+          color: '#98ccffff',
+          fontWeight: 'bold',
+          fontSize: '1.5rem',
+          textShadow: '0 1px 1px rgba(28, 63, 102, 0.9)'
+        }}>
           {title}
         </Typography>
         
-        <Paper sx={{
-          bgcolor: 'white',
-          border: '1px solid #e0e0e0',
-          p: 2,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+        <TableContainer component={Paper} sx={{
+          bgcolor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(224, 224, 224, 0.8)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+          borderRadius: '8px',
+          overflow: 'hidden'
         }}>
-          <Grid container spacing={2}>
-            {fields.map(({ key, label, isMetadata }) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={key}>
-                <Box sx={{
-                  p: 1.5,
-                  borderRadius: 1,
-                  bgcolor: '#f5f5f5',
-                  border: '1px solid #e0e0e0',
-                  height: '100%'
-                }}>
-                  <Typography
-                    variant="subtitle2"
+          <Table size="medium">
+            <TableHead>
+              <TableRow>
+                {fields.map(({ key, label }) => (
+                  <TableCell
+                    key={key}
                     sx={{
-                      color: '#1976d2',
+                      bgcolor: '#f5f5f5',
+                      color: '#333333',
+                      borderBottom: '2px solid #1976d2',
+                      fontSize: '1rem',
                       fontWeight: 'bold',
-                      display: 'block',
-                      mb: 0.5,
-                      fontSize: '0.95rem'
+                      padding: '12px 16px',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {label}
-                  </Typography>
-                  <Typography
-                    variant="body1"
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow
+                sx={{
+                  bgcolor: 'rgba(255, 255, 255, 0.8)',
+                  '&:hover': {
+                    bgcolor: 'rgba(25, 118, 210, 0.08)',
+                  },
+                  transition: 'background-color 0.2s',
+                }}
+              >
+                {fields.map(({ key, isMetadata }) => (
+                  <TableCell
+                    key={key}
                     sx={{
                       color: '#333333',
-                      fontFamily: 'monospace',
-                      wordBreak: 'break-all',
+                      borderBottom: '1px solid rgba(224, 224, 224, 0.5)',
                       fontSize: '1.1rem',
-                      fontWeight: '500'
+                      fontFamily: 'monospace',
+                      padding: '12px 16px',
+                      textAlign: 'center',
+                      wordBreak: 'break-all'
                     }}
                   >
                     {getFieldValue(key, isMetadata)}
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </Box>
   );
