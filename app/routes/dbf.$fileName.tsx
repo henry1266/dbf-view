@@ -93,7 +93,9 @@ export default function DbfFile() {
 
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
-    if (fileName.toUpperCase() === 'CO02P.DBF') {
+    if (fileName.toUpperCase() === 'CO01M.DBF') {
+      return ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'MSEX'];
+    } else if (fileName.toUpperCase() === 'CO02P.DBF') {
       return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
       return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LISRS' , 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'A97', 'TOT'];
@@ -200,8 +202,12 @@ export default function DbfFile() {
       let defaultSortField = 'PDATE';
       let defaultSortDirection = 'desc';
       
-      // 如果是CO03L.DBF，則默認按_recordNo排序
-      if (fileName.toUpperCase() === 'CO03L.DBF') {
+      // 根據不同檔案設置不同的默認排序
+      if (fileName.toUpperCase() === 'CO01M.DBF') {
+        defaultSortField = 'KCSTMR';
+        defaultSortDirection = 'asc';
+        console.log('檔案是CO01M.DBF，默認按KCSTMR排序');
+      } else if (fileName.toUpperCase() === 'CO03L.DBF') {
         defaultSortField = '_recordNo';
         console.log('檔案是CO03L.DBF，默認按記錄編號排序');
       }
