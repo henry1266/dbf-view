@@ -69,12 +69,12 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
 
   return (
     <Box sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ bgcolor: 'rgba(100, 255, 218, 0.05)', p: 2, borderRadius: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2, color: '#64ffda' }}>
+      <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, border: '1px solid #e0e0e0' }}>
+        <Typography variant="h5" sx={{ mb: 2, color: '#1976d2', fontWeight: 'bold' }}>
           配對的 CO02P 記錄
         </Typography>
         
-        <Box sx={{ bgcolor: 'rgba(0, 0, 0, 0.2)', p: 1, borderRadius: 1 }}>
+        <Box sx={{ p: 1, borderRadius: 1 }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -84,17 +84,20 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
               <Typography variant="body2">{error}</Typography>
             </Box>
           ) : matchingRecords.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#e6f1ff', p: 1 }}>
+            <Typography variant="body2" sx={{ color: '#666666', p: 1 }}>
               沒有找到配對的 CO02P 記錄
             </Typography>
           ) : (
             <TableContainer component={Paper} sx={{
-              maxHeight: '300px',
-              bgcolor: 'rgba(10, 25, 47, 0.7)',
+              maxHeight: '400px',
+              bgcolor: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(100, 255, 218, 0.1)',
+              border: '1px solid rgba(224, 224, 224, 0.8)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+              borderRadius: '8px',
+              overflow: 'hidden'
             }}>
-              <Table size="small" stickyHeader>
+              <Table stickyHeader size="medium">
                 <TableHead>
                   <TableRow>
                     {co02pColumns.map((column) => (
@@ -102,11 +105,13 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
                         key={column.id}
                         align={column.align}
                         sx={{
-                          bgcolor: 'rgba(10, 25, 47, 0.9)',
-                          color: 'rgba(230, 241, 255, 0.8);',
-                          borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
-                          fontSize: '0.9rem',
-                          padding: '8px',
+                          bgcolor: '#f5f5f5',
+                          color: '#333333',
+                          borderBottom: '2px solid #1976d2',
+                          fontSize: '0.95rem',
+                          padding: '12px 16px',
+                          fontWeight: 'bold',
+                          whiteSpace: 'nowrap'
                         }}
                       >
                         {column.label}
@@ -121,11 +126,15 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
                       hover
                       sx={{
                         '&:hover': {
-                          bgcolor: 'rgba(100, 255, 218, 0.05) !important',
+                          bgcolor: 'rgba(25, 118, 210, 0.08) !important',
                         },
                         '&:nth-of-type(odd)': {
-                          bgcolor: 'rgba(0, 0, 0, 0.1)',
+                          bgcolor: 'rgba(245, 245, 245, 0.6)',
                         },
+                        '&:nth-of-type(even)': {
+                          bgcolor: 'rgba(255, 255, 255, 0.8)',
+                        },
+                        transition: 'background-color 0.2s',
                       }}
                     >
                       {co02pColumns.map((column) => {
@@ -138,17 +147,18 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
                               key={column.id}
                               align={column.align}
                               sx={{
-                                color: '#e6f1ff',
-                                borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                                fontSize: '0.9rem',
-                                padding: '8px',
+                                color: '#333333',
+                                borderBottom: '1px solid #e0e0e0',
+                                fontSize: '1rem',
+                                padding: '10px 16px',
                               }}
                             >
                               <Link
                                 to={`/dbf/CO02P.DBF/${record._recordNo}`}
                                 style={{
-                                  color: '#64ffda',
+                                  color: '#1976d2',
                                   textDecoration: 'none',
+                                  fontWeight: 'bold'
                                 }}
                               >
                                 詳情
@@ -164,10 +174,10 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
                             key={column.id}
                             align={column.align}
                             sx={{
-                              color: '#e6f1ff',
-                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                              fontSize: '0.9rem',
-                              padding: '8px',
+                              color: '#333333',
+                              borderBottom: '1px solid #e0e0e0',
+                              fontSize: '1rem',
+                              padding: '10px 16px',
                               fontFamily: 'monospace',
                             }}
                           >

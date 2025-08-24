@@ -39,48 +39,60 @@ function CollapsibleFields({
 
   return (
     <Box sx={{ mt: 4, mb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(100, 255, 218, 0.05)', p: 1, borderRadius: 1 }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        bgcolor: '#f8f9fa',
+        p: 1.5,
+        borderRadius: 1,
+        border: '1px solid #e0e0e0',
+        mb: 1
+      }}>
         <IconButton
           aria-label="展開其他欄位"
-          size="small"
+          size="medium"
           onClick={() => setOpen(!open)}
-          sx={{ color: '#64ffda' }}
+          sx={{ color: '#1976d2' }}
         >
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton>
-        <Typography variant="subtitle1" sx={{ ml: 1, color: '#64ffda' }}>
+        <Typography variant="h6" sx={{ ml: 1, color: '#1976d2', fontWeight: 'bold' }}>
           {title}
         </Typography>
       </Box>
       <Collapse in={open} timeout="auto" unmountOnExit>
-        <Box sx={{ mt: 1, bgcolor: 'rgba(0, 0, 0, 0.2)', p: 1, borderRadius: 1 }}>
+        <Box sx={{ p: 1, borderRadius: 1 }}>
           <TableContainer component={Paper} sx={{
-            maxHeight: '300px',
-            bgcolor: 'rgba(10, 25, 47, 0.7)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(100, 255, 218, 0.1)',
+            maxHeight: '400px',
+            bgcolor: 'white',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
           }}>
-            <Table size="small" stickyHeader>
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell 
+                  <TableCell
                     sx={{
-                      bgcolor: 'rgba(10, 25, 47, 0.9)',
-                      color: 'rgba(230, 241, 255, 0.8);',
-                      borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
-                      fontSize: '0.9rem',
-                      padding: '8px',
+                      bgcolor: '#f5f5f5',
+                      color: '#333333',
+                      borderBottom: '1px solid #e0e0e0',
+                      fontSize: '1rem',
+                      padding: '12px 16px',
+                      fontWeight: 'bold',
+                      width: '30%'
                     }}
                   >
                     欄位
                   </TableCell>
-                  <TableCell 
+                  <TableCell
                     sx={{
-                      bgcolor: 'rgba(10, 25, 47, 0.9)',
-                      color: 'rgba(230, 241, 255, 0.8);',
-                      borderBottom: '1px solid rgba(100, 255, 218, 0.2)',
-                      fontSize: '0.9rem',
-                      padding: '8px',
+                      bgcolor: '#f5f5f5',
+                      color: '#333333',
+                      borderBottom: '1px solid #e0e0e0',
+                      fontSize: '1rem',
+                      padding: '12px 16px',
+                      fontWeight: 'bold',
+                      width: '70%'
                     }}
                   >
                     值
@@ -94,31 +106,33 @@ function CollapsibleFields({
                     hover
                     sx={{
                       '&:hover': {
-                        bgcolor: 'rgba(100, 255, 218, 0.05) !important',
+                        bgcolor: '#f9fafb',
                       },
                       '&:nth-of-type(odd)': {
-                        bgcolor: 'rgba(0, 0, 0, 0.1)',
+                        bgcolor: '#f5f5f5',
                       },
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: '#e6f1ff',
-                        borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                        fontSize: '0.9rem',
-                        padding: '8px',
+                        color: '#1976d2',
+                        borderBottom: '1px solid #e0e0e0',
+                        fontSize: '1rem',
+                        padding: '12px 16px',
                         fontFamily: 'monospace',
+                        fontWeight: '500'
                       }}
                     >
                       {key}
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: '#e6f1ff',
-                        borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                        fontSize: '0.9rem',
-                        padding: '8px',
+                        color: '#333333',
+                        borderBottom: '1px solid #e0e0e0',
+                        fontSize: '1.1rem',
+                        padding: '12px 16px',
                         fontFamily: 'monospace',
+                        wordBreak: 'break-all'
                       }}
                     >
                       {value || ''}

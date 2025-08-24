@@ -9,7 +9,7 @@ import type { DbfRecord } from '../types/dbf.types';
 
 // 引入元件
 import MatchingCO02PRecordsNoCollapse from '../components/dbf/MatchingCO02PRecordsNoCollapse';
-import MainFields from '../components/dbf/MainFields';
+import MainFieldsGrid from '../components/dbf/MainFieldsGrid';
 import CollapsibleFields from '../components/dbf/CollapsibleFields';
 
 export default function DbfRecordDetail() {
@@ -80,21 +80,24 @@ export default function DbfRecordDetail() {
           </div>
 
           <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-gray-50 p-3 rounded">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">建立時間</h3>
-                <p className="text-gray-900">{new Date(record._created).toLocaleString()}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">更新時間</h3>
-                <p className="text-gray-900">{new Date(record._updated).toLocaleString()}</p>
-              </div>
-            </div>
 
             {/* 第一區：主要欄位 */}
-            <MainFields
+            <MainFieldsGrid
               record={record}
-              fields={['_recordNo', 'KCSTMR', 'LNAME', 'MPERSONID', 'DATE', 'LISRS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT']}
+              fields={[
+                { key: '_recordNo', label: '記錄編號' },
+                { key: 'KCSTMR', label: 'KCSTMR' },
+                { key: 'LNAME', label: 'LNAME' },
+                { key: 'MPERSONID', label: 'MPERSONID' },
+                { key: 'DATE', label: 'DATE' },
+                { key: 'LISRS', label: 'LISRS' },
+                { key: 'DAYQTY', label: 'DAYQTY' },
+                { key: 'LDRU', label: 'LDRU' },
+                { key: 'LLDCN', label: 'LLDCN' },
+                { key: 'LLDTT', label: 'LLDTT' },
+                { key: '_created', label: '建立時間', isMetadata: true },
+                { key: '_updated', label: '更新時間', isMetadata: true }
+              ]}
               title="主要欄位"
             />
 
