@@ -55,7 +55,6 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
       return {
         id: field,
         label: field,
-        minWidth: 100, // 設置更寬的寬度
         align: 'left' as const
       };
     }
@@ -63,7 +62,6 @@ function getColumns(priorityFields: string[], availableFields: string[], fileNam
     return {
       id: field,
       label: field,
-      minWidth: 100, // 其他欄位的默認寬度
       align: 'left' as const
     };
   });
@@ -596,31 +594,7 @@ export default function DbfFile() {
                                         value = record.data[column.id];
                                       }
                                       
-                                      // 為 MPERSONID 欄位設置特殊樣式
-                                      if (column.id === 'MPERSONID') {
-                                        return (
-                                          <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                            sx={{
-                                              color: '#e6f1ff',
-                                              borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
-                                              // 調整字體大小和行高
-                                              fontSize: '1rem',
-                                              padding: '12px',
-                                              fontFamily: 'monospace',
-                                              width: '10px', // 設置固定寬度
-                                              maxWidth: '10px',
-                                              overflow: 'hidden',
-                                              textOverflow: 'ellipsis',
-                                              whiteSpace: 'nowrap',
-                                              backgroundColor: 'rgba(100, 255, 218, 0.05)', // 添加背景色以突出顯示
-                                            }}
-                                          >
-                                            {column.format ? column.format(value) : value}
-                                          </TableCell>
-                                        );
-                                      }
+
                                       
                                       return (
                                         <TableCell
