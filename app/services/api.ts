@@ -153,4 +153,34 @@ export const fetchKdrugRecords = async (value: string, startDate = '', endDate =
   }
 };
 
+/**
+ * @function fetchMatchingCO02PRecords
+ * @description 根據 CO03L 記錄的 KCSTMR、DATE 和 TIME 值，獲取配對的 CO02P 記錄
+ * @param {string} kcstmr - 客戶編號
+ * @param {string} date - 日期
+ * @param {string} time - 時間
+ * @returns {Promise<Array<any>>} 包含配對的 CO02P 記錄的數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const matchingRecords = await fetchMatchingCO02PRecords('12345', '1130814', '1430');
+ * console.log(matchingRecords); // 配對的 CO02P 記錄數組
+ */
+export const fetchMatchingCO02PRecords = async (kcstmr: string, date: string, time: string) => {
+  try {
+    // 使用 fetchDbfRecords 函數獲取 CO02P 記錄
+    // 設置查詢參數，使用 KCSTMR 作為搜索值，不限制頁碼和每頁記錄數
+    const result = await api.get('/dbf-match/CO02P', {
+      params: {
+        kcstmr,
+        date,
+        time
+      },
+    });
+    return result.data;
+  } catch (error) {
+    console.error(`Error fetching matching CO02P records for KCSTMR=${kcstmr}, DATE=${date}, TIME=${time}:`, error);
+    throw error;
+  }
+};
+
 export default api;

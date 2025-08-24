@@ -14,6 +14,7 @@ import { corsMiddleware } from './src/middleware/cors';
 // 引入路由
 import dbfFilesRouter from './src/routes/dbf-files';
 import dbfRecordsRouter from './src/routes/dbf-records';
+import dbfMatchRouter from './src/routes/dbf-match';
 import kcstmrRouter from './src/routes/kcstmr';
 import kdrugRouter from './src/routes/kdrug';
 
@@ -43,6 +44,7 @@ app.use(corsMiddleware);
 // 設定路由
 app.use('/api/dbf-files', dbfFilesRouter);
 app.use('/api/dbf', dbfRecordsRouter);
+app.use('/api/dbf-match', dbfMatchRouter);
 app.use('/api/KCSTMR', kcstmrRouter);
 app.use('/api/KDRUG', kdrugRouter);
 
