@@ -170,7 +170,17 @@ export default function DbfFiles() {
                             fontSize: '0.9rem'
                           }}>
                             <Link
-                              to={`/dbf/${encodeURIComponent(file.fileName)}?sortField=${file.fileName.toUpperCase() === 'CO03L.DBF' ? '_recordNo' : 'PDATE'}&sortDirection=desc&page=1`}
+                              to={`/dbf/${encodeURIComponent(file.fileName)}?sortField=${
+                                file.fileName.toUpperCase() === 'CO01M.DBF'
+                                  ? 'KCSTMR'
+                                  : file.fileName.toUpperCase() === 'CO03L.DBF'
+                                    ? '_recordNo'
+                                    : 'PDATE'
+                              }&sortDirection=${
+                                file.fileName.toUpperCase() === 'CO01M.DBF'
+                                  ? 'asc'
+                                  : 'desc'
+                              }&page=1`}
                               style={{
                                 color: '#64ffda',
                                 textDecoration: 'none',
