@@ -76,12 +76,12 @@ function MainFieldsGrid({
             fontWeight: 'bold',
             display: 'inline-flex',
             alignItems: 'center',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            backgroundColor: `${color}15`,
+            padding: '2px 4px',
+            borderRadius: '3px',
+            backgroundColor: `${color}10`,
           }}
         >
-          {value} <Box component="span" sx={{ ml: 1, fontSize: '0.8rem' }}>→</Box>
+          {value} <Box component="span" sx={{ ml: 0.5, fontSize: '0.75rem' }}>→</Box>
         </Link>
       );
     }
@@ -97,13 +97,13 @@ function MainFieldsGrid({
 
   // 渲染單個表格
   const renderTable = (group: FieldGroup, index: number | string) => (
-    <Box key={index} sx={{ mb: 2 }}>
+    <Box key={index} sx={{ mb: 1.5 }}>
       <Typography variant="h6" sx={{
-        mb: 1.5,
+        mb: 0.75,
         color: '#333333',
         fontWeight: 'bold',
-        fontSize: '1.2rem',
-        pl: 1
+        fontSize: '1rem',
+        pl: 0.5
       }}>
         {group.title}
       </Typography>
@@ -112,8 +112,8 @@ function MainFieldsGrid({
         bgcolor: 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(224, 224, 224, 0.8)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-        borderRadius: '8px',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+        borderRadius: '4px',
         overflow: 'hidden',
         height: '100%'
       }}>
@@ -127,9 +127,9 @@ function MainFieldsGrid({
                     bgcolor: '#f5f5f5',
                     color: '#333333',
                     borderBottom: '2px solid #1976d2',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     fontWeight: 'bold',
-                    padding: '12px 16px',
+                    padding: '8px 12px',
                     textAlign: 'center',
                     whiteSpace: 'nowrap'
                   }}
@@ -155,9 +155,9 @@ function MainFieldsGrid({
                   sx={{
                     color: '#333333',
                     borderBottom: '1px solid rgba(224, 224, 224, 0.5)',
-                    fontSize: '1.1rem',
+                    fontSize: '0.95rem',
                     fontFamily: 'monospace',
-                    padding: '12px 16px',
+                    padding: '6px 12px',
                     textAlign: 'center',
                     wordBreak: 'break-all'
                   }}
@@ -173,20 +173,21 @@ function MainFieldsGrid({
   );
 
   return (
-    <Box sx={{ mt: 4, mb: 2 }}>
+    <Box sx={{ mt: 3, mb: 1.5 }}>
       <Box sx={{
         bgcolor: 'rgba(215, 229, 255, 0.1)',
-        p: 2.5,
-        borderRadius: 2,
+        p: 1.5,
+        borderRadius: 1,
         border: '1px solid rgba(224, 224, 224, 0.8)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
       }}>
         <Typography variant="h5" sx={{
-          mb: 2.5,
+          mb: 1.5,
           color: '#1976d2',
           fontWeight: 'bold',
-          fontSize: '1.5rem',
-          textShadow: '0 1px 1px rgba(255, 255, 255, 0.9)'
+          fontSize: '1.25rem',
+          textShadow: '0 1px 1px rgba(255, 255, 255, 0.9)',
+          pl: 0.5
         }}>
           {title}
         </Typography>
@@ -199,7 +200,7 @@ function MainFieldsGrid({
           <Box sx={{
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
-            gap: 2
+            gap: 1
           }}>
             <Box sx={{ flex: 1 }}>
               {leftGroups.map((group, index) => renderTable(group, `left-${index}`))}
