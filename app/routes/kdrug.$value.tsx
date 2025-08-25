@@ -620,9 +620,22 @@ export default function KdrugQuery() {
                         fontSize: '0.75rem',
                         fontWeight: 'bold',
                         letterSpacing: '0.05em',
-                        borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
+                        borderBottom: '1px solid rgba(64, 175, 255, 0.3)',
+                        color: field === 'PDATE' ? '#64ffda' : '#e6f1ff',
+                        textShadow: field === 'PDATE' ? '0 0 8px rgba(100, 255, 218, 0.5)' : 'none',
+                        backgroundColor: field === 'PDATE' ? 'rgba(100, 255, 218, 0.15)' : 'transparent',
+                        position: 'relative'
                       }}>
                         {field}
+                        {field === 'PDATE' && (
+                          <Box component="span" sx={{
+                            ml: 1,
+                            fontSize: '0.7rem',
+                            opacity: 0.8
+                          }}>
+                            ▼
+                          </Box>
+                        )}
                       </th>
                     ))}
                     <th style={{
@@ -650,7 +663,14 @@ export default function KdrugQuery() {
                       </td>
                     </tr>
                   ) : (
-                    data.records.map((record) => (
+                    // 按照 PDATE 降序排序，數字大的在上面
+                    [...data.records]
+                      .sort((a, b) => {
+                        const pdateA = a.data.PDATE ? parseInt(a.data.PDATE) : 0;
+                        const pdateB = b.data.PDATE ? parseInt(b.data.PDATE) : 0;
+                        return pdateB - pdateA; // 降序排序
+                      })
+                      .map((record) => (
                       <tr key={record._id} style={{
                         transition: 'background-color 0.3s'
                       }} className="hover:bg-opacity-10 hover:bg-blue-400">
@@ -666,8 +686,17 @@ export default function KdrugQuery() {
                           <td key={field} style={{
                             padding: '12px 16px',
                             whiteSpace: 'nowrap',
-                            color: 'rgba(230, 241, 255, 0.8)',
-                            borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
+                            color: field === 'PDATE'
+                              ? '#64ffda'
+                              : 'rgba(230, 241, 255, 0.8)',
+                            fontWeight: field === 'PDATE' ? 'bold' : 'normal',
+                            borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                            textShadow: field === 'PDATE'
+                              ? '0 0 8px rgba(100, 255, 218, 0.4)'
+                              : 'none',
+                            backgroundColor: field === 'PDATE'
+                              ? 'rgba(100, 255, 218, 0.1)'
+                              : 'transparent'
                           }}>
                             {record.data[field] || ''}
                           </td>
