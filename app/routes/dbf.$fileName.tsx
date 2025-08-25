@@ -357,7 +357,7 @@ export default function DbfFile() {
 
 export function meta({ params }: { params: { fileName: string } }) {
   return [
-    { title: `${params.fileName} - DBF 檔案瀏覽器` },
+    { title: `${params.fileName} - DBF 處方瀏覽器` },
     { name: "description", content: `瀏覽 ${params.fileName} 的記錄` },
   ];
 }

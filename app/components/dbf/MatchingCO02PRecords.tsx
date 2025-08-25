@@ -71,6 +71,7 @@ function MatchingCO02PRecords({ co03lRecord }: MatchingCO02PRecordsProps) {
     { id: 'PRMK', label: 'PRMK', align: 'left' as const },
     { id: 'KDRUG', label: 'KDRUG', align: 'left' as const },
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
+    { id: 'PPR', label: 'PPR', align: 'left' as const },
     { id: 'actions', label: '操作', align: 'center' as const }
   ];
 

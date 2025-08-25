@@ -37,7 +37,7 @@ export default function KcstmrQuery() {
 
   // 設置各檔案的優先顯示欄位
   const priorityFieldsByFile: Record<string, string[]> = {
-    'CO02P.DBF': ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'],
+    'CO02P.DBF': ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY', 'PPR'],
     'CO03L.DBF': ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'],
   };
 
@@ -217,7 +217,7 @@ export default function KcstmrQuery() {
 
 export function meta({ params }: { params: { value: string } }) {
   return [
-    { title: `KCSTMR: ${params.value} - DBF 檔案瀏覽器` },
+    { title: `KCSTMR: ${params.value} - DBF 處方瀏覽器` },
     { name: "description", content: `查看與 KCSTMR=${params.value} 相關的所有記錄` },
   ];
 }

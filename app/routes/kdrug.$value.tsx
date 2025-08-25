@@ -39,7 +39,7 @@ export default function KdrugQuery() {
   const [dateRange, setDateRange] = useState({ startDate, endDate });
 
   // 設置優先顯示欄位
-  const priorityFields = ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'DNO', 'DDESC', 'PTQTY'];
+  const priorityFields = ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'DNO', 'DDESC', 'PTQTY', 'PPR'];
 
   useEffect(() => {
     const loadKdrugRecords = async () => {
@@ -642,7 +642,7 @@ export default function KdrugQuery() {
 
 export function meta({ params }: { params: { value: string } }) {
   return [
-    { title: `KDRUG: ${params.value} - DBF 檔案瀏覽器` },
+    { title: `KDRUG: ${params.value} - DBF 處方瀏覽器` },
     { name: "description", content: `查看與 KDRUG=${params.value} 相關的所有記錄` },
   ];
 }

@@ -23,7 +23,7 @@ export default function DbfRecordDetail() {
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
     if (fileName.toUpperCase() === 'CO02P.DBF') {
-      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY'];
+      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY', 'PPR'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
       return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LISRS' ,'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'];
     }
@@ -152,6 +152,7 @@ export default function DbfRecordDetail() {
                         }
                       },
                       { key: 'PTQTY', label: 'PTQTY' },
+                      { key: 'PPR', label: 'PPR' },
                       { key: '_created', label: '建立時間', isMetadata: true },
                       { key: '_updated', label: '更新時間', isMetadata: true }
                     ]
@@ -226,7 +227,7 @@ export default function DbfRecordDetail() {
 
 export function meta({ params }: { params: { fileName: string; recordNo: string } }) {
   return [
-    { title: `${params.fileName} 記錄 #${params.recordNo} - DBF 檔案瀏覽器` },
+    { title: `${params.fileName} 記錄 #${params.recordNo} - DBF 處方瀏覽器` },
     { name: "description", content: `查看 ${params.fileName} 的記錄 #${params.recordNo} 的詳細資訊` },
   ];
 }
