@@ -200,7 +200,7 @@ router.get('/:fileName', async (req: Request, res: Response) => {
       // 如果是 CO03L.DBF，則使用 DATE 欄位
       if (baseName.toUpperCase() === 'CO03L') {
         dateField = 'data.DATE';
-        console.log(`使用 ${fileName} 特殊日期欄位: DATE`);
+        //console.log(`使用 ${fileName} 特殊日期欄位: DATE`);
       }
       
       // 構建日期範圍條件

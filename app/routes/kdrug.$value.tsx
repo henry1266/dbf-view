@@ -39,7 +39,7 @@ export default function KdrugQuery() {
   const [dateRange, setDateRange] = useState({ startDate, endDate });
 
   // 設置優先顯示欄位
-  const priorityFields = ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'PTQTY'];
+  const priorityFields = ['KCSTMR', 'MBIRTHDT', 'MPERSONID', 'MNAME', 'PDATE', 'PTQTY', 'PTIME', 'PLM', 'LDRU', 'KDRUG'];
 
   useEffect(() => {
     const loadKdrugRecords = async () => {
