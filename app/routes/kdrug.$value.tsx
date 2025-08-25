@@ -249,46 +249,49 @@ export default function KdrugQuery() {
                 }
               }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box>
-                    <Box sx={{
-                      fontFamily: 'monospace',
-                      letterSpacing: '0.05em',
-                      color: '#e6f1ff',
-                      fontSize: '1rem',
-                      mb: 1,
-                      fontWeight: 'bold'
-                    }}>
-                      KDRUG (藥品碼)
+                  {/* KDRUG 和 DNO 水平排列 */}
+                  <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{
+                        fontFamily: 'monospace',
+                        letterSpacing: '0.05em',
+                        color: '#e6f1ff',
+                        fontSize: '1rem',
+                        mb: 1,
+                        fontWeight: 'bold'
+                      }}>
+                        KDRUG (藥品碼)
+                      </Box>
+                      <Box sx={{
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                        fontSize: '1.5rem',
+                        color: '#64ffda',
+                        textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+                      }}>
+                        {value || data.records[0]?.data.KDRUG || '無資料'}
+                      </Box>
                     </Box>
-                    <Box sx={{
-                      fontFamily: 'monospace',
-                      fontWeight: 'bold',
-                      fontSize: '1.5rem',
-                      color: '#64ffda',
-                      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-                    }}>
-                      {value || data.records[0]?.data.KDRUG || '無資料'}
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Box sx={{
-                      fontFamily: 'monospace',
-                      letterSpacing: '0.05em',
-                      color: '#e6f1ff',
-                      fontSize: '1rem',
-                      mb: 1,
-                      fontWeight: 'bold'
-                    }}>
-                      DNO (藥品代碼)
-                    </Box>
-                    <Box sx={{
-                      fontFamily: 'monospace',
-                      fontWeight: 'bold',
-                      fontSize: '1.5rem',
-                      color: '#64ffda',
-                      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
-                    }}>
-                      {data.records[0]?.data.DNO || '無資料'}
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{
+                        fontFamily: 'monospace',
+                        letterSpacing: '0.05em',
+                        color: '#e6f1ff',
+                        fontSize: '1rem',
+                        mb: 1,
+                        fontWeight: 'bold'
+                      }}>
+                        DNO (藥品代碼)
+                      </Box>
+                      <Box sx={{
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                        fontSize: '1.5rem',
+                        color: '#64ffda',
+                        textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+                      }}>
+                        {data.records[0]?.data.DNO || '無資料'}
+                      </Box>
                     </Box>
                   </Box>
                   <Box>
