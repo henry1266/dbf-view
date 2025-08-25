@@ -396,12 +396,12 @@ router.get('/:fileName', async (req: Request, res: Response) => {
     // 如果是 CO03L.DBF 或 CO02P.DBF，在應用層面添加客戶資料欄位
     if (baseName.toUpperCase() === 'CO03L' || baseName.toUpperCase() === 'CO02P') {
       // 使用可重用組件添加客戶資料
-      await addCustomerDataToRecords(records as any[]);
+      await addCustomerDataToRecords(records);
     }
     
     const response: DbfRecordsResponse = {
       fileName,
-      records: records as DbfRecord[],
+      records,
       pagination: {
         currentPage: parseInt(page),
         totalPages,
@@ -410,7 +410,7 @@ router.get('/:fileName', async (req: Request, res: Response) => {
       },
       sortApplied: {
         field: sortField || '',
-        direction: sortDirection as 'asc' | 'desc'
+        direction: sortDirection
       },
       filters: {
         search,
@@ -490,7 +490,7 @@ router.get('/:fileName/:recordNo', async (req: Request, res: Response) => {
     // 如果是 CO03L.DBF 或 CO02P.DBF，在應用層面添加客戶資料欄位
     if ((baseName.toUpperCase() === 'CO03L' || baseName.toUpperCase() === 'CO02P') && record.data && record.data.KCSTMR) {
       // 使用可重用組件添加客戶資料
-      await addCustomerDataToRecord(record as any);
+      await addCustomerDataToRecord(record);
     }
     
     res.json(record);

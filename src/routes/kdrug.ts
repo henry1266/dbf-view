@@ -6,6 +6,7 @@
 import express, { Request, Response, Router } from 'express';
 import { connect, getCollection } from '../db/mongo';
 import { KdrugResponse } from '../types';
+import { addCustomerDataToRecords } from '../db/customer-data';
 
 // 創建路由
 const router: Router = express.Router();
@@ -129,6 +130,9 @@ router.get('/:value', async (req: Request, res: Response) => {
     
     // 執行查詢
     const records = await co02pCollection.find(query).sort({ _recordNo: 1 }).toArray();
+    
+    // 使用可重用組件添加客戶資料欄位（MNAME, MBIRTHDT, MPERSONID）
+    await addCustomerDataToRecords(records as any[]);
     
     // 為每個 co02p 記錄查找匹配的 CO03L 記錄，並獲取 LDRU 值
     for (const record of records) {

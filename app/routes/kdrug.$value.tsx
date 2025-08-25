@@ -39,7 +39,7 @@ export default function KdrugQuery() {
   const [dateRange, setDateRange] = useState({ startDate, endDate });
 
   // 設置優先顯示欄位
-  const priorityFields = ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'DNO', 'DDESC', 'PTQTY', 'PPR'];
+  const priorityFields = ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'DNO', 'DDESC', 'PTQTY', 'PPR'];
 
   useEffect(() => {
     const loadKdrugRecords = async () => {
@@ -496,22 +496,6 @@ export default function KdrugQuery() {
             border: '1px solid rgba(64, 175, 255, 0.3)',
             position: 'relative',
           }}>
-            <Box sx={{
-              p: 2,
-              borderBottom: '1px solid rgba(64, 175, 255, 0.3)',
-              bgcolor: 'rgba(0, 30, 60, 0.3)',
-            }}>
-              <Box sx={{
-                fontFamily: 'monospace',
-                letterSpacing: '0.05em',
-                color: '#e6f1ff',
-                fontSize: '1.1rem',
-                fontWeight: 'bold',
-                textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
-              }}>
-                KDRUG={data.kdrugValue} 的記錄 ({data.records.length} 筆)
-              </Box>
-            </Box>
             <Box sx={{ overflow: 'auto' }}>
               <table style={{
                 width: '100%',
@@ -528,7 +512,7 @@ export default function KdrugQuery() {
                       letterSpacing: '0.05em',
                       borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
                     }}>
-                      記錄編號
+                      #
                     </th>
                     {/* 優先顯示欄位 */}
                     {priorityFields.map((field) => (
