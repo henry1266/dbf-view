@@ -507,6 +507,28 @@ router.get('/:fileName/:recordNo', async (req: Request, res: Response) => {
       return res.status(404).json({ error: `找不到記錄編號為 ${recordNo} 的 ${fileName} 記錄` });
     }
     
+    // 如果是 CO03L.DBF，在應用層面添加 MPERSONID 欄位
+    if (baseName.toUpperCase() === 'CO03L' && record.data && record.data.KCSTMR) {
+      // 獲取 CO01M 集合
+      const co01mCollection = getCollection('co01m');
+      
+      if (co01mCollection) {
+        // 從 CO01M 集合中查找對應的 MPERSONID
+        const kcstmr = record.data.KCSTMR.trim();
+        const co01mRecord = await co01mCollection.findOne(
+          { 'data.KCSTMR': kcstmr },
+          { projection: { 'data.MPERSONID': 1 } }
+        );
+        
+        // 如果找到對應記錄，則添加 MPERSONID 欄位
+        if (co01mRecord && co01mRecord.data && co01mRecord.data.MPERSONID) {
+          record.data.MPERSONID = co01mRecord.data.MPERSONID.trim();
+        } else {
+          record.data.MPERSONID = '';
+        }
+      }
+    }
+    
     res.json(record);
   } catch (err) {
     console.error(`Error fetching ${fileName} record #${recordNo}:`, err);
