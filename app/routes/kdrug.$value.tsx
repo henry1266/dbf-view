@@ -39,7 +39,7 @@ export default function KdrugQuery() {
   const [dateRange, setDateRange] = useState({ startDate, endDate });
 
   // 設置優先顯示欄位
-  const priorityFields = ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'DNO', 'DDESC', 'PTQTY', 'PPR'];
+  const priorityFields = ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'LDRU', 'KDRUG', 'PTQTY'];
 
   useEffect(() => {
     const loadKdrugRecords = async () => {
@@ -222,104 +222,199 @@ export default function KdrugQuery() {
       ) : data ? (
         <TechBackground>
           <TechBreadcrumb />
-          {/* 日期範圍篩選表單 */}
-          <Box sx={{
-            bgcolor: 'rgba(17, 34, 64, 0.6)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: 2,
-            p: 3,
-            mb: 3,
-            boxShadow: '0 4px 30px rgba(64, 175, 255, 0.3)',
-            border: '1px solid rgba(64, 175, 255, 0.3)',
-            position: 'relative',
-            overflow: 'hidden',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '3px',
-              background: 'linear-gradient(90deg, #1976d2, #4791db)',
-              boxShadow: '0 0 25px #1976d2'
-            }
-          }}>
-            <Box sx={{
-              fontFamily: 'monospace',
-              letterSpacing: '0.05em',
-              color: '#e6f1ff',
-              fontSize: '1.2rem',
-              mb: 2,
-              fontWeight: 'bold',
-              textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
-            }}>
-              日期範圍
-            </Box>
-            <form onSubmit={handleDateRangeSubmit}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'flex-end' }}>
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 1, color: '#e6f1ff' }}>開始</Box>
-                  <input
-                    type="text"
-                    id="startDate"
-                    value={dateRange.startDate}
-                    onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                    style={{
-                      width: '90%',
-                      padding: '8px 12px',
-                      backgroundColor: 'rgba(0, 30, 60, 0.5)',
-                      border: '1px solid rgba(64, 175, 255, 0.3)',
-                      borderRadius: '4px',
+          
+          {/* 藥品信息和日期範圍篩選表單並排 */}
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 3 }}>
+            {/* 藥品信息 - 左半邊 */}
+            {data.records.length > 0 && (
+              <Box sx={{
+                flex: 1,
+                bgcolor: 'rgba(17, 34, 64, 0.6)',
+                backdropFilter: 'blur(8px)',
+                borderRadius: 2,
+                p: 3,
+                boxShadow: '0 4px 30px rgba(100, 255, 218, 0.3)',
+                border: '1px solid rgba(100, 255, 218, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #4caf78ff, #81c784)',
+                  boxShadow: '0 0 25px #4caf78ff'
+                }
+              }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
+                      letterSpacing: '0.05em',
                       color: '#e6f1ff',
-                      outline: 'none'
-                    }}
-                    placeholder="YYYYMMDD"
-                  />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 1, color: '#e6f1ff' }}>結束</Box>
-                  <input
-                    type="text"
-                    id="endDate"
-                    value={dateRange.endDate}
-                    onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                    style={{
-                      width: '90%',
-                      padding: '8px 12px',
-                      backgroundColor: 'rgba(0, 30, 60, 0.5)',
-                      border: '1px solid rgba(64, 175, 255, 0.3)',
-                      borderRadius: '4px',
-                      color: '#e6f1ff',
-                      outline: 'none'
-                    }}
-                    placeholder="YYYYMMDD"
-                  />
-                </Box>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  width: 'auto'
-                }}>
-                  <button
-                    type="submit"
-                    style={{
-                      width: '100%',
-                      padding: '8px 16px',
-                      backgroundColor: 'rgba(64, 175, 255, 0.3)',
-                      border: '1px solid rgba(64, 175, 255, 0.5)',
-                      borderRadius: '4px',
-                      color: '#e6f1ff',
+                      fontSize: '1rem',
+                      mb: 1,
+                      fontWeight: 'bold'
+                    }}>
+                      KDRUG (藥品碼)
+                    </Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
                       fontWeight: 'bold',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s',
-                      boxShadow: '0 0 10px rgba(64, 175, 255, 0.2)'
-                    }}
-                  >
-                    篩選
-                  </button>
+                      fontSize: '1.5rem',
+                      color: '#64ffda',
+                      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+                    }}>
+                      {value || data.records[0]?.data.KDRUG || '無資料'}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
+                      letterSpacing: '0.05em',
+                      color: '#e6f1ff',
+                      fontSize: '1rem',
+                      mb: 1,
+                      fontWeight: 'bold'
+                    }}>
+                      DNO (藥品代碼)
+                    </Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold',
+                      fontSize: '1.5rem',
+                      color: '#64ffda',
+                      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+                    }}>
+                      {data.records[0]?.data.DNO || '無資料'}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
+                      letterSpacing: '0.05em',
+                      color: '#e6f1ff',
+                      fontSize: '1rem',
+                      mb: 1,
+                      fontWeight: 'bold'
+                    }}>
+                      DDESC (藥品描述)
+                    </Box>
+                    <Box sx={{
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold',
+                      fontSize: '1.5rem',
+                      color: '#64ffda',
+                      textShadow: '0 0 10px rgba(100, 255, 218, 0.5)'
+                    }}>
+                      {data.records[0]?.data.DDESC || '無資料'}
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
-            </form>
+            )}
+            
+            {/* 日期範圍篩選表單 - 右半邊 */}
+            <Box sx={{
+              flex: 1,
+              bgcolor: 'rgba(17, 34, 64, 0.6)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              p: 3,
+              boxShadow: '0 4px 30px rgba(64, 175, 255, 0.3)',
+              border: '1px solid rgba(64, 175, 255, 0.3)',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '3px',
+                background: 'linear-gradient(90deg, #1976d2, #4791db)',
+                boxShadow: '0 0 25px #1976d2'
+              }
+            }}>
+              <Box sx={{
+                fontFamily: 'monospace',
+                letterSpacing: '0.05em',
+                color: '#e6f1ff',
+                fontSize: '1.2rem',
+                mb: 2,
+                fontWeight: 'bold',
+                textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
+              }}>
+                日期範圍
+              </Box>
+              <form onSubmit={handleDateRangeSubmit}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'flex-end' }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ mb: 1, color: '#e6f1ff' }}>開始</Box>
+                    <input
+                      type="text"
+                      id="startDate"
+                      value={dateRange.startDate}
+                      onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+                      style={{
+                        width: '90%',
+                        padding: '8px 12px',
+                        backgroundColor: 'rgba(0, 30, 60, 0.5)',
+                        border: '1px solid rgba(64, 175, 255, 0.3)',
+                        borderRadius: '4px',
+                        color: '#e6f1ff',
+                        outline: 'none'
+                      }}
+                      placeholder="YYYYMMDD"
+                    />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ mb: 1, color: '#e6f1ff' }}>結束</Box>
+                    <input
+                      type="text"
+                      id="endDate"
+                      value={dateRange.endDate}
+                      onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+                      style={{
+                        width: '90%',
+                        padding: '8px 12px',
+                        backgroundColor: 'rgba(0, 30, 60, 0.5)',
+                        border: '1px solid rgba(64, 175, 255, 0.3)',
+                        borderRadius: '4px',
+                        color: '#e6f1ff',
+                        outline: 'none'
+                      }}
+                      placeholder="YYYYMMDD"
+                    />
+                  </Box>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: 'auto'
+                  }}>
+                    <button
+                      type="submit"
+                      style={{
+                        width: '100%',
+                        padding: '8px 16px',
+                        backgroundColor: 'rgba(64, 175, 255, 0.3)',
+                        border: '1px solid rgba(64, 175, 255, 0.5)',
+                        borderRadius: '4px',
+                        color: '#e6f1ff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s',
+                        boxShadow: '0 0 10px rgba(64, 175, 255, 0.2)'
+                      }}
+                    >
+                      篩選
+                    </button>
+                  </Box>
+                </Box>
+              </form>
+            </Box>
           </Box>
 
           {/* 統計信息 - 水平排列 */}
