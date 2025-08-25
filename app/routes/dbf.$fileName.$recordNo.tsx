@@ -81,69 +81,137 @@ export default function DbfRecordDetail() {
 
           <div className="p-4">
 
-            {/* 第一區：主要欄位 */}
-            <MainFieldsGrid
-              record={record}
-              fields={[
-                { key: '_recordNo', label: '記錄編號' },
-                { key: 'KCSTMR', label: 'KCSTMR' },
-                { key: 'LNAME', label: 'LNAME' },
-                { key: 'MPERSONID', label: 'MPERSONID' },
-                { key: 'DATE', label: 'DATE' },
-                { key: 'LISRS', label: 'LISRS' },
-                { key: 'DAYQTY', label: 'DAYQTY' },
-                { key: 'LDRU', label: 'LDRU' },
-                { key: 'LLDCN', label: 'LLDCN' },
-                { key: 'LLDTT', label: 'LLDTT' },
-                { key: '_created', label: '建立時間', isMetadata: true },
-                { key: '_updated', label: '更新時間', isMetadata: true }
-              ]}
-              title="主要欄位"
-            />
-
-            {/* 第三區：剩餘欄位（摺疊） */}
-            <CollapsibleFields
-              record={record}
-              excludeFields={['KCSTMR', 'LNAME', 'MPERSONID', 'DATE', 'LISRS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT']}
-              title="其他欄位"
-            />
-
-            {/* 特殊處理：如果是 co02p.DBF 記錄，提供 KCSTMR 和 KDRUG 的快速鏈接 */}
-            {fileName?.toUpperCase() === 'CO02P.DBF' && record.data.KCSTMR && (
-              <div className="mt-6 mb-6 flex flex-wrap gap-2">
-                <Link
-                  to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  查看 KCSTMR: {record.data.KCSTMR}
-                </Link>
-                {record.data.KDRUG && (
-                  <Link
-                    to={`/kdrug/${encodeURIComponent(record.data.KDRUG)}`}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700"
-                  >
-                    查看 KDRUG: {record.data.KDRUG}
-                  </Link>
-                )}
-              </div>
+            {/* 第一區：主要欄位（分組） - 根據檔案類型顯示不同布局 */}
+            {fileName?.toUpperCase() === 'CO03L.DBF' ? (
+              <MainFieldsGrid
+                record={record}
+                fieldGroups={[
+                  {
+                    title: "處方資訊",
+                    fields: [
+                      { key: '_recordNo', label: '記錄編號' },
+                      { key: 'DATE', label: 'DATE' },
+                      { key: 'TIME', label: 'TIME' },
+                      { key: 'LPID', label: 'LPID' },
+                      { key: 'LDRU', label: 'LDRU' },
+                      { key: 'LCS', label: 'LCS' },
+                      { key: '_created', label: '建立時間', isMetadata: true },
+                      { key: '_updated', label: '更新時間', isMetadata: true }
+                    ],
+                    layout: 'full'
+                  },
+                  {
+                    title: "病人資訊",
+                    fields: [
+                      {
+                        key: 'KCSTMR',
+                        label: 'KCSTMR',
+                        renderLink: {
+                          path: '/kcstmr/:value',
+                          color: '#1976d2'
+                        }
+                      },
+                      { key: 'LNAME', label: 'LNAME' },
+                      { key: 'MPERSONID', label: 'MPERSONID' }
+                    ],
+                    layout: 'left'
+                  },
+                  {
+                    title: "調劑資訊",
+                    fields: [
+                      { key: 'LISRS', label: 'LISRS' },
+                      { key: 'DAYQTY', label: 'DAYQTY' },
+                      { key: 'A2', label: 'A2' },
+                      { key: 'A99', label: 'A99' },
+                      { key: 'A97', label: 'A97' },
+                      { key: 'TOT', label: 'TOT' }
+                    ],
+                    layout: 'right'
+                  }
+                ]}
+                title="主要欄位"
+              />
+            ) : fileName?.toUpperCase() === 'CO02P.DBF' ? (
+              <MainFieldsGrid
+                record={record}
+                fieldGroups={[
+                  {
+                    title: "藥品資訊",
+                    fields: [
+                      { key: '_recordNo', label: '記錄編號' },
+                      { key: 'PDATE', label: 'PDATE' },
+                      { key: 'PTIME', label: 'PTIME' },
+                      { key: 'PLM', label: 'PLM' },
+                      { key: 'PRMK', label: 'PRMK' },
+                      {
+                        key: 'KDRUG',
+                        label: 'KDRUG',
+                        renderLink: {
+                          path: '/kdrug/:value',
+                          color: '#2e7d32'
+                        }
+                      },
+                      { key: 'PTQTY', label: 'PTQTY' },
+                      { key: '_created', label: '建立時間', isMetadata: true },
+                      { key: '_updated', label: '更新時間', isMetadata: true }
+                    ]
+                  },
+                  {
+                    title: "病人資訊",
+                    fields: [
+                      {
+                        key: 'KCSTMR',
+                        label: 'KCSTMR',
+                        renderLink: {
+                          path: '/kcstmr/:value',
+                          color: '#1976d2'
+                        }
+                      }
+                    ]
+                  }
+                ]}
+                title="主要欄位"
+              />
+            ) : (
+              // 其他 DBF 檔案的通用布局
+              <MainFieldsGrid
+                record={record}
+                fieldGroups={[
+                  {
+                    title: "主要欄位",
+                    fields: [
+                      { key: '_recordNo', label: '記錄編號' },
+                      ...priorityFields.map(field => ({ key: field, label: field })),
+                      { key: '_created', label: '建立時間', isMetadata: true },
+                      { key: '_updated', label: '更新時間', isMetadata: true }
+                    ]
+                  }
+                ]}
+                title="記錄詳情"
+              />
             )}
 
-            {/* 特殊處理：如果是 CO03L.DBF 記錄，提供 KCSTMR 的快速鏈接 */}
-            {fileName?.toUpperCase() === 'CO03L.DBF' && record.data.KCSTMR && (
-              <div className="mt-6 mb-6">
-                <Link
-                  to={`/kcstmr/${encodeURIComponent(record.data.KCSTMR)}`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  查看 KCSTMR: {record.data.KCSTMR}
-                </Link>
-              </div>
-            )}
+            
+
+            {/* 超連結已整合到表格中 */}
             
             {/* 第二區：配對資料（如果是 CO03L.DBF 記錄） */}
             {fileName?.toUpperCase() === 'CO03L.DBF' && (
               <MatchingCO02PRecordsNoCollapse co03lRecord={record} />
             )}
+          
+          {/* 第三區：剩餘欄位（摺疊） */}
+            <CollapsibleFields
+              record={record}
+              excludeFields={[
+                'KCSTMR', 'LNAME', 'MPERSONID',
+                'DATE', 'TIME', 'LPID', 'LDRU', 'LCS',
+                'LISRS', 'A2', 'A99', 'A97', 'TOT', 'DAYQTY',
+                'LLDCN', 'LLDTT'
+              ]}
+              title="其他欄位"
+            />
+          
           </div>
         </div>
       ) : (
