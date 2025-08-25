@@ -7,6 +7,7 @@ import express, { Request, Response, Router } from 'express';
 import path from 'path';
 import { connect, getCollection } from '../db/mongo';
 import { DbfRecord, DbfRecordsResponse } from '../types';
+import { addCustomerDataToRecords, addCustomerDataToRecord } from '../db/customer-data';
 
 // 創建路由
 const router: Router = express.Router();
@@ -392,36 +393,15 @@ router.get('/:fileName', async (req: Request, res: Response) => {
     // 執行聚合查詢
     const records = await collection.aggregate(aggregationPipeline).toArray();
     
-    // 如果是 CO03L.DBF，在應用層面添加 MPERSONID 欄位
-    if (baseName.toUpperCase() === 'CO03L') {
-      // 獲取 CO01M 集合
-      const co01mCollection = getCollection('co01m');
-      
-      if (co01mCollection) {
-        // 從 CO01M 集合中獲取 KCSTMR -> MPERSONID 的映射
-        const co01mRecords = await co01mCollection.find({}, { projection: { 'data.KCSTMR': 1, 'data.MPERSONID': 1 } }).toArray();
-        
-        // 建立 KCSTMR -> MPERSONID 的映射
-        const kcstmrToMpersonid: Record<string, string> = {};
-        for (const record of co01mRecords) {
-          if (record.data && record.data.KCSTMR && record.data.MPERSONID) {
-            kcstmrToMpersonid[record.data.KCSTMR.trim()] = record.data.MPERSONID.trim();
-          }
-        }
-        
-        // 在應用層面為每條記錄添加 MPERSONID 欄位
-        for (const record of records) {
-          if (record.data && record.data.KCSTMR) {
-            const kcstmr = record.data.KCSTMR.trim();
-            record.data.MPERSONID = kcstmrToMpersonid[kcstmr] || '';
-          }
-        }
-      }
+    // 如果是 CO03L.DBF 或 CO02P.DBF，在應用層面添加客戶資料欄位
+    if (baseName.toUpperCase() === 'CO03L' || baseName.toUpperCase() === 'CO02P') {
+      // 使用可重用組件添加客戶資料
+      await addCustomerDataToRecords(records as any[]);
     }
     
     const response: DbfRecordsResponse = {
       fileName,
-      records,
+      records: records as DbfRecord[],
       pagination: {
         currentPage: parseInt(page),
         totalPages,
@@ -430,7 +410,7 @@ router.get('/:fileName', async (req: Request, res: Response) => {
       },
       sortApplied: {
         field: sortField || '',
-        direction: sortDirection
+        direction: sortDirection as 'asc' | 'desc'
       },
       filters: {
         search,
@@ -507,26 +487,10 @@ router.get('/:fileName/:recordNo', async (req: Request, res: Response) => {
       return res.status(404).json({ error: `找不到記錄編號為 ${recordNo} 的 ${fileName} 記錄` });
     }
     
-    // 如果是 CO03L.DBF，在應用層面添加 MPERSONID 欄位
-    if (baseName.toUpperCase() === 'CO03L' && record.data && record.data.KCSTMR) {
-      // 獲取 CO01M 集合
-      const co01mCollection = getCollection('co01m');
-      
-      if (co01mCollection) {
-        // 從 CO01M 集合中查找對應的 MPERSONID
-        const kcstmr = record.data.KCSTMR.trim();
-        const co01mRecord = await co01mCollection.findOne(
-          { 'data.KCSTMR': kcstmr },
-          { projection: { 'data.MPERSONID': 1 } }
-        );
-        
-        // 如果找到對應記錄，則添加 MPERSONID 欄位
-        if (co01mRecord && co01mRecord.data && co01mRecord.data.MPERSONID) {
-          record.data.MPERSONID = co01mRecord.data.MPERSONID.trim();
-        } else {
-          record.data.MPERSONID = '';
-        }
-      }
+    // 如果是 CO03L.DBF 或 CO02P.DBF，在應用層面添加客戶資料欄位
+    if ((baseName.toUpperCase() === 'CO03L' || baseName.toUpperCase() === 'CO02P') && record.data && record.data.KCSTMR) {
+      // 使用可重用組件添加客戶資料
+      await addCustomerDataToRecord(record as any);
     }
     
     res.json(record);
