@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import TechBackground from '../components/TechBackground';
 import TechBreadcrumb from '../components/TechBreadcrumb';
 
@@ -21,6 +21,7 @@ export default function DbfRecordDetail() {
   const [record, setRecord] = useState<DbfRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPediatricDialog, setShowPediatricDialog] = useState(false);
 
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
@@ -33,6 +34,13 @@ export default function DbfRecordDetail() {
   };
 
   const priorityFields = fileName ? getPriorityFields(fileName) : [];
+  
+  // 檢查是否為小兒用藥（A99=65或70）
+  const isPediatricMedication = () => {
+    if (!record || !record.data) return false;
+    const a99Value = record.data['A99'];
+    return a99Value === '65' || a99Value === '70' || a99Value === 65 || a99Value === 70;
+  };
 
   useEffect(() => {
     const loadDbfRecord = async () => {
@@ -54,8 +62,87 @@ export default function DbfRecordDetail() {
     loadDbfRecord();
   }, [fileName, recordNo]);
 
+  // 處理打開小兒用藥訊息框
+  const handleOpenPediatricDialog = () => {
+    setShowPediatricDialog(true);
+  };
+
+  // 處理關閉小兒用藥訊息框
+  const handleClosePediatricDialog = () => {
+    setShowPediatricDialog(false);
+  };
+
   return (
     <Layout title="">
+      {/* 小兒用藥按鈕 - 當A99=65或70時顯示 */}
+      {!loading && record && isPediatricMedication() && (
+        <Button
+          variant="contained"
+          color="warning"
+          onClick={handleOpenPediatricDialog}
+          sx={{
+            position: 'absolute',
+            top: '10px',
+            right: '20px',
+            zIndex: 1000,
+            fontWeight: 'bold',
+            boxShadow: '0 0 10px rgba(255, 152, 0, 0.5)',
+            '&:hover': {
+              backgroundColor: '#ff9800',
+              boxShadow: '0 0 15px rgba(255, 152, 0, 0.7)',
+            }
+          }}
+        >
+          小兒
+        </Button>
+      )}
+
+      {/* 小兒用藥訊息框 */}
+      <Dialog
+        open={showPediatricDialog}
+        onClose={handleClosePediatricDialog}
+        PaperProps={{
+          sx: {
+            bgcolor: 'rgba(17, 34, 64, 0.95)',
+            color: '#e6f1ff',
+            border: '1px solid rgba(255, 152, 0, 0.5)',
+            boxShadow: '0 0 20px rgba(255, 152, 0, 0.3)',
+            borderRadius: '8px',
+            minWidth: '300px'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          color: '#ff9800',
+          fontWeight: 'bold',
+          borderBottom: '1px solid rgba(255, 152, 0, 0.3)',
+          textAlign: 'center'
+        }}>
+          小兒用藥提醒
+        </DialogTitle>
+        <DialogContent sx={{ my: 2 }}>
+          <Typography variant="body1" sx={{ textAlign: 'center' }}>
+            小兒用藥
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+          <Button
+            onClick={handleClosePediatricDialog}
+            variant="contained"
+            color="warning"
+            sx={{
+              minWidth: '100px',
+              '&:hover': {
+                backgroundColor: '#ff9800',
+                boxShadow: '0 0 10px rgba(255, 152, 0, 0.5)',
+              }
+            }}
+          >
+            確定
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <TechBackground>
         <TechBreadcrumb
           items={[
@@ -202,7 +289,7 @@ export default function DbfRecordDetail() {
               />
             ) : (
               // 其他 DBF 檔案的通用布局
-              <MainFieldsGrid
+              <TechMainFieldsGrid
                 record={record}
                 fieldGroups={[
                   {
