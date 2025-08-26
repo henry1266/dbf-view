@@ -63,6 +63,8 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
     { id: 'PLM', label: 'PLM', align: 'left' as const },
     { id: 'PRMK', label: 'PRMK', align: 'left' as const },
     { id: 'KDRUG', label: 'KDRUG', align: 'left' as const },
+    { id: 'PQTY', label: 'PQTY', align: 'left' as const },
+    { id: 'PFQ', label: 'PFQ', align: 'left' as const },
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
     { id: 'PPR', label: 'PPR', align: 'left' as const },
     { id: 'actions', label: '操作', align: 'center' as const }
@@ -72,7 +74,7 @@ function MatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecordsPro
     <Box sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, border: '1px solid #e0e0e0' }}>
         <Typography variant="h5" sx={{ mb: 2, color: '#1976d2', fontWeight: 'bold' }}>
-          配對的 CO02P 記錄
+          CO02P 藥物
         </Typography>
         
         <Box sx={{ p: 1, borderRadius: 1 }}>

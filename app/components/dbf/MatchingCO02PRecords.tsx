@@ -70,6 +70,8 @@ function MatchingCO02PRecords({ co03lRecord }: MatchingCO02PRecordsProps) {
     { id: 'PLM', label: 'PLM', align: 'left' as const },
     { id: 'PRMK', label: 'PRMK', align: 'left' as const },
     { id: 'KDRUG', label: 'KDRUG', align: 'left' as const },
+    { id: 'PQTY', label: 'PQTY', align: 'left' as const },
+    { id: 'PFQ', label: 'PFQ', align: 'left' as const },
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
     { id: 'PPR', label: 'PPR', align: 'left' as const },
     { id: 'actions', label: '操作', align: 'center' as const }

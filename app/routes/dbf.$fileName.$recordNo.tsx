@@ -23,7 +23,7 @@ export default function DbfRecordDetail() {
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
     if (fileName.toUpperCase() === 'CO02P.DBF') {
-      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY', 'PPR'];
+      return ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PQTY', 'PFQ', 'PTQTY', 'PPR'];
     } else if (fileName.toUpperCase() === 'CO03L.DBF') {
       return ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LISRS' ,'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'];
     }
@@ -64,22 +64,10 @@ export default function DbfRecordDetail() {
           <span className="block sm:inline"> {error}</span>
         </div>
       ) : record ? (
+        
+        
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-700">
-                記錄詳情
-              </h2>
-              <Link
-                to={`/dbf/${encodeURIComponent(fileName)}`}
-                className="text-blue-600 hover:text-blue-900 text-sm font-medium"
-              >
-                返回列表
-              </Link>
-            </div>
-          </div>
-
-          <div className="p-4">
+          <div className="p-4 pt-0">
 
             {/* 第一區：主要欄位（分組） - 根據檔案類型顯示不同布局 */}
             {fileName?.toUpperCase() === 'CO03L.DBF' ? (
@@ -151,6 +139,8 @@ export default function DbfRecordDetail() {
                           color: '#2e7d32'
                         }
                       },
+                      { key: 'PQTY', label: 'PQTY' },
+                      { key: 'PFQ', label: 'PFQ' },
                       { key: 'PTQTY', label: 'PTQTY' },
                       { key: 'PPR', label: 'PPR' },
                       { key: '_created', label: '建立時間', isMetadata: true },

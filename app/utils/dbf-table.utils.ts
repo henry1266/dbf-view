@@ -13,7 +13,7 @@ export function getPriorityFields(fileName: string): string[] {
   if (fileName.toUpperCase() === 'CO01M.DBF') {
     return ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'MSEX'];
   } else if (fileName.toUpperCase() === 'CO02P.DBF') {
-    return ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY', 'PPR'];
+    return ['KCSTMR', 'MNAME', 'MBIRTHDT', 'MPERSONID', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PQTY', 'PFQ', 'PTQTY', 'PPR'];
   } else if (fileName.toUpperCase() === 'CO03L.DBF') {
     return ['KCSTMR', 'LNAME', 'MPERSONID', 'DATA_TIME', 'LPID_LDRU', 'LISRS', 'LCS', 'DAYQTY', 'LLDCN_LLDTT', 'A2', 'A99', 'A97', 'TOT'];
   }
