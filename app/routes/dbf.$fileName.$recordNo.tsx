@@ -3,14 +3,16 @@ import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
 import { Box, Typography } from '@mui/material';
+import TechBackground from '../components/TechBackground';
+import TechBreadcrumb from '../components/TechBreadcrumb';
 
 // 引入型別定義
 import type { DbfRecord } from '../types/dbf.types';
 
 // 引入元件
-import MatchingCO02PRecordsNoCollapse from '../components/dbf/MatchingCO02PRecordsNoCollapse';
-import MainFieldsGrid from '../components/dbf/MainFieldsGrid';
-import CollapsibleFields from '../components/dbf/CollapsibleFields';
+import TechMatchingCO02PRecordsNoCollapse from '../components/dbf/TechMatchingCO02PRecordsNoCollapse';
+import TechMainFieldsGrid from '../components/dbf/TechMainFieldsGrid';
+import TechCollapsibleFields from '../components/dbf/TechCollapsibleFields';
 
 export default function DbfRecordDetail() {
   const params = useParams<{ fileName: string; recordNo: string }>();
@@ -53,25 +55,60 @@ export default function DbfRecordDetail() {
   }, [fileName, recordNo]);
 
   return (
-    <Layout title={`${fileName || 'DBF 檔案'} 記錄 #${recordNo || ''}`}>
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">錯誤！</strong>
-          <span className="block sm:inline"> {error}</span>
-        </div>
-      ) : record ? (
+    <Layout title="">
+      <TechBackground>
+        <TechBreadcrumb
+          items={[
+            { label: '首頁', path: '/', icon: '🏠' },
+            { label: '檔案列表', path: '/dbf-files', icon: '📁' },
+            { label: fileName, path: `/dbf/${fileName}`, icon: '📄' },
+            { label: `記錄 #${recordNo}`, icon: '🔍' }
+          ]}
+        />
         
-        
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="p-4 pt-0">
+        <Box sx={{ width: '98%', mx: 'auto', my: '1%' }}>
+          
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <Box sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                border: '3px solid rgba(100, 255, 218, 0.3)',
+                borderTop: '3px solid rgba(100, 255, 218, 0.8)',
+                animation: 'spin 1s linear infinite',
+                '@keyframes spin': {
+                  '0%': { transform: 'rotate(0deg)' },
+                  '100%': { transform: 'rotate(360deg)' }
+                },
+                boxShadow: '0 0 15px rgba(100, 255, 218, 0.5)'
+              }} />
+            </Box>
+          ) : error ? (
+            <Box sx={{
+              bgcolor: 'rgba(255, 100, 100, 0.2)',
+              border: '1px solid rgba(255, 100, 100, 0.5)',
+              color: '#ffcccc',
+              p: 2,
+              borderRadius: 1,
+              boxShadow: '0 0 15px rgba(255, 100, 100, 0.3)'
+            }}>
+              <Box component="span" sx={{ fontWeight: 'bold' }}>錯誤！</Box>
+              <Box component="span" sx={{ ml: 1 }}>{error}</Box>
+            </Box>
+          ) : record ? (
+            <Box sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              p: '1%',
+              borderRadius: 2,
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 30px rgba(0, 120, 255, 0.3)',
+              border: '1px solid rgba(64, 175, 255, 0.2)'
+            }}>
 
             {/* 第一區：主要欄位（分組） - 根據檔案類型顯示不同布局 */}
             {fileName?.toUpperCase() === 'CO03L.DBF' ? (
-              <MainFieldsGrid
+              <TechMainFieldsGrid
                 record={record}
                 fieldGroups={[
                   {
@@ -96,7 +133,7 @@ export default function DbfRecordDetail() {
                         label: 'KCSTMR',
                         renderLink: {
                           path: '/kcstmr/:value',
-                          color: '#1976d2'
+                          color: '#64ffda'
                         }
                       },
                       { key: 'LNAME', label: 'LNAME' },
@@ -120,7 +157,7 @@ export default function DbfRecordDetail() {
                 title="主要欄位"
               />
             ) : fileName?.toUpperCase() === 'CO02P.DBF' ? (
-              <MainFieldsGrid
+              <TechMainFieldsGrid
                 record={record}
                 fieldGroups={[
                   {
@@ -136,7 +173,7 @@ export default function DbfRecordDetail() {
                         label: 'KDRUG',
                         renderLink: {
                           path: '/kdrug/:value',
-                          color: '#2e7d32'
+                          color: '#64ffda'
                         }
                       },
                       { key: 'PQTY', label: 'PQTY' },
@@ -188,11 +225,11 @@ export default function DbfRecordDetail() {
             
             {/* 第二區：配對資料（如果是 CO03L.DBF 記錄） */}
             {fileName?.toUpperCase() === 'CO03L.DBF' && (
-              <MatchingCO02PRecordsNoCollapse co03lRecord={record} />
+              <TechMatchingCO02PRecordsNoCollapse co03lRecord={record} />
             )}
           
           {/* 第三區：剩餘欄位（摺疊） */}
-            <CollapsibleFields
+            <TechCollapsibleFields
               record={record}
               excludeFields={[
                 'KCSTMR', 'LNAME', 'MPERSONID',
@@ -203,14 +240,22 @@ export default function DbfRecordDetail() {
               title="其他欄位"
             />
           
-          </div>
-        </div>
-      ) : (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">找不到記錄！</strong>
-          <span className="block sm:inline"> 找不到指定的記錄。</span>
-        </div>
-      )}
+            </Box>
+          ) : (
+            <Box sx={{
+              bgcolor: 'rgba(255, 204, 0, 0.1)',
+              border: '1px solid rgba(255, 204, 0, 0.3)',
+              color: '#ffcc00',
+              p: 2,
+              borderRadius: 1,
+              boxShadow: '0 0 15px rgba(255, 204, 0, 0.2)'
+            }}>
+              <Box component="span" sx={{ fontWeight: 'bold' }}>找不到記錄！</Box>
+              <Box component="span" sx={{ ml: 1 }}>找不到指定的記錄。</Box>
+            </Box>
+          )}
+        </Box>
+      </TechBackground>
     </Layout>
   );
 }
