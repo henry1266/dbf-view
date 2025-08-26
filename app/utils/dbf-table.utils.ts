@@ -33,20 +33,26 @@ export function getColumns(priorityFields: string[], availableFields: string[], 
     {
       id: 'recordNo',
       label: '#',
-      align: 'left'
+      align: 'left',
+      minWidth: 10 // 設置最小寬度為50px
     }
   ];
   
   // 優先顯示欄位
   const priorityColumns = priorityFields.map(field => {
-    // 為 MPERSONID 欄位設置寬度
-    if (field === 'MPERSONID') {
-      return {
-        id: field,
-        label: field,
-        align: 'left' as const
-      };
+    // 為不同欄位設置不同的寬度
+    let minWidth = 10; // 默認寬度
+    
+    // 根據欄位名稱設置不同的寬度
+    if (['KCSTMR', 'MNAME', 'LNAME'].includes(field)) {
+      minWidth = 10; // 較長的名稱欄位
+    } else if (['MPERSONID', 'PDATE', 'PTIME', 'DATE', 'TIME'].includes(field)) {
+      minWidth = 10; // 中等長度的欄位
+    } else if (['A2', 'A99', 'A97', 'TOT', 'LCS', 'DAYQTY'].includes(field)) {
+      minWidth = 10; // 較短的數值欄位
     }
+    
+
     
     // 為 LLDCN_LLDTT 合併欄位設置特殊處理
     if (field === 'LLDCN_LLDTT') {
@@ -96,7 +102,8 @@ export function getColumns(priorityFields: string[], availableFields: string[], 
     return {
       id: field,
       label: field,
-      align: 'left' as const
+      align: 'left' as const,
+      minWidth: minWidth
     };
   });
   
@@ -104,7 +111,8 @@ export function getColumns(priorityFields: string[], availableFields: string[], 
   const actionColumn = {
     id: 'actions',
     label: '操作',
-    align: 'center' as const
+    align: 'center' as const,
+    minWidth: 85 // 設置最小寬度為150px
   };
   
   // 只返回基本列、優先欄位和操作列，不包含其他欄位

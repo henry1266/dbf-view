@@ -1,16 +1,18 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  TableSortLabel, 
-  Paper, 
-  Box 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Paper,
+  Box,
+  Button
 } from '@mui/material';
+import axios from 'axios';
 import type { Column, DbfRecord, DbfRecordsResponse } from '../../types/dbf.types';
 
 interface DbfTableProps {
@@ -26,13 +28,13 @@ interface DbfTableProps {
  * DBF 表格元件
  * 顯示 DBF 記錄的表格
  */
-function DbfTable({ 
-  data, 
-  columns, 
-  fileName, 
-  orderBy, 
-  order, 
-  onRequestSort 
+function DbfTable({
+  data,
+  columns,
+  fileName,
+  orderBy,
+  order,
+  onRequestSort
 }: DbfTableProps) {
   const [searchParams] = useSearchParams();
 
@@ -41,6 +43,39 @@ function DbfTable({
    */
   const handleRequestSort = (property: string) => {
     onRequestSort(property);
+  };
+
+  /**
+   * 檢查記錄是否符合小兒條件（A99=65或70）
+   */
+  const isPediatricMedication = (record: DbfRecord): boolean => {
+    if (!record || !record.data) return false;
+    const a99Value = record.data['A99'];
+    return a99Value === '65' || a99Value === '70' || a99Value === 65 || a99Value === 70;
+  };
+
+  /**
+   * 處理列印按鈕點擊事件
+   */
+  const handlePrint = async (record: DbfRecord) => {
+    try {
+      const lname = record.data['LNAME'] || '';
+      const pqty = 1; // 預設值
+      const pfq = 1;  // 預設值
+      
+      // 發送API請求
+      const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
+        value1: pqty,
+        value2: lname,
+        value3: pfq
+      });
+      
+      console.log('列印成功:', response.data);
+      // 可以添加成功提示
+    } catch (error) {
+      console.error('列印失敗:', error);
+      // 可以添加錯誤提示
+    }
   };
 
   return (
@@ -140,7 +175,11 @@ function DbfTable({
                           align={column.align}
                           sx={{
                             color: '#e6f1ff',
-                            borderBottom: '1px solid rgba(100, 255, 218, 0.1)'
+                            borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '15px',
+                            padding: '8px 16px'
                           }}
                         >
                           <Link
@@ -152,6 +191,28 @@ function DbfTable({
                           >
                             詳情
                           </Link>
+                          
+                          {/* 列印按鈕 - 僅在CO03L.DBF且A99=65或70時顯示 */}
+                          {fileName.toUpperCase() === 'CO03L.DBF' && isPediatricMedication(record) && (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => handlePrint(record)}
+                              sx={{
+                                minWidth: '25px',
+                                fontSize: '0.75rem',
+                                padding: '1px 4px',
+                                color: '#ff9800',
+                                borderColor: '#ff9800',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                                  borderColor: '#ff9800',
+                                }
+                              }}
+                            >
+                              印
+                            </Button>
+                          )}
                         </TableCell>
                       );
                     } else {

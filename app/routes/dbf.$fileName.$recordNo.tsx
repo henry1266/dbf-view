@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
+import axios from 'axios';
 import {
   Box,
   Typography,
@@ -122,6 +123,66 @@ export default function DbfRecordDetail() {
     setShowPediatricDialog(false);
   };
 
+  // 處理列印按鈕點擊事件
+  const handlePrint = async (pqty: string | number, pfq: string | number) => {
+    try {
+      const lname = record?.data?.['LNAME'] || '';
+      
+      // 發送API請求
+      const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
+        value1: pqty,
+        value2: lname,
+        value3: pfq
+      });
+      
+      console.log('列印成功:', response.data);
+      // 可以添加成功提示
+    } catch (error) {
+      console.error('列印失敗:', error);
+      // 可以添加錯誤提示
+    }
+  };
+
+  // 處理批次列印按鈕點擊事件
+  const handleBatchPrint = async () => {
+    if (!matchingCO02PRecords || matchingCO02PRecords.length === 0) {
+      console.log('沒有可列印的記錄');
+      return;
+    }
+
+    const lname = record?.data?.['LNAME'] || '';
+    const filteredRecords = matchingCO02PRecords.filter(record => isGreaterThanOne(record.data['PQTY']));
+    
+    if (filteredRecords.length === 0) {
+      console.log('沒有PQTY > 1的記錄');
+      return;
+    }
+
+    // 顯示正在處理的提示
+    console.log(`開始批次列印 ${filteredRecords.length} 個項目`);
+    
+    // 依序發送API請求
+    for (const record of filteredRecords) {
+      try {
+        const pqty = record.data['PQTY'];
+        const pfq = record.data['PFQ'];
+        
+        // 發送API請求
+        const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
+          value1: pqty,
+          value2: lname,
+          value3: pfq
+        });
+        
+        console.log(`列印成功 KDRUG: ${record.data['KDRUG']}, PQTY: ${pqty}, PFQ: ${pfq}`);
+      } catch (error) {
+        console.error(`列印失敗 KDRUG: ${record.data['KDRUG']}:`, error);
+      }
+    }
+    
+    console.log('批次列印完成');
+  };
+
   return (
     <Layout title="">
       {/* 小兒用藥按鈕 - 當A99=65或70時顯示 */}
@@ -218,13 +279,37 @@ export default function DbfRecordDetail() {
             </Typography>
           ) : (
             <>
-              <Typography variant="subtitle1" sx={{
-                color: '#ff9800',
-                fontWeight: 'bold',
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 1
               }}>
-                多數量項目 (PQTY {'>'} 1):
-              </Typography>
+                <Typography variant="subtitle1" sx={{
+                  color: '#ff9800',
+                  fontWeight: 'bold'
+                }}>
+                  多數量項目 (PQTY {'>'} 1):
+                </Typography>
+                
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="success"
+                  onClick={handleBatchPrint}
+                  sx={{
+                    minWidth: '100px',
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: '#2e7d32',
+                      boxShadow: '0 0 10px rgba(46, 125, 50, 0.5)',
+                    }
+                  }}
+                >
+                  批次列印
+                </Button>
+              </Box>
               <TableContainer component={Paper} sx={{
                 maxHeight: '300px',
                 bgcolor: 'rgba(17, 34, 64, 0.6)',
@@ -267,6 +352,16 @@ export default function DbfRecordDetail() {
                         textAlign: 'center',
                         fontFamily: 'monospace'
                       }}>PFQ</TableCell>
+                      <TableCell sx={{
+                        bgcolor: 'rgba(10, 25, 47, 0.7)',
+                        color: '#ff9800',
+                        borderBottom: '2px solid rgba(255, 152, 0, 0.5)',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: 'monospace'
+                      }}>操作</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -309,6 +404,31 @@ export default function DbfRecordDetail() {
                             padding: '6px 12px',
                             textAlign: 'center'
                           }}>{record.data['PFQ']}</TableCell>
+                          <TableCell sx={{
+                            color: '#e6f1ff',
+                            borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+                            fontSize: '0.9rem',
+                            fontFamily: 'monospace',
+                            padding: '6px 12px',
+                            textAlign: 'center'
+                          }}>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="info"
+                              onClick={() => handlePrint(record.data['PQTY'], record.data['PFQ'])}
+                              sx={{
+                                minWidth: '60px',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  backgroundColor: '#0288d1',
+                                  boxShadow: '0 0 10px rgba(2, 136, 209, 0.5)',
+                                }
+                              }}
+                            >
+                              列印
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -336,14 +456,51 @@ export default function DbfRecordDetail() {
       </Dialog>
 
       <TechBackground>
-        <TechBreadcrumb
-          items={[
-            { label: '首頁', path: '/', icon: '🏠' },
-            { label: '檔案列表', path: '/dbf-files', icon: '📁' },
-            { label: fileName, path: `/dbf/${fileName}`, icon: '📄' },
-            { label: `記錄 #${recordNo}`, icon: '🔍' }
-          ]}
-        />
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          position: 'relative'
+        }}>
+          <TechBreadcrumb
+            items={[
+              { label: '首頁', path: '/', icon: '🏠' },
+              { label: '檔案列表', path: '/dbf-files', icon: '📁' },
+              { label: fileName, path: `/dbf/${fileName}`, icon: '📄' },
+              { label: `記錄 #${recordNo}`, icon: '🔍' }
+            ]}
+          />
+          
+          {/* 批次列印按鈕 - 僅在CO03L.DBF且A99=65或70時顯示 */}
+          {!loading && record && fileName?.toUpperCase() === 'CO03L.DBF' && isPediatricMedication() && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                await fetchCO02PRecords();
+                handleBatchPrint();
+              }}
+              sx={{
+                position: 'absolute',
+                right: '20px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontFamily: 'monospace',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #1976d2, #4791db)',
+                border: '1px solid rgba(64, 175, 255, 0.3)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #1565c0, #1976d2)',
+                  boxShadow: '0 0 15px rgba(25, 118, 210, 0.5)',
+                }
+              }}
+            >
+              批次列印
+            </Button>
+          )}
+        </Box>
         
         <Box sx={{ width: '98%', mx: 'auto', my: '1%' }}>
           
