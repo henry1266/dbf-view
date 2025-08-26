@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { fetchDbfRecords } from '../services/api';
 import { Button, Box, Typography, Paper } from '@mui/material';
 import TechBackground from '../components/TechBackground';
+import TechBreadcrumb from '../components/TechBreadcrumb';
 
 // 引入型別定義
 import type { DbfRecordsResponse } from '../types/dbf.types';
@@ -278,10 +279,14 @@ export default function DbfFile() {
   return (
     <Layout title="">
       <TechBackground>
+        <TechBreadcrumb
+          items={[
+            { label: '首頁', path: '/', icon: '🏠' },
+            { label: '檔案列表', path: '/dbf-files', icon: '📁' },
+            { label: fileName, icon: '📄' }
+          ]}
+        />
         <Box sx={{ width: '98%', mx: 'auto', my: '1%'  }}>
-          <Typography variant="h5" sx={{ mb: '1%', color: '#64ffda', fontWeight: 'bold' }}>
-            {fileName} 數據瀏覽
-          </Typography>
           
           <Box sx={{ bgcolor: 'rgba(255, 255, 255, 0.05)', p: '1%', borderRadius: 2, backdropFilter: 'blur(10px)' }}>
             {loading ? (
