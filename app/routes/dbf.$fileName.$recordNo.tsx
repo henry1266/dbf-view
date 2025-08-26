@@ -2,7 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
-import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from '@mui/material';
 import TechBackground from '../components/TechBackground';
 import TechBreadcrumb from '../components/TechBreadcrumb';
 
@@ -22,6 +37,8 @@ export default function DbfRecordDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPediatricDialog, setShowPediatricDialog] = useState(false);
+  const [matchingCO02PRecords, setMatchingCO02PRecords] = useState<DbfRecord[]>([]);
+  const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
 
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
@@ -40,6 +57,13 @@ export default function DbfRecordDetail() {
     if (!record || !record.data) return false;
     const a99Value = record.data['A99'];
     return a99Value === '65' || a99Value === '70' || a99Value === 65 || a99Value === 70;
+  };
+
+  // 檢查數值是否大於1
+  const isGreaterThanOne = (value: any): boolean => {
+    if (!value) return false;
+    return (typeof value === 'string' && parseInt(value, 10) > 1) ||
+           (typeof value === 'number' && value > 1);
   };
 
   useEffect(() => {
@@ -62,8 +86,34 @@ export default function DbfRecordDetail() {
     loadDbfRecord();
   }, [fileName, recordNo]);
 
+  // 獲取與CO03L記錄相關的CO02P記錄
+  const fetchCO02PRecords = async () => {
+    if (!record || !record.data || fileName.toUpperCase() !== 'CO03L.DBF') return;
+
+    const kcstmr = record.data.KCSTMR;
+    const date = record.data.DATE;
+    const time = record.data.TIME;
+
+    if (!kcstmr || !date || !time) {
+      console.error('缺少必要的配對欄位：KCSTMR、DATE 或 TIME');
+      return;
+    }
+
+    try {
+      setLoadingCO02PRecords(true);
+      const records = await fetchMatchingCO02PRecords(kcstmr, date, time);
+      setMatchingCO02PRecords(records);
+    } catch (err) {
+      console.error('獲取配對記錄失敗:', err);
+    } finally {
+      setLoadingCO02PRecords(false);
+    }
+  };
+
   // 處理打開小兒用藥訊息框
-  const handleOpenPediatricDialog = () => {
+  const handleOpenPediatricDialog = async () => {
+    // 獲取與CO03L記錄相關的CO02P記錄
+    await fetchCO02PRecords();
     setShowPediatricDialog(true);
   };
 
@@ -120,10 +170,152 @@ export default function DbfRecordDetail() {
         }}>
           小兒用藥提醒
         </DialogTitle>
-        <DialogContent sx={{ my: 2 }}>
-          <Typography variant="body1" sx={{ textAlign: 'center' }}>
+        <DialogContent sx={{ my: 2, minWidth: '500px' }}>
+          <Typography variant="body1" sx={{ textAlign: 'center', mb: 1 }}>
             小兒用藥
           </Typography>
+          
+          {record && record.data && record.data['LNAME'] && (
+            <Typography variant="subtitle1" sx={{
+              textAlign: 'center',
+              mb: 2,
+              color: '#e6f1ff',
+              fontWeight: 'bold',
+              border: '1px solid rgba(255, 152, 0, 0.3)',
+              borderRadius: '4px',
+              padding: '8px',
+              backgroundColor: 'rgba(255, 152, 0, 0.1)'
+            }}>
+              病人姓名: {record.data['LNAME']}
+            </Typography>
+          )}
+          
+          {loadingCO02PRecords ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                border: '3px solid rgba(100, 255, 218, 0.3)',
+                borderTop: '3px solid rgba(100, 255, 218, 0.8)',
+                animation: 'spin 1s linear infinite',
+                '@keyframes spin': {
+                  '0%': { transform: 'rotate(0deg)' },
+                  '100%': { transform: 'rotate(360deg)' }
+                },
+                boxShadow: '0 0 15px rgba(100, 255, 218, 0.5)'
+              }} />
+            </Box>
+          ) : matchingCO02PRecords.length === 0 ? (
+            <Typography variant="body2" sx={{
+              color: '#e6f1ff',
+              p: 1,
+              opacity: 0.7,
+              fontStyle: 'italic',
+              textAlign: 'center'
+            }}>
+              沒有找到配對的 CO02P 記錄
+            </Typography>
+          ) : (
+            <>
+              <Typography variant="subtitle1" sx={{
+                color: '#ff9800',
+                fontWeight: 'bold',
+                mb: 1
+              }}>
+                多數量項目 (PQTY {'>'} 1):
+              </Typography>
+              <TableContainer component={Paper} sx={{
+                maxHeight: '300px',
+                bgcolor: 'rgba(17, 34, 64, 0.6)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 152, 0, 0.3)',
+                boxShadow: '0 4px 30px rgba(255, 152, 0, 0.2)',
+                borderRadius: '4px',
+                overflow: 'auto'
+              }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{
+                        bgcolor: 'rgba(10, 25, 47, 0.7)',
+                        color: '#ff9800',
+                        borderBottom: '2px solid rgba(255, 152, 0, 0.5)',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: 'monospace'
+                      }}>KDRUG</TableCell>
+                      <TableCell sx={{
+                        bgcolor: 'rgba(10, 25, 47, 0.7)',
+                        color: '#ff9800',
+                        borderBottom: '2px solid rgba(255, 152, 0, 0.5)',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: 'monospace'
+                      }}>PQTY</TableCell>
+                      <TableCell sx={{
+                        bgcolor: 'rgba(10, 25, 47, 0.7)',
+                        color: '#ff9800',
+                        borderBottom: '2px solid rgba(255, 152, 0, 0.5)',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        padding: '8px 12px',
+                        textAlign: 'center',
+                        fontFamily: 'monospace'
+                      }}>PFQ</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {matchingCO02PRecords
+                      .filter(record => isGreaterThanOne(record.data['PQTY']))
+                      .map((record, index) => (
+                        <TableRow key={index} sx={{
+                          bgcolor: 'rgba(17, 34, 64, 0.4)',
+                          '&:hover': {
+                            bgcolor: 'rgba(255, 152, 0, 0.05)',
+                          },
+                          '&:nth-of-type(odd)': {
+                            bgcolor: 'rgba(17, 34, 64, 0.4)',
+                          },
+                          '&:nth-of-type(even)': {
+                            bgcolor: 'rgba(17, 34, 64, 0.2)',
+                          }
+                        }}>
+                          <TableCell sx={{
+                            color: '#e6f1ff',
+                            borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+                            fontSize: '0.9rem',
+                            fontFamily: 'monospace',
+                            padding: '6px 12px',
+                            textAlign: 'center'
+                          }}>{record.data['KDRUG']}</TableCell>
+                          <TableCell sx={{
+                            color: '#e6f1ff',
+                            borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+                            fontSize: '0.9rem',
+                            fontFamily: 'monospace',
+                            padding: '6px 12px',
+                            textAlign: 'center'
+                          }}>{record.data['PQTY']}</TableCell>
+                          <TableCell sx={{
+                            color: '#e6f1ff',
+                            borderBottom: '1px solid rgba(255, 152, 0, 0.2)',
+                            fontSize: '0.9rem',
+                            fontFamily: 'monospace',
+                            padding: '6px 12px',
+                            textAlign: 'center'
+                          }}>{record.data['PFQ']}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
           <Button
