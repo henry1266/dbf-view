@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { fetchKdrugRecords } from '../services/api';
 import { Grid, Box } from '@mui/material';
 import TechBackground from '../components/TechBackground';
+import TechBreadcrumb from '../components/TechBreadcrumb';
 
 interface DbfRecord {
   _id: string;
@@ -93,120 +94,6 @@ export default function KdrugQuery() {
     </Box>
   );
 
-  // 創建科技風格的麵包屑導航
-  const TechBreadcrumb = () => (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      mb: 3,
-      position: 'relative',
-      zIndex: 1
-    }}>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        background: 'rgba(17, 34, 64, 0.7)',
-        backdropFilter: 'blur(8px)',
-        borderRadius: '20px',
-        p: '4px 16px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-        border: '1px solid rgba(64, 175, 255, 0.3)',
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(90deg, rgba(64, 175, 255, 0.1), transparent)',
-          zIndex: -1
-        }
-      }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <Box sx={{
-            color: '#e6f1ff',
-            fontFamily: 'monospace',
-            fontSize: '0.9rem',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'all 0.3s',
-            '&:hover': {
-              color: '#64ffda'
-            }
-          }}>
-            <Box component="span" sx={{ mr: 1 }}>🏠</Box>
-            <Box component="span">首頁</Box>
-          </Box>
-        </Link>
-        
-        <Box sx={{
-          mx: 1,
-          color: 'rgba(100, 255, 218, 0.7)',
-          fontSize: '1.2rem',
-          lineHeight: 1,
-          transform: 'translateY(-1px)'
-        }}>
-          /
-        </Box>
-        
-        <Link to="/dbf-files" style={{ textDecoration: 'none' }}>
-          <Box sx={{
-            color: '#e6f1ff',
-            fontFamily: 'monospace',
-            fontSize: '0.9rem',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'all 0.3s',
-            '&:hover': {
-              color: '#64ffda'
-            }
-          }}>
-            <Box component="span" sx={{ mr: 1 }}>📁</Box>
-            <Box component="span">檔案</Box>
-          </Box>
-        </Link>
-        
-        <Box sx={{
-          mx: 1,
-          color: 'rgba(100, 255, 218, 0.7)',
-          fontSize: '1.2rem',
-          lineHeight: 1,
-          transform: 'translateY(-1px)'
-        }}>
-          /
-        </Box>
-        
-        <Box sx={{
-          color: '#64ffda',
-          fontFamily: 'monospace',
-          fontSize: '0.9rem',
-          fontWeight: 'bold',
-          display: 'flex',
-          alignItems: 'center',
-          textShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
-        }}>
-          <Box component="span" sx={{ mr: 1 }}>🔍</Box>
-          <Box component="span">KDRUG: {value || ''}</Box>
-        </Box>
-      </Box>
-      
-      {/* 裝飾元素 - 發光點 */}
-      <Box sx={{
-        position: 'absolute',
-        right: '-5px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        backgroundColor: '#64ffda',
-        boxShadow: '0 0 10px #64ffda, 0 0 20px #64ffda',
-        animation: 'pulse 2s infinite'
-      }} />
-    </Box>
-  );
 
   return (
     <Layout title="">
@@ -221,7 +108,13 @@ export default function KdrugQuery() {
         </div>
       ) : data ? (
         <TechBackground>
-          <TechBreadcrumb />
+          <TechBreadcrumb
+            items={[
+              { label: '首頁', path: '/', icon: '🏠' },
+              { label: '檔案', path: '/dbf-files', icon: '📁' },
+              { label: `KDRUG: ${value || ''}`, icon: '🔍' }
+            ]}
+          />
           
           {/* 藥品信息和日期範圍篩選表單並排 */}
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 3 }}>

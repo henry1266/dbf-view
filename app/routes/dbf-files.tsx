@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { fetchDbfFiles } from '../services/api';
 import TechBackground from '../components/TechBackground';
+import TechBreadcrumb from '../components/TechBreadcrumb';
 import { Box } from '@mui/material';
 
 interface DbfFile {
@@ -37,6 +38,13 @@ export default function DbfFiles() {
   return (
     <Layout title="DBF 檔案列表">
       <TechBackground>
+        <TechBreadcrumb
+          items={[
+            { label: '首頁', path: '/', icon: '🏠' },
+            { label: '檔案列表', icon: '📁' }
+          ]}
+        />
+
         <Box sx={{ p: 2 }}>
           {loading ? (
             <Box sx={{
