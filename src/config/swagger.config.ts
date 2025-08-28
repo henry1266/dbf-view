@@ -19,7 +19,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:7001',
+        url: `http://${process.env.VITE_API_HOST || 'localhost'}:${process.env.VITE_API_PORT || '7001'}`,
         description: '開發環境 API 伺服器'
       }
     ],

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:7001/api';
+// 使用固定的 IP 地址
+const API_BASE_URL = 'http://192.168.68.90:7001/api';
 
 /**
  * @description 創建 axios 實例，配置基本 URL 和請求頭

@@ -43,6 +43,8 @@ export default defineConfig({
   server: {
     // 伺服器監聽的埠號
     port: 6002,
+    // 伺服器主機名稱
+    host: process.env.VITE_API_HOST || 'localhost',
     // 啟動時自動在瀏覽器中開啟應用程式
     open: true,
     // 關閉 HMR 錯誤覆蓋層
@@ -52,7 +54,7 @@ export default defineConfig({
     // 為開發伺服器設定代理規則，解決跨域問題
     proxy: {
       '/api': {
-        target: 'http://localhost:7001', // 後端 API 的地址
+        target: `http://${process.env.VITE_API_HOST || 'localhost'}:${process.env.VITE_API_PORT || '7001'}`, // 後端 API 的地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

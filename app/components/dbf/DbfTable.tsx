@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Table,
@@ -13,6 +13,7 @@ import {
   Button
 } from '@mui/material';
 import axios from 'axios';
+import { fetchMatchingCO02PRecords } from '../../services/api';
 import type { Column, DbfRecord, DbfRecordsResponse } from '../../types/dbf.types';
 
 interface DbfTableProps {
@@ -37,6 +38,8 @@ function DbfTable({
   onRequestSort
 }: DbfTableProps) {
   const [searchParams] = useSearchParams();
+  const [matchingCO02PRecords, setMatchingCO02PRecords] = useState<DbfRecord[]>([]);
+  const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
 
   /**
    * 處理排序請求
@@ -55,26 +58,90 @@ function DbfTable({
   };
 
   /**
+   * 檢查數值是否大於1
+   */
+  const isGreaterThanOne = (value: any): boolean => {
+    if (!value) return false;
+    return (typeof value === 'string' && parseInt(value, 10) > 1) ||
+           (typeof value === 'number' && value > 1);
+  };
+
+  /**
+   * 獲取與CO03L記錄相關的CO02P記錄
+   */
+  const fetchCO02PRecords = async (record: DbfRecord) => {
+    if (!record || !record.data || fileName.toUpperCase() !== 'CO03L.DBF') return;
+
+    const kcstmr = record.data.KCSTMR;
+    const date = record.data.DATE;
+    const time = record.data.TIME;
+
+    if (!kcstmr || !date || !time) {
+      console.error('缺少必要的配對欄位：KCSTMR、DATE 或 TIME');
+      return;
+    }
+
+    try {
+      setLoadingCO02PRecords(true);
+      const records = await fetchMatchingCO02PRecords(kcstmr, date, time);
+      setMatchingCO02PRecords(records);
+      return records;
+    } catch (err) {
+      console.error('獲取配對記錄失敗:', err);
+      return [];
+    } finally {
+      setLoadingCO02PRecords(false);
+    }
+  };
+
+  /**
    * 處理列印按鈕點擊事件
    */
   const handlePrint = async (record: DbfRecord) => {
     try {
       const lname = record.data['LNAME'] || '';
-      const pqty = 1; // 預設值
-      const pfq = 1;  // 預設值
       
-      // 發送API請求
-      const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
-        value1: pqty,
-        value2: lname,
-        value3: pfq
-      });
+      // 獲取與CO03L記錄相關的CO02P記錄
+      const co02pRecords = await fetchCO02PRecords(record);
       
-      console.log('列印成功:', response.data);
-      // 可以添加成功提示
+      if (!co02pRecords || co02pRecords.length === 0) {
+        console.log('沒有可列印的記錄');
+        return;
+      }
+      
+      // 過濾出PQTY > 1的記錄
+      const filteredRecords = co02pRecords.filter((record: DbfRecord) => isGreaterThanOne(record.data['PQTY']));
+      
+      if (filteredRecords.length === 0) {
+        console.log('沒有PQTY > 1的記錄');
+        return;
+      }
+      
+      // 顯示正在處理的提示
+      console.log(`開始批次列印 ${filteredRecords.length} 個項目`);
+      
+      // 依序發送API請求
+      for (const record of filteredRecords) {
+        try {
+          const pqty = record.data['PQTY'];
+          const pfq = record.data['PFQ'];
+          
+          // 發送API請求
+          const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
+            value1: pqty,
+            value2: lname,
+            value3: pfq
+          });
+          
+          console.log(`列印成功 KDRUG: ${record.data['KDRUG']}, PQTY: ${pqty}, PFQ: ${pfq}`);
+        } catch (error) {
+          console.error(`列印失敗 KDRUG: ${record.data['KDRUG']}:`, error);
+        }
+      }
+      
+      console.log('批次列印完成');
     } catch (error) {
       console.error('列印失敗:', error);
-      // 可以添加錯誤提示
     }
   };
 

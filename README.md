@@ -98,8 +98,6 @@ npm run dev
 npm run api
 ```
 
-前端應用程序將在 `http://localhost:5173` 可用，後端 API 服務將在 `http://localhost:7001` 可用。
-
 ## 構建生產版本
 
 創建生產版本：
@@ -115,19 +113,6 @@ npm run build
 - `GET /api/dbf/:fileName/:recordNo` - 獲取特定記錄的詳情
 - `GET /api/KCSTMR/:value` - KCSTMR 查詢
 - `GET /api/KDRUG/:value` - KDRUG 查詢
-
-## 部署
-
-### Docker 部署
-
-使用 Docker 構建和運行：
-
-```bash
-docker build -t dbf-viewer .
-
-# 運行容器
-docker run -p 7001:7001 -p 5173:5173 dbf-viewer
-```
 
 ## 故障排除
 
