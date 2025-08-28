@@ -184,4 +184,69 @@ export const fetchMatchingCO02PRecords = async (kcstmr: string, date: string, ti
   }
 };
 
+// DbfRecord 接口定義
+interface DbfRecord {
+  _id: string;
+  _recordNo: number;
+  _file: string;
+  hash: string;
+  data: Record<string, any>;
+  _created: string;
+  _updated: string;
+}
+
+/**
+ * @function fetchLdruICountsByDate
+ * @description 獲取 CO03L.DBF 中每日 LDRU=I (已調劑) 的數量
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<Record<string, number>>} 包含每個日期的 LDRU=I 數量的對象
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const ldruICounts = await fetchLdruICountsByDate('1130801', '1130831');
+ * console.log(ldruICounts); // { '1130801': 5, '1130802': 8, ... }
+ */
+export const fetchLdruICountsByDate = async (startDate = '', endDate = '') => {
+  try {
+    // 獲取 CO03L.DBF 的所有記錄
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000, // 使用較大的頁面大小以獲取更多記錄
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true' // 標記為統計頁面請求
+    );
+
+    // 初始化每日 LDRU=I 數量的對象
+    const ldruICounts: Record<string, number> = {};
+
+    // 處理記錄，計算每日 LDRU=I 的數量
+    result.records.forEach((record: DbfRecord) => {
+      const ldruValue = record.data.LDRU || '';
+      const dateValue = record.data.DATE || '';
+
+      // 只處理 LDRU=I 的記錄
+      if (ldruValue === 'I' && dateValue) {
+        // 如果該日期尚未在對象中，初始化為 0
+        if (!ldruICounts[dateValue]) {
+          ldruICounts[dateValue] = 0;
+        }
+        
+        // 增加該日期的 LDRU=I 數量
+        ldruICounts[dateValue]++;
+      }
+    });
+
+    return ldruICounts;
+  } catch (error) {
+    console.error('Error fetching LDRU=I counts by date:', error);
+    throw error;
+  }
+};
+
 export default api;
