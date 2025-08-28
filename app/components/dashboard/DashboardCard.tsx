@@ -90,11 +90,73 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: `${color}.light`,
-          color: `${color}.main`,
+          background: color === 'primary'
+            ? 'linear-gradient(135deg, rgba(64, 175, 255, 0.9), rgba(0, 120, 255, 0.7))'
+            : color === 'success'
+              ? 'linear-gradient(135deg, rgba(100, 255, 218, 0.9), rgba(0, 210, 180, 0.7))'
+              : color === 'warning'
+                ? 'linear-gradient(135deg, rgba(255, 152, 0, 0.9), rgba(255, 100, 0, 0.7))'
+                : 'linear-gradient(135deg, rgba(0, 120, 255, 0.9), rgba(0, 80, 200, 0.7))',
+          color: '#ffffff',
           borderRadius: '50%',
-          p: 1,
-          boxShadow: `0 0 20px ${color}.light`
+          p: 1.2,
+          boxShadow: color === 'primary'
+            ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
+            : color === 'success'
+              ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
+              : color === 'warning'
+                ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
+                : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)',
+          border: color === 'primary'
+            ? '1px solid rgba(64, 175, 255, 0.6)'
+            : color === 'success'
+              ? '1px solid rgba(100, 255, 218, 0.6)'
+              : color === 'warning'
+                ? '1px solid rgba(255, 152, 0, 0.6)'
+                : '1px solid rgba(0, 120, 255, 0.6)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: '-10px',
+            left: '-10px',
+            right: '-10px',
+            bottom: '-10px',
+            background: color === 'primary'
+              ? 'radial-gradient(circle, rgba(64, 175, 255, 0.3) 0%, rgba(0, 0, 0, 0) 70%)'
+              : color === 'success'
+                ? 'radial-gradient(circle, rgba(100, 255, 218, 0.3) 0%, rgba(0, 0, 0, 0) 70%)'
+                : color === 'warning'
+                  ? 'radial-gradient(circle, rgba(255, 152, 0, 0.3) 0%, rgba(0, 0, 0, 0) 70%)'
+                  : 'radial-gradient(circle, rgba(0, 120, 255, 0.3) 0%, rgba(0, 0, 0, 0) 70%)',
+            filter: 'blur(8px)',
+            zIndex: -1
+          },
+          animation: 'pulse 2s infinite',
+          '@keyframes pulse': {
+            '0%': { boxShadow: color === 'primary'
+              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
+              : color === 'success'
+                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
+                : color === 'warning'
+                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
+                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)' },
+            '50%': { boxShadow: color === 'primary'
+              ? '0 0 35px rgba(64, 175, 255, 0.9), inset 0 0 20px rgba(64, 175, 255, 0.6)'
+              : color === 'success'
+                ? '0 0 35px rgba(100, 255, 218, 0.9), inset 0 0 20px rgba(100, 255, 218, 0.6)'
+                : color === 'warning'
+                  ? '0 0 35px rgba(255, 152, 0, 0.9), inset 0 0 20px rgba(255, 152, 0, 0.6)'
+                  : '0 0 35px rgba(0, 120, 255, 0.9), inset 0 0 20px rgba(0, 120, 255, 0.6)' },
+            '100%': { boxShadow: color === 'primary'
+              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
+              : color === 'success'
+                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
+                : color === 'warning'
+                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
+                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)' }
+          }
         }}>
           {icon}
         </Box>
