@@ -32,6 +32,8 @@ export function meta() {
 export default function Dashboard() {
   // 存儲 LDRU=I 的每日數量數據
   const [ldruICounts, setLdruICounts] = useState<Record<string, number>>({});
+  // 存儲 LDRU=I 的總數
+  const [totalLdruI, setTotalLdruI] = useState<number>(0);
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -70,7 +72,11 @@ export default function Dashboard() {
         // 獲取 LDRU=I 的每日數量數據
         const data = await fetchLdruICountsByDate(start, end);
         
+        // 計算 LDRU=I 的總數
+        const total = Object.values(data).reduce((sum, count) => sum + count, 0);
+        
         setLdruICounts(data);
+        setTotalLdruI(total);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -90,7 +96,7 @@ export default function Dashboard() {
         <DashboardHeader />
         
         {/* 頂部統計卡片 */}
-        <StatisticsCards />
+        <StatisticsCards totalLdruI={totalLdruI} />
 
         {/* 中央日曆和統計區域 */}
         <Grid container spacing={3}>
