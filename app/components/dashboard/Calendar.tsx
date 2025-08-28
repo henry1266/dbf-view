@@ -283,25 +283,6 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
         justifyContent: 'space-between',
         px: 1
       }}>
-        <Typography variant="caption" sx={{
-          color: '#e6f1ff',
-          fontFamily: 'monospace',
-          fontSize: '0.7rem',
-          textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
-          letterSpacing: '0.05em'
-        }}>
-          SYS.TIME: {dayjs().format('HH:mm:ss')}
-        </Typography>
-        <Typography variant="caption" sx={{
-          color: '#64ffda',
-          fontFamily: 'monospace',
-          fontSize: '0.7rem',
-          textShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
-          letterSpacing: '0.05em',
-          fontWeight: 'bold'
-        }}>
-          STATUS: ONLINE
-        </Typography>
       </Box>
     </Paper>
   );

@@ -34,6 +34,8 @@ export default function Dashboard() {
   const [ldruICounts, setLdruICounts] = useState<Record<string, number>>({});
   // 存儲 LDRU=I 的總數
   const [totalLdruI, setTotalLdruI] = useState<number>(0);
+  // 存儲當週 LDRU=I 的總數
+  const [weeklyLdruI, setWeeklyLdruI] = useState<number>(0);
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -75,8 +77,38 @@ export default function Dashboard() {
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
         
+        // 計算當週 LDRU=I 的總數
+        const now = new Date();
+        const currentDay = now.getDay(); // 0 是星期日，1 是星期一，以此類推
+        const firstDayOfWeek = new Date(now);
+        firstDayOfWeek.setDate(now.getDate() - currentDay); // 設置為本週的星期日
+        
+        const lastDayOfWeek = new Date(firstDayOfWeek);
+        lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6); // 設置為本週的星期六
+        
+        // 將日期轉換為民國年格式 (YYYMMDD)
+        const formatToMinguoDate = (date: Date): string => {
+          const year = date.getFullYear() - 1911; // 西元年轉民國年
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          return `${year}${month}${day}`;
+        };
+        
+        const firstDayStr = formatToMinguoDate(firstDayOfWeek);
+        const lastDayStr = formatToMinguoDate(lastDayOfWeek);
+        
+        // 計算當週的 LDRU=I 總數
+        let weeklyTotal = 0;
+        Object.entries(data).forEach(([date, count]) => {
+          // 檢查日期是否在當週範圍內
+          if (date >= firstDayStr && date <= lastDayStr) {
+            weeklyTotal += count;
+          }
+        });
+        
         setLdruICounts(data);
         setTotalLdruI(total);
+        setWeeklyLdruI(weeklyTotal);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -96,7 +128,7 @@ export default function Dashboard() {
         <DashboardHeader />
         
         {/* 頂部統計卡片 */}
-        <StatisticsCards totalLdruI={totalLdruI} />
+        <StatisticsCards totalLdruI={totalLdruI} weeklyLdruI={weeklyLdruI} />
 
         {/* 中央日曆和統計區域 */}
         <Grid container spacing={3}>

@@ -47,7 +47,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
               color === 'warning' ? '255, 152, 0' :
               color === 'info' ? '0, 120, 255' : '0, 0, 0'}, 0.3)`,
     '&:hover': {
-      transform: 'translateY(-5px)',
       boxShadow: `0 8px 35px rgba(${color === 'primary' ? '64, 175, 255' :
                   color === 'success' ? '100, 255, 218' :
                   color === 'warning' ? '255, 152, 0' :
@@ -133,30 +132,13 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
             filter: 'blur(8px)',
             zIndex: -1
           },
-          animation: 'pulse 2s infinite',
-          '@keyframes pulse': {
-            '0%': { boxShadow: color === 'primary'
-              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
-              : color === 'success'
-                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
-                : color === 'warning'
-                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
-                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)' },
-            '50%': { boxShadow: color === 'primary'
-              ? '0 0 35px rgba(64, 175, 255, 0.9), inset 0 0 20px rgba(64, 175, 255, 0.6)'
-              : color === 'success'
-                ? '0 0 35px rgba(100, 255, 218, 0.9), inset 0 0 20px rgba(100, 255, 218, 0.6)'
-                : color === 'warning'
-                  ? '0 0 35px rgba(255, 152, 0, 0.9), inset 0 0 20px rgba(255, 152, 0, 0.6)'
-                  : '0 0 35px rgba(0, 120, 255, 0.9), inset 0 0 20px rgba(0, 120, 255, 0.6)' },
-            '100%': { boxShadow: color === 'primary'
-              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
-              : color === 'success'
-                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
-                : color === 'warning'
-                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
-                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)' }
-          }
+          boxShadow: color === 'primary'
+            ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
+            : color === 'success'
+              ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
+              : color === 'warning'
+                ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
+                : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)'
         }}>
           {icon}
         </Box>
