@@ -1,11 +1,17 @@
-import React from 'react';
-import { Paper, Box, Typography, Tooltip } from '@mui/material';
+import React, { useState } from 'react';
+import { Paper, Box, Typography, Tooltip, IconButton } from '@mui/material';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
+// 使用 dayjs 的類型
+type Dayjs = dayjs.Dayjs;
 
 // 定義 props 接口
 interface CalendarProps {
   ldruICounts?: Record<string, number>;
+  onMonthChange?: (year: number, month: number) => void;
 }
 
 // 將民國年日期轉換為西元年日期
@@ -19,7 +25,53 @@ const convertMinguoToGregorian = (minguoDate: string): string => {
   return `${year}-${month}-${day}`;
 };
 
-const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
+// 擴展 props 接口，添加初始年份和月份
+interface CalendarProps {
+  ldruICounts?: Record<string, number>;
+  onMonthChange?: (year: number, month: number) => void;
+  initialYear?: number;
+  initialMonth?: number;
+}
+
+const Calendar: React.FC<CalendarProps> = ({
+  ldruICounts = {},
+  onMonthChange,
+  initialYear = new Date().getFullYear(),
+  initialMonth = new Date().getMonth() + 1
+}) => {
+  // 使用 props 中的初始年份和月份
+  const [currentMonth, setCurrentMonth] = useState<Dayjs>(
+    dayjs(new Date(initialYear, initialMonth - 1, 1))
+  );
+  
+  // 處理月份切換的函數
+  const handlePreviousMonth = (e: React.MouseEvent) => {
+    // 阻止事件冒泡
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const newMonth = currentMonth.subtract(1, 'month');
+    setCurrentMonth(newMonth);
+    
+    // 通知父組件月份已經改變
+    if (onMonthChange) {
+      onMonthChange(newMonth.year(), newMonth.month() + 1); // 月份從0開始，所以加1
+    }
+  };
+  
+  const handleNextMonth = (e: React.MouseEvent) => {
+    // 阻止事件冒泡
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const newMonth = currentMonth.add(1, 'month');
+    setCurrentMonth(newMonth);
+    
+    // 通知父組件月份已經改變
+    if (onMonthChange) {
+      onMonthChange(newMonth.year(), newMonth.month() + 1); // 月份從0開始，所以加1
+    }
+  };
   return (
     <Paper
       sx={{
@@ -91,15 +143,51 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
           boxShadow: '0 0 20px rgba(64, 175, 255, 0.8)'
         }
         }}>
-        <Typography variant="h4" sx={{
-          fontFamily: 'monospace',
-          fontWeight: 'bold',
-          color: '#64ffda',
-          textShadow: '0 0 15px rgba(100, 255, 218, 0.8)',
-          letterSpacing: '0.05em'
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          mb: 1
         }}>
-          {dayjs().locale('zh-tw').format('YYYY/MM')}
-        </Typography>
+          <IconButton
+            onClick={handlePreviousMonth}
+            sx={{
+              color: '#64ffda',
+              '&:hover': {
+                bgcolor: 'rgba(100, 255, 218, 0.1)',
+                boxShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
+              }
+            }}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+          
+          <Typography variant="h4" sx={{
+            fontFamily: 'monospace',
+            fontWeight: 'bold',
+            color: '#64ffda',
+            textShadow: '0 0 15px rgba(100, 255, 218, 0.8)',
+            letterSpacing: '0.05em',
+            mx: 2
+          }}>
+            {currentMonth.locale('zh-tw').format('YYYY/MM')}
+          </Typography>
+          
+          <IconButton
+            onClick={handleNextMonth}
+            sx={{
+              color: '#64ffda',
+              '&:hover': {
+                bgcolor: 'rgba(100, 255, 218, 0.1)',
+                boxShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
+              }
+            }}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
+        
         <Typography variant="h6" sx={{
           fontFamily: 'monospace',
           color: '#e6f1ff',
@@ -116,7 +204,7 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
             mr: 1,
             boxShadow: '0 0 8px rgba(100, 255, 218, 0.7)'
           }}/>
-          {dayjs().locale('zh-tw').format('dddd')}
+          {currentMonth.locale('zh-tw').format('dddd')}
         </Typography>
       </Box>
       
@@ -150,8 +238,8 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
           </Box>
         ))}
         {Array.from({ length: 35 }, (_, i) => {
-          const d = dayjs().startOf('month').startOf('week').add(i, 'day');
-          const isCurrentMonth = d.month() === dayjs().month();
+          const d = currentMonth.startOf('month').startOf('week').add(i, 'day');
+          const isCurrentMonth = d.month() === currentMonth.month();
           const isToday = d.isSame(dayjs(), 'day');
           
           // 格式化日期為民國年格式 (YYYMMDD)

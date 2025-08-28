@@ -40,20 +40,21 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
   const [error, setError] = useState<string | null>(null);
+  // 當前選擇的年份和月份
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
 
-  // 獲取當月的第一天和最後一天（民國年格式）
-  const getCurrentMonthRange = (): { start: string, end: string } => {
-    const now = new Date();
-    
-    // 當月第一天
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  // 獲取指定月份的第一天和最後一天（民國年格式）
+  const getMonthRange = (year: number = new Date().getFullYear(), month: number = new Date().getMonth() + 1): { start: string, end: string } => {
+    // 指定月份的第一天
+    const firstDay = new Date(year, month - 1, 1); // 月份從0開始，所以減1
     const firstDayYear = firstDay.getFullYear() - 1911; // 西元年轉民國年
     const firstDayMonth = (firstDay.getMonth() + 1).toString().padStart(2, '0');
     const firstDayDate = firstDay.getDate().toString().padStart(2, '0');
     const firstDayStr = `${firstDayYear}${firstDayMonth}${firstDayDate}`;
     
-    // 當月最後一天
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    // 指定月份的最後一天
+    const lastDay = new Date(year, month, 0); // 下個月的第0天就是當月的最後一天
     const lastDayYear = lastDay.getFullYear() - 1911; // 西元年轉民國年
     const lastDayMonth = (lastDay.getMonth() + 1).toString().padStart(2, '0');
     const lastDayDate = lastDay.getDate().toString().padStart(2, '0');
@@ -62,14 +63,20 @@ export default function Dashboard() {
     return { start: firstDayStr, end: lastDayStr };
   };
 
-  // 在組件加載時獲取數據
+  // 處理月份切換的函數
+  const handleMonthChange = (year: number, month: number) => {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+  };
+
+  // 在組件加載時或月份變化時獲取數據
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        // 獲取當月日期範圍
-        const { start, end } = getCurrentMonthRange();
+        // 獲取選擇的月份日期範圍
+        const { start, end } = getMonthRange(selectedYear, selectedMonth);
         
         // 獲取 LDRU=I 的每日數量數據
         const data = await fetchLdruICountsByDate(start, end);
@@ -119,7 +126,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [selectedYear, selectedMonth]);
 
   return (
     <Layout title="科技儀表板">
@@ -167,7 +174,12 @@ export default function Dashboard() {
                 {error}
               </Box>
             ) : (
-              <Calendar ldruICounts={ldruICounts} />
+              <Calendar
+                ldruICounts={ldruICounts}
+                onMonthChange={handleMonthChange}
+                initialYear={selectedYear}
+                initialMonth={selectedMonth}
+              />
             )}
           </Grid>
         </Grid>

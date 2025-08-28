@@ -39,7 +39,7 @@ const DashboardHeader: React.FC = () => {
           boxShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
         }
       }}>
-        科技儀表板
+        處方儀表板
       </Typography>
       <Typography variant="body2" sx={{
         fontFamily: 'monospace',
