@@ -183,11 +183,9 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
                   p: 1,
                   borderRadius: 1,
                   bgcolor: isToday
-                    ? 'rgba(64, 175, 255, 0.8)'
+                    ? 'rgba(38, 102, 148, 0.8)'
                     : isCurrentMonth
-                      ? ldruICount > 0
-                        ? `rgba(121, 129, 203, ${0.3 + bgIntensity * 0.5})`
-                        : 'rgba(17, 34, 64, 0.5)'
+                      ? 'rgba(17, 34, 64, 0.5)'
                       : 'transparent',
                   color: isToday ? 'white' : isCurrentMonth ? '#e6f1ff' : 'rgba(230, 241, 255, 0.4)',
                   fontWeight: isToday ? 'bold' : 'normal',
@@ -197,7 +195,7 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
                     ? 'none'
                     : isCurrentMonth
                       ? ldruICount > 0
-                        ? '1px solid rgba(121, 129, 203, 0.6)'
+                        ? `1px solid rgba(121, 129, 203, ${0.6 + bgIntensity * 0.4})`
                         : '1px solid rgba(64, 175, 255, 0.3)'
                       : 'none',
                   boxShadow: isToday
@@ -214,7 +212,7 @@ const Calendar: React.FC<CalendarProps> = ({ ldruICounts = {} }) => {
                   position: 'relative',
                   '&:hover': {
                     bgcolor: isToday
-                      ? 'rgba(64, 175, 255, 0.9)'
+                      ? 'rgba(54, 165, 245, 0.9)'
                       : ldruICount > 0
                         ? `rgba(121, 129, 203, ${0.4 + bgIntensity * 0.5})`
                         : 'rgba(64, 175, 255, 0.3)',
