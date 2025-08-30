@@ -1,7 +1,20 @@
 import axios from 'axios';
 
-// 使用固定的 IP 地址
-const API_BASE_URL = 'http://192.168.68.90:7001/api';
+// 使用環境變量設置 API 地址
+const API_HOST = import.meta.env.VITE_API_HOST || '192.168.68.90';
+const API_PORT = import.meta.env.VITE_API_PORT || '7001';
+
+// 始終使用絕對 URL
+const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api`;
+
+// 輸出調試信息
+console.log('API 設置:', {
+  API_HOST,
+  API_PORT,
+  API_BASE_URL,
+  VITE_API_HOST: import.meta.env.VITE_API_HOST,
+  VITE_API_PORT: import.meta.env.VITE_API_PORT
+});
 
 /**
  * @description 創建 axios 實例，配置基本 URL 和請求頭
@@ -245,6 +258,51 @@ export const fetchLdruICountsByDate = async (startDate = '', endDate = '') => {
     return ldruICounts;
   } catch (error) {
     console.error('Error fetching LDRU=I counts by date:', error);
+    throw error;
+  }
+};
+
+/**
+ * @function fetchA99Count75
+ * @description 獲取 CO03L.DBF 中 A99 欄位為 75 的記錄數量
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<number>} A99 欄位為 75 的記錄數量
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const count = await fetchA99Count75('1130801', '1130831');
+ * console.log(count); // 10
+ */
+export const fetchA99Count75 = async (startDate = '', endDate = '') => {
+  try {
+    // 獲取 CO03L.DBF 的所有記錄
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000, // 使用較大的頁面大小以獲取更多記錄
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true' // 標記為統計頁面請求
+    );
+
+    // 計算 A99 欄位為 75 的記錄數量
+    let count = 0;
+    result.records.forEach((record: DbfRecord) => {
+      const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
+      
+      // 檢查 A99 欄位是否為 75
+      if (a99Value === 75) {
+        count++;
+      }
+    });
+
+    return count;
+  } catch (error) {
+    console.error('Error fetching A99=75 count:', error);
     throw error;
   }
 };

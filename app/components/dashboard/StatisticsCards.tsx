@@ -6,9 +6,14 @@ import DashboardCard from './DashboardCard';
 interface StatisticsCardsProps {
   totalLdruI?: number;
   weeklyLdruI?: number;
+  a99Count75?: number;
 }
 
-const StatisticsCards: React.FC<StatisticsCardsProps> = ({ totalLdruI = 0, weeklyLdruI = 0 }) => {
+const StatisticsCards: React.FC<StatisticsCardsProps> = ({
+  totalLdruI = 0,
+  weeklyLdruI = 0,
+  a99Count75 = 0
+}) => {
   return (
     <Grid container>
       
@@ -37,10 +42,10 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ totalLdruI = 0, weekl
         />
       </Grid>
       <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' }, p: 1.5 }}>
-        <DashboardCard 
-          title="系統效能" 
-          value="94%" 
-          icon="⚡" 
+        <DashboardCard
+          title="A99=75 數量"
+          value={a99Count75.toString()}
+          icon="🔢"
           color="info"
         />
       </Grid>

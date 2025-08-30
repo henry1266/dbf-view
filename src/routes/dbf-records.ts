@@ -157,7 +157,7 @@ router.get('/:fileName', async (req: Request, res: Response) => {
   if (!sortField) {
     if (baseName === 'co03l') {
       sortField = '_recordNo';  // CO03L.DBF 默認按紀錄編號排序
-      console.log(`使用 ${fileName} 特殊排序: 按紀錄編號排序`);
+      //console.log(`使用 ${fileName} 特殊排序: 按紀錄編號排序`);
     } else {
       sortField = 'PDATE';  // 其他檔案默認按 PDATE 排序
     }

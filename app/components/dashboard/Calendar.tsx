@@ -271,7 +271,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   p: 1,
                   borderRadius: 1,
                   bgcolor: isToday
-                    ? 'rgba(38, 102, 148, 0.8)'
+                    ? 'rgba(34, 89, 129, 0.8)'
                     : isCurrentMonth
                       ? 'rgba(17, 34, 64, 0.5)'
                       : 'transparent',
@@ -280,7 +280,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   fontFamily: 'monospace',
                   fontSize: '0.875rem',
                   border: isToday
-                    ? 'none'
+                    ? '1px solid rgba(167, 245, 255, 1)'
                     : isCurrentMonth
                       ? ldruICount > 0
                         ? `1px solid rgba(121, 129, 203, ${0.6 + bgIntensity * 0.4})`
@@ -289,7 +289,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   boxShadow: isToday
                     ? '0 0 15px rgba(64, 175, 255, 0.7)'
                     : ldruICount > 0
-                      ? `0 0 ${5 + bgIntensity * 10}px rgba(121, 129, 203, ${0.3 + bgIntensity * 0.4})`
+                      ? `0 0 ${5 + bgIntensity * 10}px rgba(121, 129, 203, ${0.2 + bgIntensity * 0.4})`
                       : 'none',
                   textShadow: isToday
                     ? '0 0 8px rgba(255, 255, 255, 0.8)'

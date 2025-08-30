@@ -10,7 +10,7 @@ import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { fetchLdruICountsByDate } from '../services/api';
+import { fetchLdruICountsByDate, fetchA99Count75 } from '../services/api';
 
 /**
  * @function meta
@@ -36,6 +36,8 @@ export default function Dashboard() {
   const [totalLdruI, setTotalLdruI] = useState<number>(0);
   // 存儲當週 LDRU=I 的總數
   const [weeklyLdruI, setWeeklyLdruI] = useState<number>(0);
+  // 存儲 A99 欄位為 75 的數量
+  const [a99Count75, setA99Count75] = useState<number>(0);
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -81,6 +83,9 @@ export default function Dashboard() {
         // 獲取 LDRU=I 的每日數量數據
         const data = await fetchLdruICountsByDate(start, end);
         
+        // 獲取 A99 欄位為 75 的數量
+        const a99Count = await fetchA99Count75(start, end);
+        
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
         
@@ -116,6 +121,7 @@ export default function Dashboard() {
         setLdruICounts(data);
         setTotalLdruI(total);
         setWeeklyLdruI(weeklyTotal);
+        setA99Count75(a99Count);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -135,7 +141,11 @@ export default function Dashboard() {
         <DashboardHeader />
         
         {/* 頂部統計卡片 */}
-        <StatisticsCards totalLdruI={totalLdruI} weeklyLdruI={weeklyLdruI} />
+        <StatisticsCards
+          totalLdruI={totalLdruI}
+          weeklyLdruI={weeklyLdruI}
+          a99Count75={a99Count75}
+        />
 
         {/* 中央日曆和統計區域 */}
         <Grid container spacing={3}>

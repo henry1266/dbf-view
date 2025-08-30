@@ -131,14 +131,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
                   : 'radial-gradient(circle, rgba(0, 120, 255, 0.3) 0%, rgba(0, 0, 0, 0) 70%)',
             filter: 'blur(8px)',
             zIndex: -1
-          },
-          boxShadow: color === 'primary'
-            ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
-            : color === 'success'
-              ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
-              : color === 'warning'
-                ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
-                : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)'
+          }
         }}>
           {icon}
         </Box>
