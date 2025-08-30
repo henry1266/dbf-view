@@ -155,14 +155,14 @@ export default function Dashboard() {
         />
 
         {/* 中央日曆和統計區域 */}
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           {/* 左側統計面板 */}
-          <Grid sx={{ width: { xs: '100%', md: '25%' }, p: 1.5 }}>
+          <Grid sx={{ width: { xs: '100%', lg: '24%' }, p: 1 }}>
             <SystemStatus />
           </Grid>
 
           {/* 中央日曆 */}
-          <Grid sx={{ width: { xs: '100%', md: '50%' }, p: 1.5 }}>
+          <Grid sx={{ width: { xs: '100%', lg: '49%' }, p: 1 }}>
             {loading ? (
               <Box sx={{
                 display: 'flex',

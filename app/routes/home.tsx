@@ -224,7 +224,7 @@ export default function Home() {
         </Typography>
 
         <Grid container spacing={4}>
-          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="儀表板"
               description="查看系統的關鍵統計數據和指標，包括處方總數、當月調劑數量、A99調劑費等重要信息。儀表板提供直觀的數據視覺化，幫助您快速了解系統狀態。"
@@ -235,7 +235,7 @@ export default function Home() {
             />
           </Grid>
           
-          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="處方查詢"
               description="使用多種方式查詢處方記錄，包括通過 KCSTMR 查詢特定客戶的處方，或通過 KDRUG 查詢特定藥品的處方記錄。提供靈活的查詢選項，滿足不同的查詢需求。"
@@ -246,7 +246,7 @@ export default function Home() {
             />
           </Grid>
           
-          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="DBF 檔案列表"
               description="瀏覽所有可用的 DBF 檔案，查看每個檔案的詳細信息和記錄。系統連接到 MongoDB 數據庫，從中獲取由 DBF 監控服務處理和存儲的數據。"
@@ -257,7 +257,7 @@ export default function Home() {
             />
           </Grid>
           
-          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+          <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="處方記錄"
               description="查看詳細的處方記錄信息，包括客戶信息、藥品信息、處方日期等。系統提供完整的處方記錄瀏覽功能，幫助您快速找到所需的處方信息。"

@@ -17,8 +17,8 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   totalA99 = 0
 }) => {
   return (
-    <Grid container>
-      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
+    <Grid container  spacing={1}>
+      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
           title="當月A99調劑費總和"
           value={totalA99.toString()}
@@ -26,7 +26,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
           color="success"
         />
       </Box>
-      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
+      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
           title="當月調劑"
           value={totalLdruI.toString()}
@@ -34,7 +34,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
           color="primary"
         />
       </Box>
-      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
+      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
           title="當週調劑"
           value={weeklyLdruI.toString()}
@@ -42,7 +42,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
           color="warning"
         />
       </Box>
-      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
+      <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
           title="A99=75 數量"
           value={a99Count75.toString()}
