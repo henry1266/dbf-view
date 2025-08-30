@@ -8,6 +8,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from '@mui/icons-material/Folder';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-tw';
 
 export function meta() {
   return [
@@ -16,7 +18,61 @@ export function meta() {
   ];
 }
 
-// 大卡片組件
+/**
+ * @component HomeHeader
+ * @description 首頁頂部組件，顯示標題和當前日期，具有現代科技風格的 UI 設計
+ * @returns {JSX.Element} 渲染的首頁頂部組件
+ */
+const HomeHeader: React.FC = () => {
+  return (
+    <Box sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      mb: 3,
+      pb: 1,
+      borderBottom: '1px solid rgba(0, 120, 255, 0.1)'
+    }}>
+      <Typography variant="body2" sx={{
+        fontFamily: 'monospace',
+        color: '#e6f1ff',
+        textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
+        letterSpacing: '0.05em',
+        display: 'flex',
+        alignItems: 'center',
+        bgcolor: 'rgba(17, 34, 64, 0.6)',
+        backdropFilter: 'blur(8px)',
+        px: 1.5,
+        py: 0.5,
+        borderRadius: 1,
+        border: '1px solid rgba(64, 175, 255, 0.3)',
+        boxShadow: '0 0 10px rgba(64, 175, 255, 0.3)'
+      }}>
+        <Box component="span" sx={{
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          bgcolor: '#64ffda',
+          display: 'inline-block',
+          mr: 1,
+          boxShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
+          animation: 'pulse 1.5s infinite',
+          '@keyframes pulse': {
+            '0%': { opacity: 0.5, transform: 'scale(0.8)' },
+            '50%': { opacity: 1, transform: 'scale(1.2)' },
+            '100%': { opacity: 0.5, transform: 'scale(0.8)' }
+          }
+        }}/>
+        ONLINE • {dayjs().format('YYYY-MM-DD')}
+      </Typography>
+    </Box>
+  );
+};
+
+/**
+ * @component BigCard
+ * @description 大卡片組件，用於顯示首頁的功能區塊
+ */
 const BigCard = ({ 
   title, 
   description, 
@@ -172,23 +228,74 @@ const BigCard = ({
             fontWeight: 'bold',
             fontSize: '1rem',
             textTransform: 'none',
-            background: getGradient(color),
-            boxShadow: color === 'primary'
-              ? '0 4px 20px rgba(64, 175, 255, 0.5)'
+            bgcolor: 'rgba(17, 34, 64, 0.6)',
+            backdropFilter: 'blur(8px)',
+            border: color === 'primary'
+              ? '1px solid rgba(64, 175, 255, 0.6)'
               : color === 'success'
-                ? '0 4px 20px rgba(100, 255, 218, 0.5)'
+                ? '1px solid rgba(100, 255, 218, 0.6)'
                 : color === 'warning'
-                  ? '0 4px 20px rgba(255, 152, 0, 0.5)'
-                  : '0 4px 20px rgba(0, 120, 255, 0.5)',
-            '&:hover': {
-              background: getGradient(color),
-              boxShadow: color === 'primary'
-                ? '0 6px 25px rgba(64, 175, 255, 0.7)'
+                  ? '1px solid rgba(255, 152, 0, 0.6)'
+                  : '1px solid rgba(0, 120, 255, 0.6)',
+            color: color === 'primary'
+              ? 'rgba(64, 175, 255, 1)'
+              : color === 'success'
+                ? 'rgba(100, 255, 218, 1)'
+                : color === 'warning'
+                  ? 'rgba(255, 152, 0, 1)'
+                  : 'rgba(0, 120, 255, 1)',
+            boxShadow: color === 'primary'
+              ? '0 4px 20px rgba(64, 175, 255, 0.3), inset 0 0 10px rgba(64, 175, 255, 0.1)'
+              : color === 'success'
+                ? '0 4px 20px rgba(100, 255, 218, 0.3), inset 0 0 10px rgba(100, 255, 218, 0.1)'
+                : color === 'warning'
+                  ? '0 4px 20px rgba(255, 152, 0, 0.3), inset 0 0 10px rgba(255, 152, 0, 0.1)'
+                  : '0 4px 20px rgba(0, 120, 255, 0.3), inset 0 0 10px rgba(0, 120, 255, 0.1)',
+            textShadow: color === 'primary'
+              ? '0 0 5px rgba(64, 175, 255, 0.5)'
+              : color === 'success'
+                ? '0 0 5px rgba(100, 255, 218, 0.5)'
+                : color === 'warning'
+                  ? '0 0 5px rgba(255, 152, 0, 0.5)'
+                  : '0 0 5px rgba(0, 120, 255, 0.5)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '2px',
+              background: color === 'primary'
+                ? 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.8), transparent)'
                 : color === 'success'
-                  ? '0 6px 25px rgba(100, 255, 218, 0.7)'
+                  ? 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.8), transparent)'
                   : color === 'warning'
-                    ? '0 6px 25px rgba(255, 152, 0, 0.7)'
-                    : '0 6px 25px rgba(0, 120, 255, 0.7)',
+                    ? 'linear-gradient(90deg, transparent, rgba(255, 152, 0, 0.8), transparent)'
+                    : 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.8), transparent)',
+              boxShadow: color === 'primary'
+                ? '0 0 10px rgba(64, 175, 255, 0.5)'
+                : color === 'success'
+                  ? '0 0 10px rgba(100, 255, 218, 0.5)'
+                  : color === 'warning'
+                    ? '0 0 10px rgba(255, 152, 0, 0.5)'
+                    : '0 0 10px rgba(0, 120, 255, 0.5)',
+            },
+            '&:hover': {
+              bgcolor: 'rgba(17, 34, 64, 0.8)',
+              boxShadow: color === 'primary'
+                ? '0 6px 25px rgba(64, 175, 255, 0.5), inset 0 0 15px rgba(64, 175, 255, 0.2)'
+                : color === 'success'
+                  ? '0 6px 25px rgba(100, 255, 218, 0.5), inset 0 0 15px rgba(100, 255, 218, 0.2)'
+                  : color === 'warning'
+                    ? '0 6px 25px rgba(255, 152, 0, 0.5), inset 0 0 15px rgba(255, 152, 0, 0.2)'
+                    : '0 6px 25px rgba(0, 120, 255, 0.5), inset 0 0 15px rgba(0, 120, 255, 0.2)',
+              border: color === 'primary'
+                ? '1px solid rgba(64, 175, 255, 0.8)'
+                : color === 'success'
+                  ? '1px solid rgba(100, 255, 218, 0.8)'
+                  : color === 'warning'
+                    ? '1px solid rgba(255, 152, 0, 0.8)'
+                    : '1px solid rgba(0, 120, 255, 0.8)',
             }
           }}
         >
@@ -201,33 +308,24 @@ const BigCard = ({
 
 export default function Home() {
   return (
-    <Layout title="歡迎使用處方瀏覽系統">
+    <Layout title="處方瀏覽系統">
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" component="h1" sx={{ 
-          mb: 2, 
-          fontWeight: 'bold',
-          color: '#0a192f',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}>
-          <HomeIcon fontSize="large" /> 歡迎使用處方瀏覽系統
-        </Typography>
-        <Typography variant="h6" sx={{ 
-          color: '#8892b0', 
+        <HomeHeader />
+        
+        <Typography variant="h6" sx={{
+          color: '#8892b0',
           mb: 4,
           fontWeight: 'normal',
           maxWidth: '800px'
         }}>
-          這是一個用於瀏覽和查詢 DBF 檔案記錄的系統。您可以瀏覽所有可用的 DBF 檔案，
-          查看每個檔案的記錄，並使用多種方式進行查詢。
+          歡迎使用處方瀏覽系統
         </Typography>
 
         <Grid container spacing={4}>
           <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="儀表板"
-              description="查看系統的關鍵統計數據和指標，包括處方總數、當月調劑數量、A99調劑費等重要信息。儀表板提供直觀的數據視覺化，幫助您快速了解系統狀態。"
+              description="儀表板提供直觀的數據視覺化，幫助您快速了解系統狀態。"
               icon={<DashboardIcon fontSize="large" />}
               color="primary"
               linkTo="/dashboard"
@@ -238,7 +336,7 @@ export default function Home() {
           <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="處方查詢"
-              description="使用多種方式查詢處方記錄，包括通過 KCSTMR 查詢特定客戶的處方，或通過 KDRUG 查詢特定藥品的處方記錄。提供靈活的查詢選項，滿足不同的查詢需求。"
+              description="使用多種方式查詢處方記錄，提供靈活的查詢選項，滿足不同的查詢需求。"
               icon={<SearchIcon fontSize="large" />}
               color="success"
               linkTo="/search"
@@ -249,7 +347,7 @@ export default function Home() {
           <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="DBF 檔案列表"
-              description="瀏覽所有可用的 DBF 檔案，查看每個檔案的詳細信息和記錄。系統連接到 MongoDB 數據庫，從中獲取由 DBF 監控服務處理和存儲的數據。"
+              description="瀏覽所有可用的 DBF 檔案，查看每個檔案的詳細信息和記錄。"
               icon={<FolderIcon fontSize="large" />}
               color="warning"
               linkTo="/dbf-files"
@@ -260,7 +358,7 @@ export default function Home() {
           <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
               title="處方記錄"
-              description="查看詳細的處方記錄信息，包括客戶信息、藥品信息、處方日期等。系統提供完整的處方記錄瀏覽功能，幫助您快速找到所需的處方信息。"
+              description="查看詳細的處方記錄信息，包括客戶信息、藥品信息、處方日期等。"
               icon={<DescriptionIcon fontSize="large" />}
               color="info"
               linkTo="/dbf-files"
