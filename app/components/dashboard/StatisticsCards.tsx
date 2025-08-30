@@ -7,21 +7,23 @@ interface StatisticsCardsProps {
   totalLdruI?: number;
   weeklyLdruI?: number;
   a99Count75?: number;
+  totalA99?: number;
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   totalLdruI = 0,
   weeklyLdruI = 0,
-  a99Count75 = 0
+  a99Count75 = 0,
+  totalA99 = 0
 }) => {
   return (
     <Grid container>
       
       <Grid sx={{ width: { xs: '100%', sm: '50%', md: '25%' }, p: 1.5 }}>
-        <DashboardCard 
-          title="總記錄數" 
-          value="24,512" 
-          icon="📊" 
+        <DashboardCard
+          title="當月A99調劑費總和"
+          value={totalA99.toString()}
+          icon="📊"
           color="success"
         />
       </Grid>

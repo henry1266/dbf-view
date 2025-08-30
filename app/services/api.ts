@@ -307,4 +307,49 @@ export const fetchA99Count75 = async (startDate = '', endDate = '') => {
   }
 };
 
+/**
+ * @function fetchA99Total
+ * @description 獲取 CO03L.DBF 中 A99 欄位的總和
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<number>} A99 欄位的總和
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const total = await fetchA99Total('1130801', '1130831');
+ * console.log(total); // 12345
+ */
+export const fetchA99Total = async (startDate = '', endDate = '') => {
+  try {
+    // 獲取 CO03L.DBF 的所有記錄
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000, // 使用較大的頁面大小以獲取更多記錄
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true' // 標記為統計頁面請求
+    );
+
+    // 計算 A99 欄位的總和
+    let total = 0;
+    result.records.forEach((record: DbfRecord) => {
+      const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
+      
+      // 只有當 A99 是有效數字時才加入總和
+      if (!isNaN(a99Value)) {
+        total += a99Value;
+      }
+    });
+
+    return total;
+  } catch (error) {
+    console.error('Error fetching A99 total:', error);
+    throw error;
+  }
+};
+
 export default api;
