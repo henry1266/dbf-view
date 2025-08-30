@@ -1,6 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { Box, Typography, Grid, Paper, Button } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import SearchIcon from '@mui/icons-material/Search';
+import FolderIcon from '@mui/icons-material/Folder';
+import DescriptionIcon from '@mui/icons-material/Description';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 
 export function meta() {
   return [
@@ -9,108 +16,276 @@ export function meta() {
   ];
 }
 
+// 大卡片組件
+const BigCard = ({ 
+  title, 
+  description, 
+  icon, 
+  color, 
+  linkTo, 
+  linkText 
+}: { 
+  title: string; 
+  description: string; 
+  icon: React.ReactNode; 
+  color: string; 
+  linkTo: string; 
+  linkText: string; 
+}) => {
+  // 根據顏色設置漸變背景
+  const getGradient = (color: string) => {
+    switch (color) {
+      case 'primary':
+        return 'linear-gradient(135deg, #40afff, #0078ff)';
+      case 'success':
+        return 'linear-gradient(135deg, #64ffda, #00d2b4)';
+      case 'warning':
+        return 'linear-gradient(135deg, #ff9800, #ff6400)';
+      case 'info':
+        return 'linear-gradient(135deg, #0078ff, #0050c8)';
+      default:
+        return 'linear-gradient(135deg, #40afff, #0078ff)';
+    }
+  };
+
+  // 根據顏色設置陰影
+  const getShadow = (color: string) => {
+    switch (color) {
+      case 'primary':
+        return '0 8px 35px rgba(64, 175, 255, 0.4)';
+      case 'success':
+        return '0 8px 35px rgba(100, 255, 218, 0.4)';
+      case 'warning':
+        return '0 8px 35px rgba(255, 152, 0, 0.4)';
+      case 'info':
+        return '0 8px 35px rgba(0, 120, 255, 0.4)';
+      default:
+        return '0 8px 35px rgba(64, 175, 255, 0.4)';
+    }
+  };
+
+  // 根據顏色設置邊框
+  const getBorder = (color: string) => {
+    switch (color) {
+      case 'primary':
+        return '1px solid rgba(64, 175, 255, 0.3)';
+      case 'success':
+        return '1px solid rgba(100, 255, 218, 0.3)';
+      case 'warning':
+        return '1px solid rgba(255, 152, 0, 0.3)';
+      case 'info':
+        return '1px solid rgba(0, 120, 255, 0.3)';
+      default:
+        return '1px solid rgba(64, 175, 255, 0.3)';
+    }
+  };
+
+  return (
+    <Paper sx={{
+      height: '100%',
+      borderRadius: 4,
+      overflow: 'hidden',
+      position: 'relative',
+      transition: 'all 0.3s ease-in-out',
+      boxShadow: getShadow(color),
+      border: getBorder(color),
+      '&:hover': {
+        transform: 'translateY(-10px)',
+        boxShadow: color === 'primary'
+          ? '0 15px 40px rgba(64, 175, 255, 0.6)'
+          : color === 'success'
+            ? '0 15px 40px rgba(100, 255, 218, 0.6)'
+            : color === 'warning'
+              ? '0 15px 40px rgba(255, 152, 0, 0.6)'
+              : '0 15px 40px rgba(0, 120, 255, 0.6)',
+      },
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* 頂部漸變色條 */}
+      <Box sx={{
+        height: '8px',
+        background: getGradient(color),
+        width: '100%',
+        boxShadow: color === 'primary'
+          ? '0 0 20px rgba(64, 175, 255, 0.8)'
+          : color === 'success'
+            ? '0 0 20px rgba(100, 255, 218, 0.8)'
+            : color === 'warning'
+              ? '0 0 20px rgba(255, 152, 0, 0.8)'
+              : '0 0 20px rgba(0, 120, 255, 0.8)',
+      }} />
+
+      {/* 卡片內容 */}
+      <Box sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: getGradient(color),
+            color: '#ffffff',
+            borderRadius: '50%',
+            p: 2,
+            mr: 2,
+            boxShadow: color === 'primary'
+              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
+              : color === 'success'
+                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
+                : color === 'warning'
+                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
+                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)',
+            fontSize: '2rem',
+          }}>
+            {icon}
+          </Box>
+          <Typography variant="h4" component="h2" sx={{
+            fontWeight: 'bold',
+            color: '#0a192f',
+            fontFamily: 'monospace',
+            letterSpacing: '0.05em',
+          }}>
+            {title}
+          </Typography>
+        </Box>
+
+        <Typography variant="body1" sx={{ 
+          color: '#8892b0', 
+          mb: 4, 
+          fontSize: '1.1rem',
+          lineHeight: 1.6,
+          flexGrow: 1
+        }}>
+          {description}
+        </Typography>
+
+        <Button
+          component={Link}
+          to={linkTo}
+          variant="contained"
+          size="large"
+          sx={{
+            mt: 'auto',
+            py: 1.5,
+            px: 4,
+            borderRadius: 2,
+            fontWeight: 'bold',
+            fontSize: '1rem',
+            textTransform: 'none',
+            background: getGradient(color),
+            boxShadow: color === 'primary'
+              ? '0 4px 20px rgba(64, 175, 255, 0.5)'
+              : color === 'success'
+                ? '0 4px 20px rgba(100, 255, 218, 0.5)'
+                : color === 'warning'
+                  ? '0 4px 20px rgba(255, 152, 0, 0.5)'
+                  : '0 4px 20px rgba(0, 120, 255, 0.5)',
+            '&:hover': {
+              background: getGradient(color),
+              boxShadow: color === 'primary'
+                ? '0 6px 25px rgba(64, 175, 255, 0.7)'
+                : color === 'success'
+                  ? '0 6px 25px rgba(100, 255, 218, 0.7)'
+                  : color === 'warning'
+                    ? '0 6px 25px rgba(255, 152, 0, 0.7)'
+                    : '0 6px 25px rgba(0, 120, 255, 0.7)',
+            }
+          }}
+        >
+          {linkText}
+        </Button>
+      </Box>
+    </Paper>
+  );
+};
+
 export default function Home() {
   return (
     <Layout title="歡迎使用處方瀏覽系統">
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">關於處方瀏覽系統</h2>
-        <p className="text-gray-600 mb-4">
-          DBF 檔案瀏覽器是一個用於瀏覽和查詢 DBF 檔案記錄的工具。您可以瀏覽所有可用的 DBF 檔案，
-          查看每個檔案的記錄，並使用 KCSTMR 或 KDRUG 值進行查詢。
-        </p>
-        <p className="text-gray-600">
-          此應用程序連接到 MongoDB 數據庫，從中獲取由 DBF 監控服務處理和存儲的數據。
-        </p>
-      </div>
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          mb: 2, 
+          fontWeight: 'bold',
+          color: '#0a192f',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+          <HomeIcon fontSize="large" /> 歡迎使用處方瀏覽系統
+        </Typography>
+        <Typography variant="h6" sx={{ 
+          color: '#8892b0', 
+          mb: 4,
+          fontWeight: 'normal',
+          maxWidth: '800px'
+        }}>
+          這是一個用於瀏覽和查詢 DBF 檔案記錄的系統。您可以瀏覽所有可用的 DBF 檔案，
+          查看每個檔案的記錄，並使用多種方式進行查詢。
+        </Typography>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-blue-50 rounded-lg shadow-md overflow-hidden">
-          <div className="bg-blue-500 text-white p-4">
-            <h3 className="text-lg font-semibold">DBF 檔案列表</h3>
-          </div>
-          <div className="p-4">
-            <p className="text-gray-600 mb-4">
-              瀏覽所有可用的 DBF 檔案，並查看每個檔案的記錄。
-            </p>
-            <Link
-              to="/dbf-files"
-              className="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
-            >
-              查看 DBF 檔案
-            </Link>
-          </div>
-        </div>
+        <Grid container spacing={4}>
+          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+            <BigCard
+              title="儀表板"
+              description="查看系統的關鍵統計數據和指標，包括處方總數、當月調劑數量、A99調劑費等重要信息。儀表板提供直觀的數據視覺化，幫助您快速了解系統狀態。"
+              icon={<DashboardIcon fontSize="large" />}
+              color="primary"
+              linkTo="/dashboard"
+              linkText="查看儀表板"
+            />
+          </Grid>
+          
+          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+            <BigCard
+              title="處方查詢"
+              description="使用多種方式查詢處方記錄，包括通過 KCSTMR 查詢特定客戶的處方，或通過 KDRUG 查詢特定藥品的處方記錄。提供靈活的查詢選項，滿足不同的查詢需求。"
+              icon={<SearchIcon fontSize="large" />}
+              color="success"
+              linkTo="/search"
+              linkText="前往查詢"
+            />
+          </Grid>
+          
+          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+            <BigCard
+              title="DBF 檔案列表"
+              description="瀏覽所有可用的 DBF 檔案，查看每個檔案的詳細信息和記錄。系統連接到 MongoDB 數據庫，從中獲取由 DBF 監控服務處理和存儲的數據。"
+              icon={<FolderIcon fontSize="large" />}
+              color="warning"
+              linkTo="/dbf-files"
+              linkText="查看檔案列表"
+            />
+          </Grid>
+          
+          <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 6' } }}>
+            <BigCard
+              title="處方記錄"
+              description="查看詳細的處方記錄信息，包括客戶信息、藥品信息、處方日期等。系統提供完整的處方記錄瀏覽功能，幫助您快速找到所需的處方信息。"
+              icon={<DescriptionIcon fontSize="large" />}
+              color="info"
+              linkTo="/dbf-files"
+              linkText="瀏覽記錄"
+            />
+          </Grid>
+        </Grid>
+      </Box>
 
-        <div className="bg-green-50 rounded-lg shadow-md overflow-hidden">
-          <div className="bg-green-500 text-white p-4">
-            <h3 className="text-lg font-semibold">KCSTMR 查詢</h3>
-          </div>
-          <div className="p-4">
-            <p className="text-gray-600 mb-4">
-              使用 KCSTMR 值查詢相關的記錄，查看特定客戶的所有處方記錄。
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const value = (e.currentTarget.elements.namedItem('kcstmrValue') as HTMLInputElement).value.trim();
-                if (value) {
-                  window.location.href = `/kcstmr/${value}`;
-                }
-              }}
-              className="flex flex-col space-y-3"
-            >
-              <input
-                type="text"
-                name="kcstmrValue"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                placeholder="輸入 KCSTMR 值 (例如: 0000008)"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md"
-              >
-                查詢
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div className="bg-purple-50 rounded-lg shadow-md overflow-hidden">
-          <div className="bg-purple-500 text-white p-4">
-            <h3 className="text-lg font-semibold">KDRUG 查詢</h3>
-          </div>
-          <div className="p-4">
-            <p className="text-gray-600 mb-4">
-              使用 KDRUG 值查詢相關的記錄，查看特定藥品的所有處方記錄。
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const value = (e.currentTarget.elements.namedItem('kdrugValue') as HTMLInputElement).value.trim();
-                if (value) {
-                  window.location.href = `/kdrug/${value}`;
-                }
-              }}
-              className="flex flex-col space-y-3"
-            >
-              <input
-                type="text"
-                name="kdrugValue"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                placeholder="輸入 KDRUG 值 (例如: ME500)"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md"
-              >
-                查詢
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+      <Box sx={{ mt: 6, mb: 4, textAlign: 'center' }}>
+        <Box sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.2), rgba(0, 210, 180, 0.1))',
+          p: 2,
+          borderRadius: 2,
+          border: '1px dashed rgba(100, 255, 218, 0.3)',
+        }}>
+          <LocalHospitalIcon sx={{ color: '#64ffda', mr: 1 }} />
+          <Typography variant="body1" sx={{ color: '#0a192f' }}>
+            此應用程序連接到 MongoDB 數據庫，從中獲取由 DBF 監控服務處理和存儲的數據。
+          </Typography>
+        </Box>
+      </Box>
     </Layout>
   );
 }

@@ -4,6 +4,7 @@ import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, Ic
 import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
+import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 
 /**
@@ -45,6 +46,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const navItems = [
     { text: '首頁', path: '/', icon: <HomeIcon /> },
     { text: '儀表板', path: '/dashboard', icon: <DashboardIcon /> },
+    { text: '處方查詢', path: '/search', icon: <SearchIcon /> },
     { text: 'DBF 檔案列表', path: '/dbf-files', icon: <FolderIcon /> },
   ];
 
