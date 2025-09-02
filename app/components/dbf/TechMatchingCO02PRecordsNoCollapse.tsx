@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchMatchingCO02PRecords } from '../../services/api';
 import type { DbfRecord, MatchingCO02PRecordsProps } from '../../types/dbf.types';
+import CO09DFieldsForCO02P from './CO09DFieldsForCO02P';
 import { 
   Box, 
   Typography, 
@@ -63,6 +64,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
     { id: 'PLM', label: 'PLM', align: 'left' as const },
     { id: 'PRMK', label: 'PRMK', align: 'left' as const },
     { id: 'KDRUG', label: 'KDRUG', align: 'left' as const },
+    { id: 'DNO', label: 'DNO', align: 'left' as const },
     { id: 'PQTY', label: 'PQTY', align: 'left' as const },
     { id: 'PFQ', label: 'PFQ', align: 'left' as const },
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
@@ -219,6 +221,24 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
                               >
                                 詳情
                               </Link>
+                            </TableCell>
+                          );
+                        } else if (column.id === 'DNO') {
+                          // 使用 CO09DFieldsForCO02P 組件顯示 DNO 欄位的值
+                          const kdrug = record.data.KDRUG || '';
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              sx={{
+                                color: '#e6f1ff',
+                                borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                                fontSize: '0.9rem',
+                                padding: '6px 12px',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              <CO09DFieldsForCO02P kdrug={kdrug} field="DNO" />
                             </TableCell>
                           );
                         } else {
