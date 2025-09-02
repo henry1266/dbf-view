@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchMatchingCO02PRecords } from '../../services/api';
+import { fetchMatchingCO02PRecords, fetchDbfRecords } from '../../services/api';
 import type { DbfRecord, MatchingCO02PRecordsProps } from '../../types/dbf.types';
 import CO09DFieldsForCO02P from './CO09DFieldsForCO02P';
-import { 
-  Box, 
-  Typography, 
-  TableContainer, 
-  Table, 
-  TableHead, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
-  Paper 
+import axios from 'axios';
+import {
+  Box,
+  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Paper,
+  Button,
+  Tooltip,
+  CircularProgress
 } from '@mui/material';
 
 /**
@@ -23,6 +27,178 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
   const [matchingRecords, setMatchingRecords] = useState<DbfRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [costResults, setCostResults] = useState<Record<string, any>>({});
+  const [loadingCost, setLoadingCost] = useState<Record<string, boolean>>({});
+  const [costErrors, setCostErrors] = useState<Record<string, string>>({});
+  
+  // 批次查詢成本相關狀態
+  const [batchQueryLoading, setBatchQueryLoading] = useState(false);
+  const [batchQueryResult, setBatchQueryResult] = useState<{
+    totalCost: number;
+    successCount: number;
+    failCount: number;
+  } | null>(null);
+  const [batchQueryError, setBatchQueryError] = useState<string | null>(null);
+
+  // 查詢成本的函數
+  const queryCost = async (recordId: string, kdrug: string, ptqty: number) => {
+    if (!kdrug || !ptqty) {
+      setCostErrors(prev => ({
+        ...prev,
+        [recordId]: '缺少必要的參數：KDRUG 或 PTQTY'
+      }));
+      return;
+    }
+
+    try {
+      setLoadingCost(prev => ({
+        ...prev,
+        [recordId]: true
+      }));
+
+      // 先獲取 DNO 值
+      const result = await fetchDbfRecords(
+        'CO09D.DBF',  // 檔案名稱
+        1,            // 頁碼
+        1,            // 每頁記錄數 (只需要一條記錄)
+        kdrug,        // 搜索關鍵字
+        'KDRUG',      // 搜索欄位
+        '',           // 排序欄位
+        ''            // 排序方向
+      );
+      
+      if (!result || !result.records || result.records.length === 0) {
+        throw new Error(`找不到對應的 CO09D 記錄 (KDRUG=${kdrug})`);
+      }
+      
+      // 獲取 DNO 值
+      const dno = result.records[0].data.DNO;
+      
+      if (!dno) {
+        throw new Error(`CO09D 記錄中沒有 DNO 值 (KDRUG=${kdrug})`);
+      }
+
+      // 調用 API 獲取成本信息
+      const response = await axios.get(`http://192.168.68.90:5000/api/fifo/simulate-by-health-insurance/${dno}/${ptqty}`);
+      
+      // 存儲成本結果
+      setCostResults(prev => ({
+        ...prev,
+        [recordId]: response.data
+      }));
+      
+      // 清除錯誤
+      setCostErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[recordId];
+        return newErrors;
+      });
+    } catch (err) {
+      console.error(`查詢成本失敗 (DNO=${dno}, PTQTY=${ptqty}):`, err);
+      setCostErrors(prev => ({
+        ...prev,
+        [recordId]: '無法獲取成本信息'
+      }));
+    } finally {
+      setLoadingCost(prev => ({
+        ...prev,
+        [recordId]: false
+      }));
+    }
+  };
+
+  // 批次查詢所有藥品成本並加總
+  const queryAllCosts = async () => {
+    if (!matchingRecords || matchingRecords.length === 0) {
+      setBatchQueryError('沒有可查詢的藥品記錄');
+      return;
+    }
+
+    try {
+      setBatchQueryLoading(true);
+      setBatchQueryError(null);
+      setBatchQueryResult(null);
+
+      let totalCost = 0;
+      let successCount = 0;
+      let failCount = 0;
+
+      // 遍歷所有記錄，獲取 KDRUG 和 PTQTY
+      const queries = matchingRecords.map(async (record) => {
+        const kdrug = record.data.KDRUG;
+        const ptqty = parseFloat(record.data.PTQTY) || 0;
+
+        if (!kdrug || !ptqty) {
+          failCount++;
+          return null;
+        }
+
+        try {
+          // 先獲取 DNO 值
+          const result = await fetchDbfRecords(
+            'CO09D.DBF',  // 檔案名稱
+            1,            // 頁碼
+            1,            // 每頁記錄數 (只需要一條記錄)
+            kdrug,        // 搜索關鍵字
+            'KDRUG',      // 搜索欄位
+            '',           // 排序欄位
+            ''            // 排序方向
+          );
+          
+          if (!result || !result.records || result.records.length === 0) {
+            failCount++;
+            return null;
+          }
+          
+          // 獲取 DNO 值
+          const dno = result.records[0].data.DNO;
+          
+          if (!dno) {
+            failCount++;
+            return null;
+          }
+
+          // 調用 API 獲取成本信息
+          const response = await axios.get(`http://192.168.68.90:5000/api/fifo/simulate-by-health-insurance/${dno}/${ptqty}`);
+          
+          // 存儲成本結果
+          setCostResults(prev => ({
+            ...prev,
+            [record._id]: response.data
+          }));
+          
+          successCount++;
+          return response.data.additionalCost || 0;
+        } catch (err) {
+          console.error(`批次查詢成本失敗 (KDRUG=${kdrug}):`, err);
+          failCount++;
+          return null;
+        }
+      });
+
+      // 等待所有查詢完成
+      const results = await Promise.all(queries);
+      
+      // 計算總成本
+      results.forEach(cost => {
+        if (cost !== null) {
+          totalCost += cost;
+        }
+      });
+
+      // 設置批次查詢結果
+      setBatchQueryResult({
+        totalCost,
+        successCount,
+        failCount
+      });
+    } catch (err) {
+      console.error('批次查詢成本失敗:', err);
+      setBatchQueryError('批次查詢成本失敗');
+    } finally {
+      setBatchQueryLoading(false);
+    }
+  };
 
   // 獲取配對的 CO02P 記錄
   const fetchMatchingRecords = async () => {
@@ -70,6 +246,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
     { id: 'PPR', label: 'PPR', align: 'left' as const },
     { id: 'PTT', label: 'PTT', align: 'left' as const },
+    { id: 'costQuery', label: '成本查詢', align: 'center' as const },
     { id: 'actions', label: '操作', align: 'center' as const }
   ];
 
@@ -94,16 +271,84 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
           boxShadow: '0 0 25px #2e7d32'
         }
       }}>
-        <Typography variant="h5" sx={{ 
-          mb: 2, 
-          color: '#64ffda', 
-          fontWeight: 'bold',
-          fontFamily: 'monospace',
-          letterSpacing: '0.05em',
-          textShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2
         }}>
-          CO02P 藥物
-        </Typography>
+          <Typography variant="h5" sx={{
+            color: '#64ffda',
+            fontWeight: 'bold',
+            fontFamily: 'monospace',
+            letterSpacing: '0.05em',
+            textShadow: '0 0 10px rgba(100, 255, 218, 0.3)'
+          }}>
+            CO02P 藥物
+          </Typography>
+          
+          {/* 批次查詢成本按鈕 */}
+          <Box>
+            {batchQueryLoading ? (
+              <CircularProgress size={24} sx={{ color: '#64ffda' }} />
+            ) : batchQueryResult ? (
+              <Tooltip title={`成功: ${batchQueryResult.successCount} | 失敗: ${batchQueryResult.failCount}`}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(46, 125, 50, 0.2)',
+                  borderRadius: 1,
+                  p: '4px 8px',
+                  border: '1px solid rgba(46, 125, 50, 0.5)'
+                }}>
+                  <Typography variant="body2" sx={{
+                    color: '#64ffda',
+                    fontWeight: 'bold',
+                    mr: 1
+                  }}>
+                    總成本: {batchQueryResult.totalCost.toFixed(2)}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={queryAllCosts}
+                    sx={{
+                      minWidth: '25px',
+                      fontSize: '0.75rem',
+                      padding: '1px 4px',
+                      color: '#64ffda',
+                      borderColor: '#64ffda',
+                      '&:hover': {
+                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                        borderColor: '#64ffda',
+                      }
+                    }}
+                  >
+                    重新查詢
+                  </Button>
+                </Box>
+              </Tooltip>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={queryAllCosts}
+                sx={{
+                  bgcolor: 'rgba(46, 125, 50, 0.8)',
+                  color: '#e6f1ff',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    bgcolor: 'rgba(46, 125, 50, 1)',
+                  },
+                  boxShadow: '0 0 10px rgba(46, 125, 50, 0.5)',
+                  textTransform: 'none',
+                  fontSize: '0.85rem'
+                }}
+              >
+                批次查詢成本
+              </Button>
+            )}
+          </Box>
+        </Box>
         
         <Box sx={{ p: 1, borderRadius: 1 }}>
           {loading ? (
@@ -262,6 +507,113 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
                               }}
                             >
                               {displayValue}
+                            </TableCell>
+                          );
+                        } else if (column.id === 'costQuery') {
+                          // 查詢成本按鈕
+                          const recordId = record._id;
+                          const dnoElement = <CO09DFieldsForCO02P kdrug={record.data.KDRUG || ''} field="DNO" />;
+                          const ptqty = parseFloat(record.data.PTQTY) || 0;
+                          
+                          // 檢查是否已經查詢過成本
+                          const hasCostResult = costResults[recordId];
+                          const isLoading = loadingCost[recordId];
+                          const errorMessage = costErrors[recordId];
+                          
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              sx={{
+                                color: '#e6f1ff',
+                                borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                                fontSize: '0.9rem',
+                                padding: '6px 12px',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              {hasCostResult ? (
+                                <Tooltip title={`產品名稱: ${costResults[recordId].productName || '未知'}`}>
+                                  <Box sx={{
+                                    color: '#4caf50',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center'
+                                  }}>
+                                    <Typography variant="body2" sx={{ color: '#64ffda' }}>
+                                      {costResults[recordId].additionalCost?.toFixed(2) || '未知'}
+                                    </Typography>
+                                    <Button
+                                      size="small"
+                                      variant="text"
+                                      onClick={() => {
+                                        // 重新查詢
+                                        queryCost(recordId, dnoElement.props.kdrug, ptqty);
+                                      }}
+                                      sx={{
+                                        minWidth: '25px',
+                                        fontSize: '0.7rem',
+                                        padding: '1px 4px',
+                                        color: '#64ffda',
+                                        '&:hover': {
+                                          backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                                        }
+                                      }}
+                                    >
+                                      重新查詢
+                                    </Button>
+                                  </Box>
+                                </Tooltip>
+                              ) : isLoading ? (
+                                <CircularProgress size={20} sx={{ color: '#64ffda' }} />
+                              ) : errorMessage ? (
+                                <Tooltip title={errorMessage}>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={() => {
+                                      // 重試
+                                      queryCost(recordId, dnoElement.props.kdrug, ptqty);
+                                    }}
+                                    sx={{
+                                      minWidth: '25px',
+                                      fontSize: '0.75rem',
+                                      padding: '1px 4px',
+                                      color: '#ff6b6b',
+                                      borderColor: '#ff6b6b',
+                                      '&:hover': {
+                                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                        borderColor: '#ff6b6b',
+                                      }
+                                    }}
+                                  >
+                                    重試
+                                  </Button>
+                                </Tooltip>
+                              ) : (
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={() => {
+                                    // 查詢成本
+                                    queryCost(recordId, dnoElement.props.kdrug, ptqty);
+                                  }}
+                                  sx={{
+                                    minWidth: '25px',
+                                    fontSize: '0.75rem',
+                                    padding: '1px 4px',
+                                    color: '#64ffda',
+                                    borderColor: '#64ffda',
+                                    '&:hover': {
+                                      backgroundColor: 'rgba(100, 255, 218, 0.1)',
+                                      borderColor: '#64ffda',
+                                    }
+                                  }}
+                                >
+                                  查詢成本
+                                </Button>
+                              )}
                             </TableCell>
                           );
                         } else {
