@@ -80,9 +80,12 @@ export default function DbfFile() {
       let defaultSortDirection = 'desc';
       
       // 根據不同檔案設置不同的默認排序
-      if (fileName.toUpperCase() === 'CO03L.DBF' || fileName.toUpperCase() === 'CO02P.DBF') {
+      if (fileName.toUpperCase() === 'CO03L.DBF') {
         defaultSortField = '_recordNo';
-        console.log(`檔案是${fileName.toUpperCase()}，默認按記錄編號從大到小排序`);
+        console.log('檔案是CO03L.DBF，默認按記錄編號排序');
+      } else if (fileName.toUpperCase() === 'CO02P.DBF') {
+        defaultSortField = '_recordNo';
+        console.log('檔案是CO02P.DBF，默認按記錄編號從大到小排序');
       } else if (fileName.toUpperCase() === 'CO01M.DBF') {
         defaultSortField = 'KCSTMR';
         defaultSortDirection = 'asc';
