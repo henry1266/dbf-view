@@ -197,6 +197,31 @@ export const fetchMatchingCO02PRecords = async (kcstmr: string, date: string, ti
   }
 };
 
+/**
+ * @function fetchMatchingRecordsForKDRUG
+ * @description 根據 KDRUG 值，獲取配對的 CO02P 記錄和 CO09D 記錄
+ * @param {string} kdrug - 藥品代碼
+ * @returns {Promise<{co02pRecords: Array<any>, co09dRecord: any}>} 包含配對的 CO02P 記錄數組和 CO09D 記錄
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const result = await fetchMatchingRecordsForKDRUG('A12345');
+ * console.log(result.co02pRecords); // 配對的 CO02P 記錄數組
+ * console.log(result.co09dRecord); // 配對的 CO09D 記錄
+ */
+export const fetchMatchingRecordsForKDRUG = async (kdrug: string) => {
+  try {
+    const result = await api.get('/dbf-match/CO09D', {
+      params: {
+        kdrug
+      },
+    });
+    return result.data;
+  } catch (error) {
+    console.error(`Error fetching matching records for KDRUG=${kdrug}:`, error);
+    throw error;
+  }
+};
+
 // DbfRecord 接口定義
 interface DbfRecord {
   _id: string;

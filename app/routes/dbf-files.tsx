@@ -181,11 +181,13 @@ export default function DbfFiles() {
                               to={`/dbf/${encodeURIComponent(file.fileName)}?sortField=${
                                 file.fileName.toUpperCase() === 'CO01M.DBF'
                                   ? 'KCSTMR'
-                                  : file.fileName.toUpperCase() === 'CO03L.DBF'
+                                  : file.fileName.toUpperCase() === 'CO03L.DBF' || file.fileName.toUpperCase() === 'CO02P.DBF'
                                     ? '_recordNo'
-                                    : 'PDATE'
+                                    : file.fileName.toUpperCase() === 'CO09D.DBF'
+                                      ? 'KDRUG'
+                                      : 'PDATE'
                               }&sortDirection=${
-                                file.fileName.toUpperCase() === 'CO01M.DBF'
+                                file.fileName.toUpperCase() === 'CO01M.DBF' || file.fileName.toUpperCase() === 'CO09D.DBF'
                                   ? 'asc'
                                   : 'desc'
                               }&page=1`}

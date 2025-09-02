@@ -27,6 +27,8 @@ import type { DbfRecord } from '../types/dbf.types';
 
 // 引入元件
 import TechMatchingCO02PRecordsNoCollapse from '../components/dbf/TechMatchingCO02PRecordsNoCollapse';
+import MatchingCO02PRecordsForCO09D from '../components/dbf/MatchingCO02PRecordsForCO09D';
+import CO09DInfoForCO02P from '../components/dbf/CO09DInfoForCO02P';
 import TechMainFieldsGrid from '../components/dbf/TechMainFieldsGrid';
 import TechCollapsibleFields from '../components/dbf/TechCollapsibleFields';
 
@@ -325,49 +327,54 @@ export default function DbfRecordDetail() {
                 title="主要欄位"
               />
             ) : fileName?.toUpperCase() === 'CO02P.DBF' ? (
-              <TechMainFieldsGrid
-                record={record}
-                fieldGroups={[
-                  {
-                    title: "藥品資訊",
-                    fields: [
-                      { key: '_recordNo', label: '記錄編號' },
-                      { key: 'PDATE', label: 'PDATE' },
-                      { key: 'PTIME', label: 'PTIME' },
-                      { key: 'PLM', label: 'PLM' },
-                      { key: 'PRMK', label: 'PRMK' },
-                      {
-                        key: 'KDRUG',
-                        label: 'KDRUG',
-                        renderLink: {
-                          path: '/kdrug/:value',
-                          color: '#64ffda'
+              <>
+                <TechMainFieldsGrid
+                  record={record}
+                  fieldGroups={[
+                    {
+                      title: "藥品資訊",
+                      fields: [
+                        { key: '_recordNo', label: '記錄編號' },
+                        { key: 'PDATE', label: 'PDATE' },
+                        { key: 'PTIME', label: 'PTIME' },
+                        { key: 'PLM', label: 'PLM' },
+                        { key: 'PRMK', label: 'PRMK' },
+                        {
+                          key: 'KDRUG',
+                          label: 'KDRUG',
+                          renderLink: {
+                            path: '/kdrug/:value',
+                            color: '#64ffda'
+                          }
+                        },
+                        { key: 'PQTY', label: 'PQTY' },
+                        { key: 'PFQ', label: 'PFQ' },
+                        { key: 'PTQTY', label: 'PTQTY' },
+                        { key: 'PPR', label: 'PPR' },
+                        { key: '_created', label: '建立時間', isMetadata: true },
+                        { key: '_updated', label: '更新時間', isMetadata: true }
+                      ]
+                    },
+                    {
+                      title: "病人資訊",
+                      fields: [
+                        {
+                          key: 'KCSTMR',
+                          label: 'KCSTMR',
+                          renderLink: {
+                            path: '/kcstmr/:value',
+                            color: '#1976d2'
+                          }
                         }
-                      },
-                      { key: 'PQTY', label: 'PQTY' },
-                      { key: 'PFQ', label: 'PFQ' },
-                      { key: 'PTQTY', label: 'PTQTY' },
-                      { key: 'PPR', label: 'PPR' },
-                      { key: '_created', label: '建立時間', isMetadata: true },
-                      { key: '_updated', label: '更新時間', isMetadata: true }
-                    ]
-                  },
-                  {
-                    title: "病人資訊",
-                    fields: [
-                      {
-                        key: 'KCSTMR',
-                        label: 'KCSTMR',
-                        renderLink: {
-                          path: '/kcstmr/:value',
-                          color: '#1976d2'
-                        }
-                      }
-                    ]
-                  }
-                ]}
-                title="主要欄位"
-              />
+                      ]
+                    }
+                  ]}
+                  title="主要欄位"
+                />
+                
+                {/* 顯示 CO09D 藥品資訊 */}
+                <CO09DInfoForCO02P co02pRecord={record} />
+              </>
             ) : (
               // 其他 DBF 檔案的通用布局
               <TechMainFieldsGrid
@@ -391,9 +398,12 @@ export default function DbfRecordDetail() {
 
             {/* 超連結已整合到表格中 */}
             
-            {/* 第二區：配對資料（如果是 CO03L.DBF 記錄） */}
+            {/* 第二區：配對資料（如果是 CO03L.DBF 或 CO09D.DBF 記錄） */}
             {fileName?.toUpperCase() === 'CO03L.DBF' && (
               <TechMatchingCO02PRecordsNoCollapse co03lRecord={record} />
+            )}
+            {fileName?.toUpperCase() === 'CO09D.DBF' && (
+              <MatchingCO02PRecordsForCO09D co09dRecord={record} />
             )}
           
           {/* 第三區：剩餘欄位（摺疊） */}
