@@ -69,6 +69,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
     { id: 'PFQ', label: 'PFQ', align: 'left' as const },
     { id: 'PTQTY', label: 'PTQTY', align: 'left' as const },
     { id: 'PPR', label: 'PPR', align: 'left' as const },
+    { id: 'PTT', label: 'PTT', align: 'left' as const },
     { id: 'actions', label: '操作', align: 'center' as const }
   ];
 
@@ -239,6 +240,28 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
                               }}
                             >
                               <CO09DFieldsForCO02P kdrug={kdrug} field="DNO" />
+                            </TableCell>
+                          );
+                        } else if (column.id === 'PTT') {
+                          // 計算 PTT 的值（PTQTY*PPR，若小於 0 則顯示 0）
+                          const ptqty = parseFloat(record.data.PTQTY) || 0;
+                          const ppr = parseFloat(record.data.PPR) || 0;
+                          const ptt = ptqty * ppr;
+                          const displayValue = ptt < 0 ? 0 : ptt;
+                          
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              sx={{
+                                color: '#e6f1ff',
+                                borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                                fontSize: '0.9rem',
+                                padding: '6px 12px',
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              {displayValue}
                             </TableCell>
                           );
                         } else {
