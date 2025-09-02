@@ -228,22 +228,22 @@ const BigCard = ({
             fontWeight: 'bold',
             fontSize: '1rem',
             textTransform: 'none',
-            bgcolor: 'rgba(17, 34, 64, 0.6)',
+            bgcolor: color === 'primary'
+              ? 'rgba(0, 30, 60, 0.9)'
+              : color === 'success'
+                ? 'rgba(0, 50, 40, 0.9)'
+                : color === 'warning'
+                  ? 'rgba(50, 30, 0, 0.9)'
+                  : 'rgba(0, 30, 60, 0.9)',
             backdropFilter: 'blur(8px)',
             border: color === 'primary'
-              ? '1px solid rgba(64, 175, 255, 0.6)'
+              ? '1px solid rgba(64, 175, 255, 0.8)'
               : color === 'success'
-                ? '1px solid rgba(100, 255, 218, 0.6)'
+                ? '1px solid rgba(100, 255, 218, 0.8)'
                 : color === 'warning'
-                  ? '1px solid rgba(255, 152, 0, 0.6)'
-                  : '1px solid rgba(0, 120, 255, 0.6)',
-            color: color === 'primary'
-              ? 'rgba(64, 175, 255, 1)'
-              : color === 'success'
-                ? 'rgba(100, 255, 218, 1)'
-                : color === 'warning'
-                  ? 'rgba(255, 152, 0, 1)'
-                  : 'rgba(0, 120, 255, 1)',
+                  ? '1px solid rgba(255, 152, 0, 0.8)'
+                  : '1px solid rgba(0, 120, 255, 0.8)',
+            color: '#ffffff',
             boxShadow: color === 'primary'
               ? '0 4px 20px rgba(64, 175, 255, 0.3), inset 0 0 10px rgba(64, 175, 255, 0.1)'
               : color === 'success'
@@ -281,21 +281,28 @@ const BigCard = ({
                     : '0 0 10px rgba(0, 120, 255, 0.5)',
             },
             '&:hover': {
-              bgcolor: 'rgba(17, 34, 64, 0.8)',
+              bgcolor: color === 'primary'
+                ? 'rgba(64, 175, 255, 0.9)'
+                : color === 'success'
+                  ? 'rgba(100, 255, 218, 0.9)'
+                  : color === 'warning'
+                    ? 'rgba(255, 152, 0, 0.9)'
+                    : 'rgba(0, 120, 255, 0.9)',
+              color: '#000000',
               boxShadow: color === 'primary'
-                ? '0 6px 25px rgba(64, 175, 255, 0.5), inset 0 0 15px rgba(64, 175, 255, 0.2)'
+                ? '0 6px 25px rgba(64, 175, 255, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
                 : color === 'success'
-                  ? '0 6px 25px rgba(100, 255, 218, 0.5), inset 0 0 15px rgba(100, 255, 218, 0.2)'
+                  ? '0 6px 25px rgba(100, 255, 218, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
                   : color === 'warning'
-                    ? '0 6px 25px rgba(255, 152, 0, 0.5), inset 0 0 15px rgba(255, 152, 0, 0.2)'
-                    : '0 6px 25px rgba(0, 120, 255, 0.5), inset 0 0 15px rgba(0, 120, 255, 0.2)',
+                    ? '0 6px 25px rgba(255, 152, 0, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
+                    : '0 6px 25px rgba(0, 120, 255, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)',
               border: color === 'primary'
-                ? '1px solid rgba(64, 175, 255, 0.8)'
+                ? '1px solid rgba(255, 255, 255, 0.8)'
                 : color === 'success'
-                  ? '1px solid rgba(100, 255, 218, 0.8)'
+                  ? '1px solid rgba(255, 255, 255, 0.8)'
                   : color === 'warning'
-                    ? '1px solid rgba(255, 152, 0, 0.8)'
-                    : '1px solid rgba(0, 120, 255, 0.8)',
+                    ? '1px solid rgba(255, 255, 255, 0.8)'
+                    : '1px solid rgba(255, 255, 255, 0.8)',
             }
           }}
         >
@@ -346,7 +353,7 @@ export default function Home() {
           
           <Grid sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1.5 }}>
             <BigCard
-              title="DBF 檔案列表"
+              title="DBF列表"
               description="瀏覽所有可用的 DBF 檔案，查看每個檔案的詳細信息和記錄。"
               icon={<FolderIcon fontSize="large" />}
               color="warning"
