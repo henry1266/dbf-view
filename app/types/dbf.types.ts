@@ -1,6 +1,7 @@
 /**
  * DBF 相關型別定義
  */
+import React from 'react';
 
 /**
  * DBF 記錄介面
@@ -37,7 +38,7 @@ export interface Column {
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
-  format?: (value: any, record?: DbfRecord) => string;
+  format?: (value: any, record?: DbfRecord) => string | React.ReactNode;
 }
 
 /**
