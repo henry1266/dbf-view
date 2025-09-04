@@ -78,13 +78,15 @@ export default function KcstmrQuery() {
             <div className="flex">
               <div className="ml-3">
                 <p className="text-sm text-blue-700">
-                  共找到 <span className="font-medium">{data.totalRecords}</span> 筆與 KCSTMR={data.kcstmrValue} 相關的記錄。
+                  共找到 <span className="font-medium">{data.recordsByFile['CO03L.DBF']?.count || 0}</span> 筆與 KCSTMR={data.kcstmrValue} 相關的 CO03L.DBF 記錄。
                 </p>
               </div>
             </div>
           </div>
 
-          {Object.entries(data.recordsByFile).map(([fileName, fileData]) => (
+          {Object.entries(data.recordsByFile)
+            .filter(([fileName]) => fileName === 'CO03L.DBF') // 只顯示 CO03L.DBF 的記錄
+            .map(([fileName, fileData]) => (
             <div key={fileName} className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
               <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
                 <h2 className="text-lg font-semibold text-gray-700">
@@ -203,7 +205,7 @@ export default function KcstmrQuery() {
       ) : (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
           <strong className="font-bold">找不到記錄！</strong>
-          <span className="block sm:inline"> 找不到與 KCSTMR={value} 相關的記錄。</span>
+          <span className="block sm:inline"> 找不到與 KCSTMR={value} 相關的 CO03L.DBF 記錄。</span>
         </div>
       )}
     </Layout>
