@@ -35,6 +35,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
   const [batchQueryLoading, setBatchQueryLoading] = useState(false);
   const [batchQueryResult, setBatchQueryResult] = useState<{
     totalCost: number;
+    totalProfit: number;
     successCount: number;
     failCount: number;
   } | null>(null);
@@ -120,6 +121,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
       setBatchQueryResult(null);
 
       let totalCost = 0;
+      let totalProfit = 0;
       let successCount = 0;
       let failCount = 0;
 
@@ -127,10 +129,15 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
       const queries = matchingRecords.map(async (record) => {
         const kdrug = record.data.KDRUG;
         const ptqty = parseFloat(record.data.PTQTY) || 0;
+        const ppr = parseFloat(record.data.PPR) || 0;
+        
+        // 計算 PTT
+        const ptt = ptqty * ppr;
+        const displayPtt = ptt < 0 ? 0 : ptt;
 
         if (!kdrug || !ptqty) {
           failCount++;
-          return null;
+          return { cost: null, ptt: displayPtt };
         }
 
         try {
@@ -147,7 +154,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
           
           if (!result || !result.records || result.records.length === 0) {
             failCount++;
-            return null;
+            return { cost: null, ptt: displayPtt };
           }
           
           // 獲取 DNO 值
@@ -155,7 +162,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
           
           if (!dno) {
             failCount++;
-            return null;
+            return { cost: null, ptt: displayPtt };
           }
 
           // 調用 API 獲取成本信息
@@ -168,27 +175,32 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
           }));
           
           successCount++;
-          return response.data.additionalCost || 0;
+          return {
+            cost: response.data.additionalCost || 0,
+            ptt: displayPtt
+          };
         } catch (err) {
           console.error(`批次查詢成本失敗 (KDRUG=${kdrug}):`, err);
           failCount++;
-          return null;
+          return { cost: null, ptt: displayPtt };
         }
       });
 
       // 等待所有查詢完成
       const results = await Promise.all(queries);
       
-      // 計算總成本
-      results.forEach(cost => {
-        if (cost !== null) {
-          totalCost += cost;
+      // 計算總成本和總毛利
+      results.forEach(result => {
+        if (result.cost !== null) {
+          totalCost += result.cost;
+          totalProfit += (result.ptt - result.cost);
         }
       });
 
       // 設置批次查詢結果
       setBatchQueryResult({
         totalCost,
+        totalProfit,
         successCount,
         failCount
       });
@@ -247,6 +259,7 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
     { id: 'PPR', label: 'PPR', align: 'left' as const },
     { id: 'PTT', label: 'PTT', align: 'left' as const },
     { id: 'costQuery', label: '成本查詢', align: 'center' as const },
+    { id: 'profit', label: '毛利', align: 'right' as const },
     { id: 'actions', label: '操作', align: 'center' as const }
   ];
 
@@ -301,13 +314,20 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
                   p: '4px 8px',
                   border: '1px solid rgba(46, 125, 50, 0.5)'
                 }}>
-                  <Typography variant="body2" sx={{
-                    color: '#64ffda',
-                    fontWeight: 'bold',
-                    mr: 1
-                  }}>
-                    總成本: {batchQueryResult.totalCost.toFixed(2)}
-                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', mr: 2 }}>
+                    <Typography variant="body2" sx={{
+                      color: '#64ffda',
+                      fontWeight: 'bold',
+                    }}>
+                      總成本: {batchQueryResult.totalCost.toFixed(2)}
+                    </Typography>
+                    <Typography variant="body2" sx={{
+                      color: batchQueryResult.totalProfit >= 0 ? '#4caf50' : '#ff6b6b',
+                      fontWeight: 'bold',
+                    }}>
+                      總毛利: {batchQueryResult.totalProfit.toFixed(2)}
+                    </Typography>
+                  </Box>
                   <Button
                     size="small"
                     variant="outlined"
@@ -614,6 +634,46 @@ function TechMatchingCO02PRecordsNoCollapse({ co03lRecord }: MatchingCO02PRecord
                                   查詢成本
                                 </Button>
                               )}
+                            </TableCell>
+                          );
+                        } else if (column.id === 'profit') {
+                          // 計算毛利 (PTT - 成本)
+                          const recordId = record._id;
+                          const hasCostResult = costResults[recordId];
+                          
+                          // 計算 PTT
+                          const ptqty = parseFloat(record.data.PTQTY) || 0;
+                          const ppr = parseFloat(record.data.PPR) || 0;
+                          const ptt = ptqty * ppr;
+                          const displayPtt = ptt < 0 ? 0 : ptt;
+                          
+                          // 計算毛利
+                          let profit = null;
+                          if (hasCostResult && hasCostResult.additionalCost !== undefined) {
+                            const cost = hasCostResult.additionalCost;
+                            profit = displayPtt - cost;
+                          }
+                          
+                          // 設置顏色
+                          let profitColor = '#64ffda'; // 默認顏色
+                          if (profit !== null) {
+                            profitColor = profit >= 0 ? '#4caf50' : '#ff6b6b';
+                          }
+                          
+                          return (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              sx={{
+                                color: profitColor,
+                                borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
+                                fontSize: '0.9rem',
+                                padding: '6px 12px',
+                                fontFamily: 'monospace',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {profit !== null ? profit.toFixed(2) : '---'}
                             </TableCell>
                           );
                         } else {
