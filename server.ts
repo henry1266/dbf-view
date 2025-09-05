@@ -17,6 +17,7 @@ import dbfRecordsRouter from './src/routes/dbf-records';
 import dbfMatchRouter from './src/routes/dbf-match';
 import kcstmrRouter from './src/routes/kcstmr';
 import kdrugRouter from './src/routes/kdrug';
+import { saveWhiteboard, loadWhiteboard, deleteWhiteboard, getWhiteboards } from './src/routes/whiteboard';
 
 // 引入數據庫連接
 import { connect } from './src/db/mongo';
@@ -47,6 +48,12 @@ app.use('/api/dbf', dbfRecordsRouter);
 app.use('/api/dbf-match', dbfMatchRouter);
 app.use('/api/KCSTMR', kcstmrRouter);
 app.use('/api/KDRUG', kdrugRouter);
+
+// 畫布管理路由
+app.post('/api/whiteboard', saveWhiteboard);
+app.get('/api/whiteboard/:recordId', loadWhiteboard);
+app.delete('/api/whiteboard/:recordId', deleteWhiteboard);
+app.get('/api/whiteboard', getWhiteboards);
 
 // 設置 Swagger UI
 setupSwagger(app);

@@ -377,4 +377,63 @@ export const fetchA99Total = async (startDate = '', endDate = '') => {
   }
 };
 
+/**
+ * @function saveWhiteboard
+ * @description 儲存觸控書寫小白板資料到資料庫
+ * @param {string} recordId - 記錄 ID
+ * @param {string} canvasData - 畫布資料 (base64 編碼)
+ * @returns {Promise<any>} 儲存結果
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const saveWhiteboard = async (recordId: string, canvasData: string) => {
+  try {
+    const response = await api.post('/whiteboard', {
+      recordId,
+      canvasData
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error saving whiteboard for record ${recordId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * @function loadWhiteboard
+ * @description 從資料庫載入觸控書寫小白板資料
+ * @param {string} recordId - 記錄 ID
+ * @returns {Promise<string | null>} 畫布資料或 null
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const loadWhiteboard = async (recordId: string) => {
+  try {
+    const response = await api.get(`/whiteboard/${recordId}`);
+    return response.data.canvasData;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      // 沒有找到資料時返回 null
+      return null;
+    }
+    console.error(`Error loading whiteboard for record ${recordId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * @function deleteWhiteboard
+ * @description 刪除觸控書寫小白板資料
+ * @param {string} recordId - 記錄 ID
+ * @returns {Promise<any>} 刪除結果
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const deleteWhiteboard = async (recordId: string) => {
+  try {
+    const response = await api.delete(`/whiteboard/${recordId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting whiteboard for record ${recordId}:`, error);
+    throw error;
+  }
+};
+
 export default api;

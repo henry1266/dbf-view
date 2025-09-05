@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
-import { fetchDbfRecord, fetchMatchingCO02PRecords } from '../services/api';
+import { fetchDbfRecord, fetchMatchingCO02PRecords, saveWhiteboard, loadWhiteboard } from '../services/api';
 import axios from 'axios';
 import {
   Box,
@@ -17,7 +17,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  TextField
 } from '@mui/material';
 import TechBackground from '../components/TechBackground';
 import TechBreadcrumb from '../components/TechBreadcrumb';
@@ -31,7 +32,6 @@ import MatchingCO02PRecordsForCO09D from '../components/dbf/MatchingCO02PRecords
 import CO09DInfoForCO02P from '../components/dbf/CO09DInfoForCO02P';
 import TechMainFieldsGrid from '../components/dbf/TechMainFieldsGrid';
 import TechCollapsibleFields from '../components/dbf/TechCollapsibleFields';
-import TouchWhiteboard from '../components/dbf/TouchWhiteboard';
 
 export default function DbfRecordDetail() {
   const params = useParams<{ fileName: string; recordNo: string }>();
@@ -43,6 +43,8 @@ export default function DbfRecordDetail() {
   const [showPediatricDialog, setShowPediatricDialog] = useState(false);
   const [matchingCO02PRecords, setMatchingCO02PRecords] = useState<DbfRecord[]>([]);
   const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
+  const [textNote, setTextNote] = useState('');
+  const [loadingTextNote, setLoadingTextNote] = useState(false);
 
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
@@ -55,7 +57,7 @@ export default function DbfRecordDetail() {
   };
 
   const priorityFields = fileName ? getPriorityFields(fileName) : [];
-  
+
   // 檢查是否為小兒用藥（A99=65或70）
   const isPediatricMedication = () => {
     if (!record || !record.data) return false;
@@ -89,6 +91,46 @@ export default function DbfRecordDetail() {
 
     loadDbfRecord();
   }, [fileName, recordNo]);
+
+  // 當記錄載入完成後，載入文字筆記
+  useEffect(() => {
+    if (record && fileName?.toUpperCase() === 'CO03L.DBF') {
+      const recordId = `${fileName}_${record._recordNo}`;
+      loadTextNote();
+    }
+  }, [record, fileName]);
+
+  // 載入文字筆記
+  const loadTextNote = async () => {
+    if (!record) return;
+    const recordId = `${fileName}_${record._recordNo}`;
+
+    try {
+      setLoadingTextNote(true);
+      const savedText = await loadWhiteboard(recordId);
+      if (savedText) {
+        setTextNote(savedText);
+      }
+    } catch (error) {
+      console.error('載入文字筆記失敗:', error);
+    } finally {
+      setLoadingTextNote(false);
+    }
+  };
+
+  // 儲存文字筆記
+  const saveTextNote = async () => {
+    if (!record) return;
+    const recordId = `${fileName}_${record._recordNo}`;
+
+    try {
+      await saveWhiteboard(recordId, textNote);
+      alert('文字筆記已儲存！');
+    } catch (error) {
+      console.error('儲存文字筆記失敗:', error);
+      alert('儲存失敗，請檢查網路連線或重試。');
+    }
+  };
 
   // 獲取與CO03L記錄相關的CO02P記錄
   const fetchCO02PRecords = async () => {
@@ -130,14 +172,14 @@ export default function DbfRecordDetail() {
   const handlePrint = async (pqty: string | number, pfq: string | number) => {
     try {
       const lname = record?.data?.['LNAME'] || '';
-      
+
       // 發送API請求
       const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
         value1: pqty,
         value2: lname,
         value3: pfq
       });
-      
+
       console.log('列印成功:', response.data);
       // 可以添加成功提示
     } catch (error) {
@@ -155,7 +197,7 @@ export default function DbfRecordDetail() {
 
     const lname = record?.data?.['LNAME'] || '';
     const filteredRecords = matchingCO02PRecords.filter(record => isGreaterThanOne(record.data['PQTY']));
-    
+
     if (filteredRecords.length === 0) {
       console.log('沒有PQTY > 1的記錄');
       return;
@@ -163,26 +205,26 @@ export default function DbfRecordDetail() {
 
     // 顯示正在處理的提示
     console.log(`開始批次列印 ${filteredRecords.length} 個項目`);
-    
+
     // 依序發送API請求
     for (const record of filteredRecords) {
       try {
         const pqty = record.data['PQTY'];
         const pfq = record.data['PFQ'];
-        
+
         // 發送API請求
         const response = await axios.post('http://192.168.68.56:6001/generate-and-print-pdf', {
           value1: pqty,
           value2: lname,
           value3: pfq
         });
-        
+
         console.log(`列印成功 KDRUG: ${record.data['KDRUG']}, PQTY: ${pqty}, PFQ: ${pfq}`);
       } catch (error) {
         console.error(`列印失敗 KDRUG: ${record.data['KDRUG']}:`, error);
       }
     }
-    
+
     console.log('批次列印完成');
   };
 
@@ -205,7 +247,7 @@ export default function DbfRecordDetail() {
               { label: `記錄 #${recordNo}`, icon: '🔍' }
             ]}
           />
-          
+
           {/* 批次列印按鈕 - 僅在CO03L.DBF且A99=65或70時顯示 */}
           {!loading && record && fileName?.toUpperCase() === 'CO03L.DBF' && isPediatricMedication() && (
             <Button
@@ -236,9 +278,9 @@ export default function DbfRecordDetail() {
             </Button>
           )}
         </Box>
-        
+
         <Box sx={{ width: '98%', mx: 'auto', my: '1%' }}>
-          
+
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <Box sx={{
@@ -372,7 +414,7 @@ export default function DbfRecordDetail() {
                   ]}
                   title="主要欄位"
                 />
-                
+
                 {/* 顯示 CO09D 藥品資訊 */}
                 <CO09DInfoForCO02P co02pRecord={record} />
               </>
@@ -395,7 +437,7 @@ export default function DbfRecordDetail() {
               />
             )}
 
-           
+
 
            {/* 超連結已整合到表格中 */}
 
@@ -406,14 +448,64 @@ export default function DbfRecordDetail() {
             {fileName?.toUpperCase() === 'CO09D.DBF' && (
               <MatchingCO02PRecordsForCO09D co09dRecord={record} />
             )}
-          
-          {/* 觸控書寫小白板 - 僅在 CO03L.DBF 記錄中顯示 */}
-           {fileName?.toUpperCase() === 'CO03L.DBF' && (
+
+          {/* 普通文字輸入板 - 僅在 CO03L.DBF 記錄中顯示 */}
+           {fileName?.toUpperCase() === 'CO03L.DBF' && record && (
              <Box sx={{ mt: 3, mb: 3 }}>
-               <TouchWhiteboard width={800} height={400} />
+               <TextField
+                 label="文字筆記"
+                 multiline
+                 rows={4}
+                 fullWidth
+                 variant="outlined"
+                 value={textNote}
+                 onChange={(e) => setTextNote(e.target.value)}
+                 disabled={loadingTextNote}
+                 sx={{
+                   '& .MuiOutlinedInput-root': {
+                     '& fieldset': {
+                       borderColor: 'rgba(100, 255, 218, 0.3)',
+                     },
+                     '&:hover fieldset': {
+                       borderColor: 'rgba(100, 255, 218, 0.5)',
+                     },
+                     '&.Mui-focused fieldset': {
+                       borderColor: '#64ffda',
+                     },
+                   },
+                   '& .MuiInputLabel-root': {
+                     color: '#64ffda',
+                     '&.Mui-focused': {
+                       color: '#64ffda',
+                     },
+                   },
+                   '& .MuiOutlinedInput-input': {
+                     color: '#64ffda',
+                   },
+                 }}
+               />
+               <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                 <Button
+                   variant="outlined"
+                   onClick={saveTextNote}
+                   disabled={loadingTextNote}
+                   sx={{
+                     color: '#64ffda',
+                     borderColor: '#64ffda',
+                     '&:hover': {
+                       borderColor: '#64ffda',
+                       bgcolor: 'rgba(100, 255, 218, 0.1)',
+                     },
+                     fontFamily: 'monospace',
+                     fontSize: '0.8rem',
+                   }}
+                 >
+                   {loadingTextNote ? '載入中...' : '儲存筆記'}
+                 </Button>
+               </Box>
              </Box>
            )}
-          
+
           {/* 第三區：剩餘欄位（摺疊） */}
             <TechCollapsibleFields
               record={record}
@@ -425,7 +517,7 @@ export default function DbfRecordDetail() {
               ]}
               title="其他欄位"
             />
-          
+
             </Box>
           ) : (
             <Box sx={{
