@@ -279,7 +279,7 @@ export default function DbfRecordDetail() {
           )}
         </Box>
 
-        <Box sx={{ width: '98%', mx: 'auto', my: '1%' }}>
+        <Box sx={{ width: '98%', mx: 'auto', mt: '0.5%', mb: '1%' }}>
 
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>

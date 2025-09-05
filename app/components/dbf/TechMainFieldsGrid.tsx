@@ -98,9 +98,9 @@ function TechMainFieldsGrid({
 
   // 渲染單個表格
   const renderTable = (group: FieldGroup, index: number | string) => (
-    <Box key={index} sx={{ mb: 1.5, display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <Box key={index} sx={{ mb: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
       <Typography variant="h6" sx={{
-        mb: 0.75,
+        mb: 0.5,
         color: '#e6f1ff',
         fontWeight: 'bold',
         fontSize: '1rem',
@@ -135,7 +135,7 @@ function TechMainFieldsGrid({
                     borderBottom: '2px solid rgba(100, 255, 218, 0.5)',
                     fontSize: '0.9rem',
                     fontWeight: 'bold',
-                    padding: '8px 12px',
+                    padding: '4px 8px',
                     textAlign: 'center',
                     whiteSpace: 'nowrap',
                     fontFamily: 'monospace',
@@ -165,7 +165,7 @@ function TechMainFieldsGrid({
                     borderBottom: '1px solid rgba(64, 175, 255, 0.2)',
                     fontSize: '0.95rem',
                     fontFamily: 'monospace',
-                    padding: '6px 12px',
+                    padding: '4px 8px',
                     textAlign: 'center',
                     wordBreak: 'break-all'
                   }}
@@ -181,10 +181,10 @@ function TechMainFieldsGrid({
   );
 
   return (
-    <Box sx={{ mt: 3, mb: 1.5 }}>
+    <Box sx={{ mt: 2, mb: 1 }}>
       <Box sx={{
         bgcolor: 'rgba(17, 34, 64, 0.4)',
-        p: 1.5,
+        p: 1,
         borderRadius: 1,
         border: '1px solid rgba(64, 175, 255, 0.2)',
         boxShadow: '0 4px 30px rgba(0, 120, 255, 0.2)',
@@ -202,7 +202,7 @@ function TechMainFieldsGrid({
         }
       }}>
         <Typography variant="h5" sx={{
-          mb: 1.5,
+          mb: 1,
           color: '#64ffda',
           fontWeight: 'bold',
           fontSize: '1.25rem',
@@ -222,7 +222,7 @@ function TechMainFieldsGrid({
           <Box sx={{
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
-            gap: 1
+            gap: 0.5
           }}>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {leftGroups.map((group, index) => renderTable(group, `left-${index}`))}
