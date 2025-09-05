@@ -180,14 +180,18 @@ router.get('/:fileName', async (req: Request, res: Response) => {
     // 處理搜尋條件
     if (search && field) {
       // 如果指定了欄位，則在該欄位中搜尋
-      query[`data.${field}`] = { $regex: search, $options: 'i' };
+      // 對搜索詞進行轉義以避免正則表達式錯誤
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query[`data.${field}`] = { $regex: escapedSearch, $options: 'i' };
     } else if (search) {
       // 如果沒有指定欄位，則在所有欄位中搜尋
       const firstRecord = await collection.findOne({}, { projection: { data: 1 } });
       if (firstRecord && firstRecord.data) {
+        // 對搜索詞進行轉義以避免正則表達式錯誤
+        const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         query.$or = Object.keys(firstRecord.data)
           .map(field => ({
-            [`data.${field}`]: { $regex: search, $options: 'i' }
+            [`data.${field}`]: { $regex: escapedSearch, $options: 'i' }
           }));
       }
     }

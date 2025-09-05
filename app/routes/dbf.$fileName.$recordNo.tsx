@@ -31,6 +31,7 @@ import MatchingCO02PRecordsForCO09D from '../components/dbf/MatchingCO02PRecords
 import CO09DInfoForCO02P from '../components/dbf/CO09DInfoForCO02P';
 import TechMainFieldsGrid from '../components/dbf/TechMainFieldsGrid';
 import TechCollapsibleFields from '../components/dbf/TechCollapsibleFields';
+import TouchWhiteboard from '../components/dbf/TouchWhiteboard';
 
 export default function DbfRecordDetail() {
   const params = useParams<{ fileName: string; recordNo: string }>();
@@ -394,17 +395,24 @@ export default function DbfRecordDetail() {
               />
             )}
 
-            
+           
 
-            {/* 超連結已整合到表格中 */}
-            
-            {/* 第二區：配對資料（如果是 CO03L.DBF 或 CO09D.DBF 記錄） */}
+           {/* 超連結已整合到表格中 */}
+
+           {/* 第二區：配對資料（如果是 CO03L.DBF 或 CO09D.DBF 記錄） */}
             {fileName?.toUpperCase() === 'CO03L.DBF' && (
               <TechMatchingCO02PRecordsNoCollapse co03lRecord={record} />
             )}
             {fileName?.toUpperCase() === 'CO09D.DBF' && (
               <MatchingCO02PRecordsForCO09D co09dRecord={record} />
             )}
+          
+          {/* 觸控書寫小白板 - 僅在 CO03L.DBF 記錄中顯示 */}
+           {fileName?.toUpperCase() === 'CO03L.DBF' && (
+             <Box sx={{ mt: 3, mb: 3 }}>
+               <TouchWhiteboard width={800} height={400} />
+             </Box>
+           )}
           
           {/* 第三區：剩餘欄位（摺疊） */}
             <TechCollapsibleFields
