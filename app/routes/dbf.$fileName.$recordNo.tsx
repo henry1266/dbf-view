@@ -45,6 +45,26 @@ export default function DbfRecordDetail() {
   const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
   const [textNote, setTextNote] = useState('');
   const [loadingTextNote, setLoadingTextNote] = useState(false);
+  // 生成檔案列表的完整路徑，包含必要的查詢參數
+  const getFileListPath = (fileName: string) => {
+    let sortField = 'PDATE';
+    let sortDirection = 'desc';
+
+    // 根據檔案名稱設置不同的默認排序
+    if (fileName.toUpperCase() === 'CO03L.DBF') {
+      sortField = '_recordNo';
+    } else if (fileName.toUpperCase() === 'CO02P.DBF') {
+      sortField = '_recordNo';
+    } else if (fileName.toUpperCase() === 'CO01M.DBF') {
+      sortField = 'KCSTMR';
+      sortDirection = 'asc';
+    } else if (fileName.toUpperCase() === 'CO09D.DBF') {
+      sortField = 'KDRUG';
+      sortDirection = 'asc';
+    }
+
+    return `/dbf/${encodeURIComponent(fileName)}?sortField=${sortField}&sortDirection=${sortDirection}&page=1`;
+  };
 
   // 設置優先顯示欄位
   const getPriorityFields = (fileName: string) => {
@@ -243,7 +263,7 @@ export default function DbfRecordDetail() {
             items={[
               { label: '首頁', path: '/', icon: '🏠' },
               { label: '檔案列表', path: '/dbf-files', icon: '📁' },
-              { label: fileName, path: `/dbf/${fileName}`, icon: '📄' },
+              { label: fileName, path: getFileListPath(fileName), icon: '📄' },
               { label: `記錄 #${recordNo}`, icon: '🔍' }
             ]}
           />

@@ -174,7 +174,13 @@ export default function KcstmrQuery() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {fileData.records.map((record) => (
+                      {[...fileData.records]
+                        .sort((a, b) => {
+                          const dateA = parseInt(a.data['DATE'] || '0', 10);
+                          const dateB = parseInt(b.data['DATE'] || '0', 10);
+                          return dateB - dateA; // 降序排序，數字大的在上面
+                        })
+                        .map((record) => (
                         <tr key={record._id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {record._recordNo}
