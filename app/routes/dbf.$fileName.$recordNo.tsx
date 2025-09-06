@@ -18,8 +18,10 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField
+  TextField,
+  IconButton
 } from '@mui/material';
+import "@blocknote/core/style.css";
 import TechBackground from '../components/TechBackground';
 import TechBreadcrumb from '../components/TechBreadcrumb';
 
@@ -45,6 +47,8 @@ export default function DbfRecordDetail() {
   const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
   const [textNote, setTextNote] = useState('');
   const [loadingTextNote, setLoadingTextNote] = useState(false);
+  const [openNoteDialog, setOpenNoteDialog] = useState(false);
+  
 
   // 生成檔案列表的完整路徑，包含必要的查詢參數
   const getFileListPath = (fileName: string) => {
@@ -131,6 +135,9 @@ export default function DbfRecordDetail() {
       const savedText = await loadWhiteboard(recordId);
       if (savedText) {
         setTextNote(savedText);
+        
+        // 設置文字筆記
+        setTextNote(savedText);
       }
     } catch (error) {
       console.error('載入文字筆記失敗:', error);
@@ -147,10 +154,27 @@ export default function DbfRecordDetail() {
     try {
       await saveWhiteboard(recordId, textNote);
       alert('文字筆記已儲存！');
+      setOpenNoteDialog(false);
     } catch (error) {
       console.error('儲存文字筆記失敗:', error);
       alert('儲存失敗，請檢查網路連線或重試。');
     }
+  };
+  
+  // 處理打開筆記編輯對話框
+  const handleOpenNoteDialog = () => {
+    setOpenNoteDialog(true);
+  };
+  
+  // 處理關閉筆記編輯對話框
+  const handleCloseNoteDialog = () => {
+    setOpenNoteDialog(false);
+  };
+  
+  // 獲取筆記摘要（顯示前100個字符）
+  const getNoteSummary = () => {
+    if (!textNote) return '無筆記內容...';
+    return textNote.length > 100 ? textNote.substring(0, 100) + '...' : textNote;
   };
 
   // 獲取與CO03L記錄相關的CO02P記錄
@@ -419,78 +443,142 @@ export default function DbfRecordDetail() {
                   </Box>
 
                   {/* 文字筆記 */}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{
-                      mb: 0.5,
-                      color: '#e6f1ff',
-                      fontWeight: 'bold',
-                      fontSize: '1rem',
-                      pl: 0.5,
-                      fontFamily: 'monospace',
-                      letterSpacing: '0.05em'
-                    }}>
-                      文字筆記
-                    </Typography>
-
-                    <Box sx={{
-                      bgcolor: 'rgba(17, 34, 64, 0.6)',
-                      backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(64, 175, 255, 0.3)',
-                      boxShadow: '0 4px 30px rgba(0, 120, 255, 0.3)',
-                      borderRadius: '4px',
-                      p: 2,
-                      height: 'auto',
-                      maxHeight: '280px',
-                      display: 'flex',
-                      flexDirection: 'column'
-                    }}>
-                      <TextField
-                        label=""
-                        multiline
-                        rows={4}
-                        fullWidth
-                        variant="outlined"
-                        value={textNote}
-                        onChange={(e) => setTextNote(e.target.value)}
-                        disabled={loadingTextNote}
-                        sx={{
-                          flex: 1,
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderColor: 'rgba(100, 255, 218, 0.3)',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: 'rgba(100, 255, 218, 0.5)',
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: '#64ffda',
-                            },
-                          },
-                          '& .MuiInputBase-input': {
-                            color: '#64ffda',
-                          },
-                        }}
-                      />
-                      <Box sx={{ mt: 0, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Box sx={{ flex: 1, position: 'relative' }}>
+                    <TechMainFieldsGrid
+                      record={{
+                        _id: 'note-record',
+                        _recordNo: 0,
+                        _file: '',
+                        _created: new Date().toISOString(),
+                        _updated: new Date().toISOString(),
+                        hash: 'note-hash',
+                        data: {
+                          NOTE: loadingTextNote ? '載入中...' : getNoteSummary()
+                        }
+                      }}
+                      fieldGroups={[
+                        {
+                          title: "文字筆記",
+                          fields: [
+                            { key: 'NOTE', label: '內容' }
+                          ]
+                        }
+                      ]}
+                      title=""
+                    />
+                    
+                    {/* 編輯按鈕 - 絕對定位到框內右上方 */}
+                    <Button
+                      size="small"
+                      onClick={handleOpenNoteDialog}
+                      sx={{
+                        position: 'absolute',
+                        top: '32px',
+                        right: '12px',
+                        zIndex: 10,
+                        color: '#64ffda',
+                        minWidth: 'auto',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        backgroundColor: 'rgba(17, 34, 64, 0.7)',
+                        '&:hover': {
+                          bgcolor: 'rgba(100, 255, 218, 0.1)',
+                        }
+                      }}
+                    >
+                      ✏️ 編輯
+                    </Button>
+                    
+                    {/* 筆記編輯對話框 */}
+                    <Dialog
+                      open={openNoteDialog}
+                      onClose={handleCloseNoteDialog}
+                      maxWidth="md"
+                      fullWidth
+                      PaperProps={{
+                        sx: {
+                          bgcolor: 'rgba(17, 34, 64, 0.95)',
+                          backdropFilter: 'blur(8px)',
+                          border: '1px solid rgba(64, 175, 255, 0.3)',
+                          boxShadow: '0 4px 30px rgba(0, 120, 255, 0.3)',
+                        }
+                      }}
+                    >
+                      <DialogTitle sx={{
+                        color: '#e6f1ff',
+                        fontFamily: 'monospace',
+                        borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
+                      }}>
+                        編輯文字筆記
+                      </DialogTitle>
+                      <DialogContent sx={{ mt: 2, minHeight: '400px' }}>
+                        <Box sx={{
+                          '.bn-container': {
+                            border: '1px solid rgba(100, 255, 218, 0.3)',
+                            borderRadius: '4px',
+                            minHeight: '350px',
+                            '.bn-editor': {
+                              backgroundColor: 'transparent',
+                              color: '#e6f1ff'
+                            }
+                          }
+                        }}>
+                          <TextField
+                            multiline
+                            rows={6}
+                            fullWidth
+                            variant="outlined"
+                            value={textNote}
+                            onChange={(e) => setTextNote(e.target.value)}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                  borderColor: 'rgba(100, 255, 218, 0.3)',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: 'rgba(100, 255, 218, 0.5)',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: '#64ffda',
+                                },
+                              },
+                              '& .MuiInputBase-input': {
+                                color: '#e6f1ff',
+                                fontSize: '0.9rem',
+                              },
+                              bgcolor: 'rgba(17, 34, 64, 0.4)',
+                            }}
+                          />
+                        </Box>
+                      </DialogContent>
+                      <DialogActions sx={{ borderTop: '1px solid rgba(64, 175, 255, 0.3)' }}>
                         <Button
-                          variant="outlined"
-                          onClick={saveTextNote}
-                          disabled={loadingTextNote}
+                          onClick={handleCloseNoteDialog}
                           sx={{
-                            color: '#64ffda',
-                            borderColor: '#64ffda',
+                            color: '#e6f1ff',
                             '&:hover': {
-                              borderColor: '#64ffda',
-                              bgcolor: 'rgba(100, 255, 218, 0.1)',
+                              bgcolor: 'rgba(230, 241, 255, 0.1)',
                             },
-                            fontFamily: 'monospace',
-                            fontSize: '0.8rem',
                           }}
                         >
-                          {loadingTextNote ? '載入中...' : '儲存筆記'}
+                          取消
                         </Button>
-                      </Box>
-                    </Box>
+                        <Button
+                          onClick={saveTextNote}
+                          variant="contained"
+                          sx={{
+                            bgcolor: 'rgba(100, 255, 218, 0.2)',
+                            color: '#64ffda',
+                            '&:hover': {
+                              bgcolor: 'rgba(100, 255, 218, 0.3)',
+                            },
+                            fontFamily: 'monospace',
+                          }}
+                        >
+                          儲存筆記
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </Box>
                 </Box>
               </>
