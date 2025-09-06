@@ -21,7 +21,6 @@ import {
   TextField,
   IconButton
 } from '@mui/material';
-import "@blocknote/core/style.css";
 import TechBackground from '../components/TechBackground';
 import TechBreadcrumb from '../components/TechBreadcrumb';
 
@@ -512,17 +511,7 @@ export default function DbfRecordDetail() {
                         編輯文字筆記
                       </DialogTitle>
                       <DialogContent sx={{ mt: 2, minHeight: '400px' }}>
-                        <Box sx={{
-                          '.bn-container': {
-                            border: '1px solid rgba(100, 255, 218, 0.3)',
-                            borderRadius: '4px',
-                            minHeight: '350px',
-                            '.bn-editor': {
-                              backgroundColor: 'transparent',
-                              color: '#e6f1ff'
-                            }
-                          }
-                        }}>
+                        <Box>
                           <TextField
                             multiline
                             rows={6}

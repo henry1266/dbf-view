@@ -15,6 +15,10 @@ export default [
     file: "routes/search.tsx"
   },
   {
+    path: "/text",
+    file: "routes/text.tsx"
+  },
+  {
     path: "/dbf-files",
     file: "routes/dbf-files.tsx"
   },

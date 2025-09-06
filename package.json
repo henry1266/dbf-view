@@ -16,9 +16,6 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
-    "@blocknote/core": "^0.37.0",
-    "@blocknote/mantine": "^0.37.0",
-    "@blocknote/react": "^0.37.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.1",
@@ -29,6 +26,9 @@
     "@react-router/node": "^7.7.1",
     "@react-router/serve": "^7.7.1",
     "@reduxjs/toolkit": "^2.8.2",
+    "@tiptap/pm": "^3.4.1",
+    "@tiptap/react": "^3.4.1",
+    "@tiptap/starter-kit": "^3.4.1",
     "axios": "^1.6.7",
     "dayjs": "^1.11.13",
     "dotenv": "^17.2.1",
