@@ -45,6 +45,7 @@ export default function DbfRecordDetail() {
   const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
   const [textNote, setTextNote] = useState('');
   const [loadingTextNote, setLoadingTextNote] = useState(false);
+
   // 生成檔案列表的完整路徑，包含必要的查詢參數
   const getFileListPath = (fileName: string) => {
     let sortField = 'PDATE';
@@ -341,54 +342,158 @@ export default function DbfRecordDetail() {
 
             {/* 第一區：主要欄位（分組） - 根據檔案類型顯示不同布局 */}
             {fileName?.toUpperCase() === 'CO03L.DBF' ? (
-              <TechMainFieldsGrid
-                record={record}
-                fieldGroups={[
-                  {
-                    title: "處方資訊",
-                    fields: [
-                      { key: '_recordNo', label: '記錄編號' },
-                      { key: 'DATE', label: 'DATE' },
-                      { key: 'TIME', label: 'TIME' },
-                      { key: 'LPID', label: 'LPID' },
-                      { key: 'LDRU', label: 'LDRU' },
-                      { key: 'LCS', label: 'LCS' },
-                      { key: '_created', label: '建立時間', isMetadata: true },
-                      { key: '_updated', label: '更新時間', isMetadata: true }
-                    ],
-                    layout: 'full'
-                  },
-                  {
-                    title: "病人資訊",
-                    fields: [
-                      {
-                        key: 'KCSTMR',
-                        label: 'KCSTMR',
-                        renderLink: {
-                          path: '/kcstmr/:value',
-                          color: '#64ffda'
+              <>
+                {/* 處方資訊 - 全寬 */}
+                <TechMainFieldsGrid
+                  record={record}
+                  fieldGroups={[
+                    {
+                      title: "處方資訊",
+                      fields: [
+                        { key: '_recordNo', label: '記錄編號' },
+                        { key: 'DATE', label: 'DATE' },
+                        { key: 'TIME', label: 'TIME' },
+                        { key: 'LPID', label: 'LPID' },
+                        { key: 'LDRU', label: 'LDRU' },
+                        { key: 'LCS', label: 'LCS' },
+                        { key: '_created', label: '建立時間', isMetadata: true },
+                        { key: '_updated', label: '更新時間', isMetadata: true }
+                      ],
+                      layout: 'full'
+                    }
+                  ]}
+                  title="主要欄位"
+                />
+
+                {/* 三欄佈局：病人資訊 | 調劑資訊 | 文字筆記 */}
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  gap: 1,
+                  mt: 1
+                }}>
+                  {/* 病人資訊 */}
+                  <Box sx={{ flex: 1 }}>
+                    <TechMainFieldsGrid
+                      record={record}
+                      fieldGroups={[
+                        {
+                          title: "病人資訊",
+                          fields: [
+                            {
+                              key: 'KCSTMR',
+                              label: 'KCSTMR',
+                              renderLink: {
+                                path: '/kcstmr/:value',
+                                color: '#64ffda'
+                              }
+                            },
+                            { key: 'LNAME', label: 'LNAME' },
+                            { key: 'MPERSONID', label: 'MPERSONID' }
+                          ]
                         }
-                      },
-                      { key: 'LNAME', label: 'LNAME' },
-                      { key: 'MPERSONID', label: 'MPERSONID' }
-                    ],
-                    layout: 'left'
-                  },
-                  {
-                    title: "調劑資訊",
-                    fields: [
-                      { key: 'LISRS', label: 'LISRS' },
-                      { key: 'DAYQTY', label: 'DAYQTY' },
-                      { key: 'A2', label: 'A2' },
-                      { key: 'A99', label: 'A99' },
-                      { key: 'A97', label: 'A97' },
-                      { key: 'TOT', label: 'TOT' }
-                    ],
-                    layout: 'right'
-                  }
-                ]}
-                title="主要欄位"
-              />
+                      ]}
+                      title=""
+                    />
+                  </Box>
+
+                  {/* 調劑資訊 */}
+                  <Box sx={{ flex: 1 }}>
+                    <TechMainFieldsGrid
+                      record={record}
+                      fieldGroups={[
+                        {
+                          title: "調劑資訊",
+                          fields: [
+                            { key: 'LISRS', label: 'LISRS' },
+                            { key: 'DAYQTY', label: 'DAYQTY' },
+                            { key: 'A2', label: 'A2' },
+                            { key: 'A99', label: 'A99' },
+                            { key: 'A97', label: 'A97' },
+                            { key: 'TOT', label: 'TOT' }
+                          ]
+                        }
+                      ]}
+                      title=""
+                    />
+                  </Box>
+
+                  {/* 文字筆記 */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{
+                      mb: 0.5,
+                      color: '#e6f1ff',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      pl: 0.5,
+                      fontFamily: 'monospace',
+                      letterSpacing: '0.05em'
+                    }}>
+                      文字筆記
+                    </Typography>
+
+                    <Box sx={{
+                      bgcolor: 'rgba(17, 34, 64, 0.6)',
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(64, 175, 255, 0.3)',
+                      boxShadow: '0 4px 30px rgba(0, 120, 255, 0.3)',
+                      borderRadius: '4px',
+                      p: 2,
+                      height: 'auto',
+                      maxHeight: '280px',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}>
+                      <TextField
+                        label=""
+                        multiline
+                        rows={4}
+                        fullWidth
+                        variant="outlined"
+                        value={textNote}
+                        onChange={(e) => setTextNote(e.target.value)}
+                        disabled={loadingTextNote}
+                        sx={{
+                          flex: 1,
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: 'rgba(100, 255, 218, 0.3)',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: 'rgba(100, 255, 218, 0.5)',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#64ffda',
+                            },
+                          },
+                          '& .MuiInputBase-input': {
+                            color: '#64ffda',
+                          },
+                        }}
+                      />
+                      <Box sx={{ mt: 0, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="outlined"
+                          onClick={saveTextNote}
+                          disabled={loadingTextNote}
+                          sx={{
+                            color: '#64ffda',
+                            borderColor: '#64ffda',
+                            '&:hover': {
+                              borderColor: '#64ffda',
+                              bgcolor: 'rgba(100, 255, 218, 0.1)',
+                            },
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          {loadingTextNote ? '載入中...' : '儲存筆記'}
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </>
             ) : fileName?.toUpperCase() === 'CO02P.DBF' ? (
               <>
                 <TechMainFieldsGrid
@@ -468,63 +573,6 @@ export default function DbfRecordDetail() {
             {fileName?.toUpperCase() === 'CO09D.DBF' && (
               <MatchingCO02PRecordsForCO09D co09dRecord={record} />
             )}
-
-          {/* 普通文字輸入板 - 僅在 CO03L.DBF 記錄中顯示 */}
-           {fileName?.toUpperCase() === 'CO03L.DBF' && record && (
-             <Box sx={{ mt: 3, mb: 3 }}>
-               <TextField
-                 label="文字筆記"
-                 multiline
-                 rows={4}
-                 fullWidth
-                 variant="outlined"
-                 value={textNote}
-                 onChange={(e) => setTextNote(e.target.value)}
-                 disabled={loadingTextNote}
-                 sx={{
-                   '& .MuiOutlinedInput-root': {
-                     '& fieldset': {
-                       borderColor: 'rgba(100, 255, 218, 0.3)',
-                     },
-                     '&:hover fieldset': {
-                       borderColor: 'rgba(100, 255, 218, 0.5)',
-                     },
-                     '&.Mui-focused fieldset': {
-                       borderColor: '#64ffda',
-                     },
-                   },
-                   '& .MuiInputLabel-root': {
-                     color: '#64ffda',
-                     '&.Mui-focused': {
-                       color: '#64ffda',
-                     },
-                   },
-                   '& .MuiOutlinedInput-input': {
-                     color: '#64ffda',
-                   },
-                 }}
-               />
-               <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                 <Button
-                   variant="outlined"
-                   onClick={saveTextNote}
-                   disabled={loadingTextNote}
-                   sx={{
-                     color: '#64ffda',
-                     borderColor: '#64ffda',
-                     '&:hover': {
-                       borderColor: '#64ffda',
-                       bgcolor: 'rgba(100, 255, 218, 0.1)',
-                     },
-                     fontFamily: 'monospace',
-                     fontSize: '0.8rem',
-                   }}
-                 >
-                   {loadingTextNote ? '載入中...' : '儲存筆記'}
-                 </Button>
-               </Box>
-             </Box>
-           )}
 
           {/* 第三區：剩餘欄位（摺疊） */}
             <TechCollapsibleFields

@@ -29,7 +29,7 @@ interface FieldConfig {
 interface FieldGroup {
   title: string;
   fields: FieldConfig[];
-  layout?: 'full' | 'left' | 'right';
+  layout?: 'full' | 'left' | 'center' | 'right';
 }
 
 interface TechMainFieldsGridProps {
@@ -60,13 +60,13 @@ function TechMainFieldsGrid({
   // 渲染欄位值（純文字或超連結）
   const renderValue = (field: FieldConfig) => {
     const value = getFieldValue(field.key, field.isMetadata);
-    
+
     // 如果有超連結配置且值存在
     if (field.renderLink && value) {
       const path = field.renderLink.path.replace(':value', encodeURIComponent(value.toString()));
       const color = field.renderLink.color || '#64ffda';
       const label = field.renderLink.label || `查看 ${field.label}: ${value}`;
-      
+
       return (
         <Link
           to={path}
@@ -86,7 +86,7 @@ function TechMainFieldsGrid({
         </Link>
       );
     }
-    
+
     // 純文字
     return value;
   };
@@ -94,6 +94,7 @@ function TechMainFieldsGrid({
   // 將表格分組為全寬和半寬（左右並排）
   const fullWidthGroups = fieldGroups.filter(group => group.layout === 'full' || !group.layout);
   const leftGroups = fieldGroups.filter(group => group.layout === 'left');
+  const centerGroups = fieldGroups.filter(group => group.layout === 'center');
   const rightGroups = fieldGroups.filter(group => group.layout === 'right');
 
   // 渲染單個表格
@@ -110,7 +111,7 @@ function TechMainFieldsGrid({
       }}>
         {group.title}
       </Typography>
-      
+
       <TableContainer component={Paper} sx={{
         bgcolor: 'rgba(17, 34, 64, 0.6)',
         backdropFilter: 'blur(8px)',
@@ -213,23 +214,32 @@ function TechMainFieldsGrid({
         }}>
           {title}
         </Typography>
-        
+
         {/* 全寬表格 */}
         {fullWidthGroups.map((group, index) => renderTable(group, index))}
-        
+
         {/* 左右並排表格 */}
-        {(leftGroups.length > 0 || rightGroups.length > 0) && (
+        {(leftGroups.length > 0 || centerGroups.length > 0 || rightGroups.length > 0) && (
           <Box sx={{
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             gap: 0.5
           }}>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {leftGroups.map((group, index) => renderTable(group, `left-${index}`))}
-            </Box>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {rightGroups.map((group, index) => renderTable(group, `right-${index}`))}
-            </Box>
+            {leftGroups.length > 0 && (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {leftGroups.map((group, index) => renderTable(group, `left-${index}`))}
+              </Box>
+            )}
+            {centerGroups.length > 0 && (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {centerGroups.map((group, index) => renderTable(group, `center-${index}`))}
+              </Box>
+            )}
+            {rightGroups.length > 0 && (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {rightGroups.map((group, index) => renderTable(group, `right-${index}`))}
+              </Box>
+            )}
           </Box>
         )}
       </Box>
