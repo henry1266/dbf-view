@@ -43,6 +43,9 @@ interface LdruStats {
     I: number;
     O: number;
     other: number;
+    a2Sum: number;
+    a97Sum: number;
+    a99Sum: number;
   }>;
 }
 
@@ -248,6 +251,20 @@ export default function DbfStats() {
       byDate: {}
     };
 
+    // 先按日期分組記錄
+    const recordsByDate: Record<string, DbfRecord[]> = {};
+    
+    records.forEach(record => {
+      const dateValue = record.data.DATE || '';
+      if (dateValue) {
+        if (!recordsByDate[dateValue]) {
+          recordsByDate[dateValue] = [];
+        }
+        recordsByDate[dateValue].push(record);
+      }
+    });
+
+    // 處理每條記錄
     records.forEach(record => {
       const ldruValue = record.data.LDRU || '';
       const dateValue = record.data.DATE || '';
@@ -268,7 +285,10 @@ export default function DbfStats() {
             total: 0,
             I: 0,
             O: 0,
-            other: 0
+            other: 0,
+            a2Sum: 0,
+            a97Sum: 0,
+            a99Sum: 0
           };
         }
 
@@ -282,6 +302,29 @@ export default function DbfStats() {
           stats.byDate[dateValue].other++;
         }
       }
+    });
+
+    // 計算每日的 a2、a97 和 a99 加總
+    Object.keys(recordsByDate).forEach(date => {
+      const dateRecords = recordsByDate[date];
+      
+      // 計算 a2 加總
+      stats.byDate[date].a2Sum = dateRecords.reduce((sum, record) => {
+        const a2Value = record.data.A2 !== undefined ? Number(record.data.A2) : 0;
+        return sum + (isNaN(a2Value) ? 0 : a2Value);
+      }, 0);
+      
+      // 計算 a97 加總
+      stats.byDate[date].a97Sum = dateRecords.reduce((sum, record) => {
+        const a97Value = record.data.A97 !== undefined ? Number(record.data.A97) : 0;
+        return sum + (isNaN(a97Value) ? 0 : a97Value);
+      }, 0);
+      
+      // 計算 a99 加總
+      stats.byDate[date].a99Sum = dateRecords.reduce((sum, record) => {
+        const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
+        return sum + (isNaN(a99Value) ? 0 : a99Value);
+      }, 0);
     });
 
     return stats;
@@ -811,12 +854,42 @@ export default function DbfStats() {
                     }}>
                       其他值
                     </th>
+                    <th style={{
+                      padding: '12px 16px',
+                      textAlign: 'left',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      letterSpacing: '0.05em',
+                      borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
+                    }}>
+                      a2藥費
+                    </th>
+                    <th style={{
+                      padding: '12px 16px',
+                      textAlign: 'left',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      letterSpacing: '0.05em',
+                      borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
+                    }}>
+                      a97部分負擔
+                    </th>
+                    <th style={{
+                      padding: '12px 16px',
+                      textAlign: 'left',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      letterSpacing: '0.05em',
+                      borderBottom: '1px solid rgba(64, 175, 255, 0.3)'
+                    }}>
+                      a99調劑費
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {Object.keys(stats.byDate).length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{
+                      <td colSpan={8} style={{
                         padding: '16px',
                         textAlign: 'center',
                         color: 'rgba(230, 241, 255, 0.7)',
@@ -870,6 +943,30 @@ export default function DbfStats() {
                             borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
                           }}>
                             {dateStat.other}
+                          </td>
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            color: '#4fc3f7',
+                            borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
+                          }}>
+                            {dateStat.a2Sum}
+                          </td>
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            color: '#ff9800',
+                            borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
+                          }}>
+                            {dateStat.a97Sum}
+                          </td>
+                          <td style={{
+                            padding: '12px 16px',
+                            whiteSpace: 'nowrap',
+                            color: '#9575cd',
+                            borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
+                          }}>
+                            {dateStat.a99Sum}
                           </td>
                         </tr>
                       ))
