@@ -330,7 +330,7 @@ export default function DbfStats() {
     return stats;
   };
 
-  // 計算 A99 欄位統計數據
+  // 計算 A99 欄位統計數據 (只統計 LDRU=I 的記錄)
   const calculateA99Stats = (records: DbfRecord[]): A99Stats => {
     const stats: A99Stats = {
       totalSum: 0,
@@ -338,6 +338,10 @@ export default function DbfStats() {
     };
 
     records.forEach(record => {
+      // 只處理 LDRU=I 的記錄
+      const ldruValue = record.data.LDRU || '';
+      if (ldruValue !== 'I') return;
+      
       // 獲取A99欄位的值，如果不存在則默認為0
       const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
       
@@ -361,7 +365,7 @@ export default function DbfStats() {
     return stats;
   };
 
-  // 計算 A2 欄位統計數據
+  // 計算 A2 欄位統計數據 (只統計 LDRU=I 的記錄)
   const calculateA2Stats = (records: DbfRecord[]): A2Stats => {
     const stats: A2Stats = {
       totalSum: 0
@@ -377,6 +381,10 @@ export default function DbfStats() {
     }
 
     records.forEach(record => {
+      // 只處理 LDRU=I 的記錄
+      const ldruValue = record.data.LDRU || '';
+      if (ldruValue !== 'I') return;
+      
       // 獲取A2欄位的值，如果不存在則默認為0
       const a2Value = record.data.A2 !== undefined ? Number(record.data.A2) : 0;
       
@@ -390,7 +398,7 @@ export default function DbfStats() {
     return stats;
   };
 
-  // 計算 A97 欄位統計數據
+  // 計算 A97 欄位統計數據 (只統計 LDRU=I 的記錄)
   const calculateA97Stats = (records: DbfRecord[]): A97Stats => {
     const stats: A97Stats = {
       totalSum: 0
@@ -406,6 +414,10 @@ export default function DbfStats() {
     }
 
     records.forEach(record => {
+      // 只處理 LDRU=I 的記錄
+      const ldruValue = record.data.LDRU || '';
+      if (ldruValue !== 'I') return;
+      
       // 獲取A97欄位的值，如果不存在則默認為0
       const a97Value = record.data.A97 !== undefined ? Number(record.data.A97) : 0;
       
@@ -419,7 +431,7 @@ export default function DbfStats() {
     return stats;
   };
 
-  // 計算 TOT 欄位統計數據
+  // 計算 TOT 欄位統計數據 (只統計 LDRU=I 的記錄)
   const calculateTOTStats = (records: DbfRecord[]): TOTStats => {
     const stats: TOTStats = {
       totalSum: 0
@@ -435,6 +447,10 @@ export default function DbfStats() {
     }
 
     records.forEach(record => {
+      // 只處理 LDRU=I 的記錄
+      const ldruValue = record.data.LDRU || '';
+      if (ldruValue !== 'I') return;
+      
       // 獲取TOT欄位的值，如果不存在則默認為0
       const totValue = record.data.TOT !== undefined ? Number(record.data.TOT) : 0;
       
@@ -947,7 +963,7 @@ export default function DbfStats() {
                           <td style={{
                             padding: '12px 16px',
                             whiteSpace: 'nowrap',
-                            color: '#4fc3f7',
+                            color: '#7cd6ffff',
                             borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
                           }}>
                             {dateStat.a2Sum}
@@ -955,7 +971,7 @@ export default function DbfStats() {
                           <td style={{
                             padding: '12px 16px',
                             whiteSpace: 'nowrap',
-                            color: '#ff9800',
+                            color: '#ffcb7dff',
                             borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
                           }}>
                             {dateStat.a97Sum}
@@ -963,7 +979,7 @@ export default function DbfStats() {
                           <td style={{
                             padding: '12px 16px',
                             whiteSpace: 'nowrap',
-                            color: '#9575cd',
+                            color: '#cdb7f3ff',
                             borderBottom: '1px solid rgba(64, 175, 255, 0.2)'
                           }}>
                             {dateStat.a99Sum}
