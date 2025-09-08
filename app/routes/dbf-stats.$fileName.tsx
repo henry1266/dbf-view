@@ -304,24 +304,27 @@ export default function DbfStats() {
       }
     });
 
-    // 計算每日的 a2、a97 和 a99 加總
+    // 計算每日的 a2、a97 和 a99 加總 (只統計 LDRU=I 的記錄)
     Object.keys(recordsByDate).forEach(date => {
       const dateRecords = recordsByDate[date];
       
-      // 計算 a2 加總
-      stats.byDate[date].a2Sum = dateRecords.reduce((sum, record) => {
+      // 只篩選 LDRU=I 的記錄
+      const ldruIRecords = dateRecords.filter(record => record.data.LDRU === 'I');
+      
+      // 計算 a2 加總 (只統計 LDRU=I 的記錄)
+      stats.byDate[date].a2Sum = ldruIRecords.reduce((sum, record) => {
         const a2Value = record.data.A2 !== undefined ? Number(record.data.A2) : 0;
         return sum + (isNaN(a2Value) ? 0 : a2Value);
       }, 0);
       
-      // 計算 a97 加總
-      stats.byDate[date].a97Sum = dateRecords.reduce((sum, record) => {
+      // 計算 a97 加總 (只統計 LDRU=I 的記錄)
+      stats.byDate[date].a97Sum = ldruIRecords.reduce((sum, record) => {
         const a97Value = record.data.A97 !== undefined ? Number(record.data.A97) : 0;
         return sum + (isNaN(a97Value) ? 0 : a97Value);
       }, 0);
       
-      // 計算 a99 加總
-      stats.byDate[date].a99Sum = dateRecords.reduce((sum, record) => {
+      // 計算 a99 加總 (只統計 LDRU=I 的記錄)
+      stats.byDate[date].a99Sum = ldruIRecords.reduce((sum, record) => {
         const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
         return sum + (isNaN(a99Value) ? 0 : a99Value);
       }, 0);
