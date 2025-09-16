@@ -142,7 +142,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
           p: 2,
           display: 'flex',
           flexDirection: 'column',
-          height: 200,
+          height: 250,
           bgcolor: 'rgba(17, 34, 64, 0.6)',
           backdropFilter: 'blur(8px)',
           boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
@@ -271,10 +271,10 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
                     alignItems: 'center',
                     gap: 1
                   }}>
-                    {/* 長條 */}
+                    {/* 長條圖 */}
                     <Box sx={{
                       flex: 1,
-                      height: 4,
+                      height: 5,
                       bgcolor: '#1e293b',
                       borderRadius: 1,
                       position: 'relative',
