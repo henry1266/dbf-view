@@ -199,9 +199,8 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
           // 獲取 valueGroups 中的所有條目
           const entries = Object.entries(a99GroupStats.valueGroups);
           
-          // 計算所有值的乘積，找出最大值用於計算比例
-          const products = entries.map(([value, count]) => Number(value) * count);
-          const maxProduct = Math.max(...products, 1); // 避免除以0
+          // 計算總計金額
+          const totalSum = a99GroupStats.totalSum || 1; // 避免除以0
           
           // 按乘積降序排序
           const sortedEntries = entries
@@ -222,7 +221,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
           
           return sortedEntries.map((entry, index) => {
             const { value, count, product } = entry;
-            const percentage = (product / maxProduct) * 100;
+            const percentage = (product / totalSum) * 100;
             const color = colors[index % colors.length];
             
             return (
@@ -258,64 +257,42 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
                     {product}
                   </Typography>
                 </Box>
+                {/* 完全重新設計的長條圖 */}
                 <Box sx={{
                   width: '100%',
-
-                  height: 6,
-                  borderRadius: 5,
                   mb: 2,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    height: '100%',
-                    width: '100%',
-                    animation: 'shimmer 2s infinite',
-                  },
-                  '@keyframes shimmer': {
-                    '0%': { transform: 'translateX(-100%)' },
-                    '100%': { transform: 'translateX(100%)' }
-                  }
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
                 }}>
+                  {/* 長條和標籤 */}
                   <Box sx={{
-                    width: `${percentage}%`,
-                    bgcolor: color.barColor,
-                    height: 6,
-                    borderRadius: 5,
-                    boxShadow: `0 0 5px ${color.shadow}`
-                  }} />
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}>
+                    {/* 長條 */}
+                    <Box sx={{
+                      flex: 1,
+                      height: 4,
+                      bgcolor: '#1e293b',
+                      borderRadius: 1,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      border: '1px solid #334155'
+                    }}>
+                      <Box sx={{
+                        height: '100%',
+                        width: `${percentage}%`,
+                        bgcolor: index === 0 ? '#3b82f6' : index === 1 ? '#10b981' : '#f97316',
+                      }} />
+                    </Box>
+                  </Box>
                 </Box>
               </React.Fragment>
             );
           });
         })()}
-        <Box sx={{
-          width: '100%',
-          height: 6,
-          borderRadius: 5,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-          }
-        }}>
-          <Box sx={{
-            width: '45%',
-            bgcolor: 'warning.main',
-            height: 6,
-            borderRadius: 5,
-            boxShadow: '0 0 5px rgba(255, 171, 64, 0.5)'
-          }} />
-        </Box>
-        
         {/* A99 總計 */}
         <Box sx={{
           display: 'flex',
