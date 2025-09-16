@@ -1,7 +1,16 @@
 import React from 'react';
 import { Paper, Box, Typography, Stack } from '@mui/material';
 
-const SystemStatus = () => {
+interface A99GroupStats {
+  totalSum: number;
+  valueGroups: Record<string, number>;
+}
+
+interface SystemStatusProps {
+  a99GroupStats: A99GroupStats;
+}
+
+const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
   return (
     <Stack spacing={3}>
       <Paper
@@ -185,161 +194,105 @@ const SystemStatus = () => {
           </Box>
         </Typography>
         
-        {/* A99 分組 - 第一組 */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: 1 }}>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#e6f1ff',
-            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <Box component="span" sx={{
-              fontSize: '0.7rem',
-              bgcolor: 'rgba(64, 175, 255, 0.2)',
-              px: 0.6,
-              py: 0.2,
-              borderRadius: 0.8,
-              color: '#40afff',
-              mr: 0.5
-            }}>
-              10×
-            </Box>
-            75
-          </Typography>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#40afff',
-            textShadow: '0 0 8px rgba(64, 175, 255, 0.7)'
-          }}>
-            750
-          </Typography>
-        </Box>
-        <Box sx={{
-          width: '100%',
-          bgcolor: 'rgba(0,0,0,0.05)',
-          height: 6,
-          borderRadius: 5,
-          mb: 2,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
-            animation: 'shimmer 2s infinite',
-          },
-          '@keyframes shimmer': {
-            '0%': { transform: 'translateX(-100%)' },
-            '100%': { transform: 'translateX(100%)' }
-          }
-        }}>
-          <Box sx={{
-            width: '75%',
-            bgcolor: 'primary.main',
-            height: 6,
-            borderRadius: 5,
-            boxShadow: '0 0 5px rgba(64, 175, 255, 0.5)'
-          }} />
-        </Box>
-        
-        {/* A99 分組 - 第二組 */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#e6f1ff',
-            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <Box component="span" sx={{
-              fontSize: '0.7rem',
-              bgcolor: 'rgba(100, 255, 218, 0.2)',
-              px: 0.6,
-              py: 0.2,
-              borderRadius: 0.8,
-              color: '#64ffda',
-              mr: 0.5
-            }}>
-              20×
-            </Box>
-            45
-          </Typography>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#64ffda',
-            textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
-          }}>
-            900
-          </Typography>
-        </Box>
-        <Box sx={{
-          width: '100%',
-          bgcolor: 'rgba(0,0,0,0.05)',
-          height: 6,
-          borderRadius: 5,
-          mb: 2,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-            animation: 'shimmer 2s infinite',
-          }
-        }}>
-          <Box sx={{
-            width: '90%',
-            bgcolor: 'success.main',
-            height: 6,
-            borderRadius: 5,
-            boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
-          }} />
-        </Box>
-        
-        {/* A99 分組 - 第三組 */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#e6f1ff',
-            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <Box component="span" sx={{
-              fontSize: '0.7rem',
-              bgcolor: 'rgba(255, 171, 64, 0.2)',
-              px: 0.6,
-              py: 0.2,
-              borderRadius: 0.8,
-              color: '#ffab40',
-              mr: 0.5
-            }}>
-              15×
-            </Box>
-            30
-          </Typography>
-          <Typography variant="body2" sx={{
-            fontFamily: 'monospace',
-            fontSize: '0.8rem',
-            color: '#ffab40',
-            textShadow: '0 0 8px rgba(255, 171, 64, 0.6)'
-          }}>
-            450
-          </Typography>
-        </Box>
+        {/* 動態生成 A99 分組數據 */}
+        {(() => {
+          // 獲取 valueGroups 中的所有條目
+          const entries = Object.entries(a99GroupStats.valueGroups);
+          
+          // 計算所有值的乘積，找出最大值用於計算比例
+          const products = entries.map(([value, count]) => Number(value) * count);
+          const maxProduct = Math.max(...products, 1); // 避免除以0
+          
+          // 按乘積降序排序
+          const sortedEntries = entries
+            .map(([value, count]) => ({
+              value,
+              count,
+              product: Number(value) * count
+            }))
+            .sort((a, b) => b.product - a.product)
+            .slice(0, 3); // 只取前三個最大值
+          
+          // 顏色配置
+          const colors = [
+            { bg: 'rgba(64, 175, 255, 0.2)', color: '#40afff', barColor: 'primary.main', shadow: 'rgba(64, 175, 255, 0.5)' },
+            { bg: 'rgba(100, 255, 218, 0.2)', color: '#64ffda', barColor: 'success.main', shadow: 'rgba(100, 255, 218, 0.5)' },
+            { bg: 'rgba(255, 171, 64, 0.2)', color: '#ffab40', barColor: 'warning.main', shadow: 'rgba(255, 171, 64, 0.5)' }
+          ];
+          
+          return sortedEntries.map((entry, index) => {
+            const { value, count, product } = entry;
+            const percentage = (product / maxProduct) * 100;
+            const color = colors[index % colors.length];
+            
+            return (
+              <React.Fragment key={value}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: index === 0 ? 1 : 0 }}>
+                  <Typography variant="body2" sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.8rem',
+                    color: '#e6f1ff',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <Box component="span" sx={{
+                      fontSize: '0.7rem',
+                      bgcolor: color.bg,
+                      px: 0.6,
+                      py: 0.2,
+                      borderRadius: 0.8,
+                      color: color.color,
+                      mr: 0.5
+                    }}>
+                      {count}×
+                    </Box>
+                    {value}
+                  </Typography>
+                  <Typography variant="body2" sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.8rem',
+                    color: color.color,
+                    textShadow: `0 0 8px ${color.shadow}`
+                  }}>
+                    {product}
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  width: '100%',
+                  bgcolor: 'rgba(0,0,0,0.05)',
+                  height: 6,
+                  borderRadius: 5,
+                  mb: 2,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    width: '100%',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
+                    animation: 'shimmer 2s infinite',
+                  },
+                  '@keyframes shimmer': {
+                    '0%': { transform: 'translateX(-100%)' },
+                    '100%': { transform: 'translateX(100%)' }
+                  }
+                }}>
+                  <Box sx={{
+                    width: `${percentage}%`,
+                    bgcolor: color.barColor,
+                    height: 6,
+                    borderRadius: 5,
+                    boxShadow: `0 0 5px ${color.shadow}`
+                  }} />
+                </Box>
+              </React.Fragment>
+            );
+          });
+        })()}
         <Box sx={{
           width: '100%',
           bgcolor: 'rgba(0,0,0,0.05)',
@@ -384,7 +337,7 @@ const SystemStatus = () => {
             color: 'transparent',
             textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
           }}>
-            總計: 2,100
+            總計: {a99GroupStats.totalSum.toLocaleString()}
           </Typography>
         </Box>
       </Paper>

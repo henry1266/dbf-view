@@ -436,4 +436,64 @@ export const deleteWhiteboard = async (recordId: string) => {
   }
 };
 
+/**
+ * @function fetchA99GroupStats
+ * @description 獲取 CO03L.DBF 中 A99 欄位的分組統計數據
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<{totalSum: number, valueGroups: Record<string, number>}>} A99 欄位的分組統計數據
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const stats = await fetchA99GroupStats('1130801', '1130831');
+ * console.log(stats); // { totalSum: 12345, valueGroups: { '10': 75, '20': 45, '15': 30 } }
+ */
+export const fetchA99GroupStats = async (startDate = '', endDate = '') => {
+  try {
+    // 獲取 CO03L.DBF 的所有記錄
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000, // 使用較大的頁面大小以獲取更多記錄
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true' // 標記為統計頁面請求
+    );
+
+    // 初始化 A99 欄位的分組統計數據
+    const valueGroups: Record<string, number> = {};
+    let totalSum = 0;
+
+    // 處理記錄，計算 A99 欄位的分組統計數據
+    result.records.forEach((record: DbfRecord) => {
+      const a99Value = record.data.A99 !== undefined ? Number(record.data.A99) : 0;
+      
+      // 只有當 A99 是有效數字時才處理
+      if (!isNaN(a99Value) && a99Value > 0) {
+        // 將 A99 值轉換為字符串作為鍵
+        const key = a99Value.toString();
+        
+        // 如果該值尚未在對象中，初始化為 0
+        if (!valueGroups[key]) {
+          valueGroups[key] = 0;
+        }
+        
+        // 增加該值的數量
+        valueGroups[key]++;
+        
+        // 增加總和
+        totalSum += a99Value;
+      }
+    });
+
+    return { totalSum, valueGroups };
+  } catch (error) {
+    console.error('Error fetching A99 group stats:', error);
+    throw error;
+  }
+};
+
 export default api;

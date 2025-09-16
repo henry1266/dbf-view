@@ -10,7 +10,7 @@ import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { fetchLdruICountsByDate, fetchA99Count75, fetchA99Total } from '../services/api';
+import { fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats } from '../services/api';
 
 /**
  * @function meta
@@ -40,6 +40,8 @@ export default function Dashboard() {
   const [a99Count75, setA99Count75] = useState<number>(0);
   // 存儲 A99 欄位的總和
   const [totalA99, setTotalA99] = useState<number>(0);
+  // 存儲 A99 欄位的分組統計數據
+  const [a99GroupStats, setA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -91,6 +93,9 @@ export default function Dashboard() {
         // 獲取 A99 欄位的總和
         const a99Total = await fetchA99Total(start, end);
         
+        // 獲取 A99 欄位的分組統計數據
+        const a99Stats = await fetchA99GroupStats(start, end);
+        
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
         
@@ -128,6 +133,7 @@ export default function Dashboard() {
         setWeeklyLdruI(weeklyTotal);
         setA99Count75(a99Count);
         setTotalA99(a99Total);
+        setA99GroupStats(a99Stats);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -158,7 +164,7 @@ export default function Dashboard() {
         <Grid container spacing={1}>
           {/* 左側統計面板 */}
           <Grid sx={{ width: { xs: '100%', lg: '24%' }, p: 1 }}>
-            <SystemStatus />
+            <SystemStatus a99GroupStats={a99GroupStats} />
           </Grid>
 
           {/* 中央日曆 */}
