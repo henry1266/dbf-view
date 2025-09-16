@@ -173,7 +173,7 @@ const SystemStatus = () => {
           justifyContent: 'space-between',
           textShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
         }}>
-          <span>SYSTEM STATUS</span>
+          <span>當月 A99 金額</span>
           <Box component="span" sx={{
             fontSize: '0.7rem',
             color: '#64ffda',
@@ -181,12 +181,41 @@ const SystemStatus = () => {
             alignItems: 'center',
             textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
           }}>
+            GROUP
           </Box>
         </Typography>
         
+        {/* A99 分組 - 第一組 */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: 1 }}>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>CPU</Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#40afff', textShadow: '0 0 8px rgba(64, 175, 255, 0.7)' }}>32%</Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#e6f1ff',
+            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Box component="span" sx={{
+              fontSize: '0.7rem',
+              bgcolor: 'rgba(64, 175, 255, 0.2)',
+              px: 0.6,
+              py: 0.2,
+              borderRadius: 0.8,
+              color: '#40afff',
+              mr: 0.5
+            }}>
+              10×
+            </Box>
+            75
+          </Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#40afff',
+            textShadow: '0 0 8px rgba(64, 175, 255, 0.7)'
+          }}>
+            750
+          </Typography>
         </Box>
         <Box sx={{
           width: '100%',
@@ -212,17 +241,45 @@ const SystemStatus = () => {
           }
         }}>
           <Box sx={{
-            width: '32%',
+            width: '75%',
             bgcolor: 'primary.main',
             height: 6,
             borderRadius: 5,
-            boxShadow: '0 0 5px rgba(25, 118, 210, 0.5)'
+            boxShadow: '0 0 5px rgba(64, 175, 255, 0.5)'
           }} />
         </Box>
         
+        {/* A99 分組 - 第二組 */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>MEMORY</Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#ffab40', textShadow: '0 0 8px rgba(255, 171, 64, 0.6)' }}>68%</Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#e6f1ff',
+            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Box component="span" sx={{
+              fontSize: '0.7rem',
+              bgcolor: 'rgba(100, 255, 218, 0.2)',
+              px: 0.6,
+              py: 0.2,
+              borderRadius: 0.8,
+              color: '#64ffda',
+              mr: 0.5
+            }}>
+              20×
+            </Box>
+            45
+          </Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#64ffda',
+            textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
+          }}>
+            900
+          </Typography>
         </Box>
         <Box sx={{
           width: '100%',
@@ -243,17 +300,45 @@ const SystemStatus = () => {
           }
         }}>
           <Box sx={{
-            width: '68%',
-            bgcolor: 'warning.main',
+            width: '90%',
+            bgcolor: 'success.main',
             height: 6,
             borderRadius: 5,
-            boxShadow: '0 0 5px rgba(255, 152, 0, 0.5)'
+            boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
           }} />
         </Box>
         
+        {/* A99 分組 - 第三組 */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#e6f1ff', textShadow: '0 0 5px rgba(230, 241, 255, 0.5)' }}>DISK</Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#64ffda', textShadow: '0 0 8px rgba(100, 255, 218, 0.6)' }}>45%</Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#e6f1ff',
+            textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Box component="span" sx={{
+              fontSize: '0.7rem',
+              bgcolor: 'rgba(255, 171, 64, 0.2)',
+              px: 0.6,
+              py: 0.2,
+              borderRadius: 0.8,
+              color: '#ffab40',
+              mr: 0.5
+            }}>
+              15×
+            </Box>
+            30
+          </Typography>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.8rem',
+            color: '#ffab40',
+            textShadow: '0 0 8px rgba(255, 171, 64, 0.6)'
+          }}>
+            450
+          </Typography>
         </Box>
         <Box sx={{
           width: '100%',
@@ -275,11 +360,32 @@ const SystemStatus = () => {
         }}>
           <Box sx={{
             width: '45%',
-            bgcolor: 'success.main',
+            bgcolor: 'warning.main',
             height: 6,
             borderRadius: 5,
-            boxShadow: '0 0 5px rgba(76, 175, 80, 0.5)'
+            boxShadow: '0 0 5px rgba(255, 171, 64, 0.5)'
           }} />
+        </Box>
+        
+        {/* A99 總計 */}
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 2,
+          borderTop: '1px solid rgba(64, 175, 255, 0.2)',
+          pt: 1
+        }}>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '0.9rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(90deg, #40afff, #64ffda)',
+            backgroundClip: 'text',
+            color: 'transparent',
+            textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
+          }}>
+            總計: 2,100
+          </Typography>
         </Box>
       </Paper>
     </Stack>
