@@ -260,7 +260,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
                 </Box>
                 <Box sx={{
                   width: '100%',
-                  bgcolor: 'rgba(0,0,0,0.05)',
+
                   height: 6,
                   borderRadius: 5,
                   mb: 2,
@@ -273,7 +273,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
                     left: 0,
                     height: '100%',
                     width: '100%',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
                     animation: 'shimmer 2s infinite',
                   },
                   '@keyframes shimmer': {
@@ -295,7 +294,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
         })()}
         <Box sx={{
           width: '100%',
-          bgcolor: 'rgba(0,0,0,0.05)',
           height: 6,
           borderRadius: 5,
           position: 'relative',
@@ -307,8 +305,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats }) => {
             left: 0,
             height: '100%',
             width: '100%',
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
-            animation: 'shimmer 2s infinite',
           }
         }}>
           <Box sx={{
