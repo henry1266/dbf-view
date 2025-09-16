@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { Grid, Box, CircularProgress } from '@mui/material';
+import { Grid, Box, CircularProgress, Paper, Typography } from '@mui/material';
 
 // 引入拆分後的組件
 import DashboardHeader from '../components/dashboard/DashboardHeader';
@@ -10,7 +10,7 @@ import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats } from '../services/api';
+import { fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
 
 /**
  * @function meta
@@ -42,6 +42,8 @@ export default function Dashboard() {
   const [totalA99, setTotalA99] = useState<number>(0);
   // 存儲 A99 欄位的分組統計數據
   const [a99GroupStats, setA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
+  // 存儲當日 A99 欄位的分組統計數據
+  const [dailyA99GroupStats, setDailyA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -96,6 +98,9 @@ export default function Dashboard() {
         // 獲取 A99 欄位的分組統計數據
         const a99Stats = await fetchA99GroupStats(start, end);
         
+        // 獲取當日 A99 欄位的分組統計數據
+        const dailyA99Stats = await fetchDailyA99GroupStats();
+        
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
         
@@ -134,6 +139,7 @@ export default function Dashboard() {
         setA99Count75(a99Count);
         setTotalA99(a99Total);
         setA99GroupStats(a99Stats);
+        setDailyA99GroupStats(dailyA99Stats);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -204,6 +210,187 @@ export default function Dashboard() {
                 initialMonth={selectedMonth}
               />
             )}
+          </Grid>
+          
+          {/* 右側當日 A99 金額面板 */}
+          <Grid sx={{ width: { xs: '100%', lg: '24%' }, p: 1 }}>
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                height: 250,
+                bgcolor: 'rgba(17, 34, 64, 0.6)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
+                borderRadius: 2,
+                position: 'relative',
+                overflow: 'hidden',
+                border: '1px solid rgba(100, 255, 218, 0.3)',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
+                  boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)'
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '10%',
+                  width: '80%',
+                  height: '1px',
+                  background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
+                  boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)'
+                }
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{
+                fontFamily: 'monospace',
+                letterSpacing: '0.05em',
+                fontSize: '0.9rem',
+                color: '#64ffda',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                textShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
+              }}>
+                <span>當日 A99 金額</span>
+                <Box component="span" sx={{
+                  fontSize: '0.7rem',
+                  color: '#64ffda',
+                  display: 'flex',
+                  alignItems: 'center',
+                  textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
+                }}>
+                  GROUP
+                </Box>
+              </Typography>
+              
+              {/* 動態生成當日 A99 分組數據 */}
+              {(() => {
+                // 獲取 valueGroups 中的所有條目
+                const entries = Object.entries(dailyA99GroupStats.valueGroups);
+                
+                // 計算總計金額
+                const totalSum = dailyA99GroupStats.totalSum || 1; // 避免除以0
+                
+                // 按乘積降序排序
+                const sortedEntries = entries
+                  .map(([value, count]) => ({
+                    value,
+                    count,
+                    product: Number(value) * count
+                  }))
+                  .sort((a, b) => b.product - a.product)
+                  .slice(0, 3); // 只取前三個最大值
+                
+                // 顏色配置
+                const colors = [
+                  { bg: 'rgba(64, 175, 255, 0.2)', color: '#40afff', barColor: 'primary.main', shadow: 'rgba(64, 175, 255, 0.5)' },
+                  { bg: 'rgba(100, 255, 218, 0.2)', color: '#64ffda', barColor: 'success.main', shadow: 'rgba(100, 255, 218, 0.5)' },
+                  { bg: 'rgba(255, 171, 64, 0.2)', color: '#ffab40', barColor: 'warning.main', shadow: 'rgba(255, 171, 64, 0.5)' }
+                ];
+                
+                return sortedEntries.map((entry, index) => {
+                  const { value, count, product } = entry;
+                  const percentage = (product / totalSum) * 100;
+                  const color = colors[index % colors.length];
+                  
+                  return (
+                    <React.Fragment key={value}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: index === 0 ? 1 : 0 }}>
+                        <Typography variant="body2" sx={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.8rem',
+                          color: '#e6f1ff',
+                          textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <Box component="span" sx={{
+                            fontSize: '0.7rem',
+                            bgcolor: color.bg,
+                            px: 0.6,
+                            py: 0.2,
+                            borderRadius: 0.8,
+                            color: color.color,
+                            mr: 0.5
+                          }}>
+                            {count}×
+                          </Box>
+                          {value}
+                        </Typography>
+                        <Typography variant="body2" sx={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.8rem',
+                          color: color.color,
+                          textShadow: `0 0 8px ${color.shadow}`
+                        }}>
+                          {product}
+                        </Typography>
+                      </Box>
+                      {/* 完全重新設計的長條圖 */}
+                      <Box sx={{
+                        width: '100%',
+                        mb: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1
+                      }}>
+                        {/* 長條和標籤 */}
+                        <Box sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
+                        }}>
+                          {/* 長條圖 */}
+                          <Box sx={{
+                            flex: 1,
+                            height: 5,
+                            bgcolor: '#1e293b',
+                            borderRadius: 1,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            border: '1px solid #334155'
+                          }}>
+                            <Box sx={{
+                              height: '100%',
+                              width: `${percentage}%`,
+                              bgcolor: index === 0 ? '#3b82f6' : index === 1 ? '#10b981' : '#f97316',
+                            }} />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </React.Fragment>
+                  );
+                });
+              })()}
+              {/* A99 總計 */}
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                mt: 2,
+                borderTop: '1px solid rgba(64, 175, 255, 0.2)',
+                pt: 1
+              }}>
+                <Typography variant="body2" sx={{
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(90deg, #40afff, #64ffda)',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
+                }}>
+                  總計: {dailyA99GroupStats.totalSum.toLocaleString()}
+                </Typography>
+              </Box>
+            </Paper>
           </Grid>
         </Grid>
       </TechBackground>

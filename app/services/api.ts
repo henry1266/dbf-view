@@ -496,4 +496,30 @@ export const fetchA99GroupStats = async (startDate = '', endDate = '') => {
   }
 };
 
+/**
+ * @function fetchDailyA99GroupStats
+ * @description 獲取 CO03L.DBF 中當日 A99 欄位的分組統計數據
+ * @returns {Promise<{totalSum: number, valueGroups: Record<string, number>}>} 當日 A99 欄位的分組統計數據
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const stats = await fetchDailyA99GroupStats();
+ * console.log(stats); // { totalSum: 1234, valueGroups: { '10': 7, '20': 4, '15': 3 } }
+ */
+export const fetchDailyA99GroupStats = async () => {
+  try {
+    // 獲取當日日期（民國年格式）
+    const now = new Date();
+    const year = now.getFullYear() - 1911; // 西元年轉民國年
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const today = `${year}${month}${day}`;
+    
+    // 使用當日日期作為開始和結束日期
+    return fetchA99GroupStats(today, today);
+  } catch (error) {
+    console.error('Error fetching daily A99 group stats:', error);
+    throw error;
+  }
+};
+
 export default api;
