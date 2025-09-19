@@ -38,7 +38,7 @@ export default function KcstmrQuery() {
   // 設置各檔案的優先顯示欄位
   const priorityFieldsByFile: Record<string, string[]> = {
     'CO02P.DBF': ['KCSTMR', 'PDATE', 'PTIME', 'PLM', 'PRMK', 'KDRUG', 'PTQTY', 'PPR'],
-    'CO03L.DBF': ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'],
+    'CO03L.DBF': ['KCSTMR', 'LNAME', 'DATE', 'TIME', 'LPID', 'LISRS', 'LCS', 'DAYQTY', 'LDRU', 'LLDCN', 'LLDTT', 'A2', 'A99', 'TOT'],
   };
 
   useEffect(() => {

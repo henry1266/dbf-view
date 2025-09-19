@@ -99,7 +99,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(100, 255, 218, 0.6)',
         }}>
-          處方瀏覽器
+          藥局處方瀏覽器
         </Typography>
       </Box>
 

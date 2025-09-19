@@ -71,7 +71,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
         }}>
           <span>當月 A99 金額</span>
           <Box component="span" sx={{
-            fontSize: '0.7rem',
+            fontSize: '0.9rem',
             color: '#64ffda',
             display: 'flex',
             alignItems: 'center',
@@ -116,14 +116,14 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: index === 0 ? 1 : 0 }}>
                   <Typography variant="body2" sx={{
                     fontFamily: 'monospace',
-                    fontSize: '0.8rem',
+                    fontSize: '0.9rem',
                     color: '#e6f1ff',
                     textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                     display: 'flex',
                     alignItems: 'center'
                   }}>
                     <Box component="span" sx={{
-                      fontSize: '0.7rem',
+                      fontSize: '0.9rem',
                       bgcolor: color.bg,
                       px: 0.6,
                       py: 0.2,
@@ -137,7 +137,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                   </Typography>
                   <Typography variant="body2" sx={{
                     fontFamily: 'monospace',
-                    fontSize: '0.8rem',
+                    fontSize: '0.9rem',
                     color: color.color,
                     textShadow: `0 0 8px ${color.shadow}`
                   }}>
@@ -190,7 +190,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
         }}>
           <Typography variant="body2" sx={{
             fontFamily: 'monospace',
-            fontSize: '0.9rem',
+            fontSize: '1rem',
             fontWeight: 'bold',
             background: 'linear-gradient(90deg, #40afff, #64ffda)',
             backgroundClip: 'text',
