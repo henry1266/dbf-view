@@ -5,7 +5,7 @@ const API_HOST = import.meta.env.VITE_API_HOST || '192.168.68.90';
 const API_PORT = import.meta.env.VITE_API_PORT || '7001';
 
 // 始終使用絕對 URL
-const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api`;
+export const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api`;
 
 // 輸出調試信息
 console.log('API 設置:', {

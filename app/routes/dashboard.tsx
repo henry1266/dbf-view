@@ -10,7 +10,7 @@ import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
+import { API_BASE_URL, fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
 
 /**
  * @function meta
@@ -51,6 +51,41 @@ export default function Dashboard() {
   // 當前選擇的年份和月份
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [refreshVersion, setRefreshVersion] = useState<number>(0);
+
+  // 監聽 MongoDB Change Streams 推播，於資料異動時刷新儀表板
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const eventsUrl = `${API_BASE_URL}/stream/dashboard`;
+    const eventSource = new EventSource(eventsUrl);
+
+    const handleChange = (event: MessageEvent) => {
+      try {
+        const payload = JSON.parse(event.data ?? '{}') as { collection?: string };
+        const changedCollection = payload.collection?.toLowerCase();
+
+        if (changedCollection === 'co03l') {
+          setRefreshVersion((prev) => prev + 1);
+        }
+      } catch (err) {
+        console.error('處理儀表板 SSE 資料時發生錯誤:', err);
+      }
+    };
+
+    const listener = (event: Event) => handleChange(event as MessageEvent);
+    eventSource.addEventListener('change', listener);
+    eventSource.onerror = (event) => {
+      console.error('儀表板 SSE 連線發生錯誤:', event);
+    };
+
+    return () => {
+      eventSource.removeEventListener('change', listener);
+      eventSource.close();
+    };
+  }, []);
 
   // 獲取指定月份的第一天和最後一天（民國年格式）
   const getMonthRange = (year: number = new Date().getFullYear(), month: number = new Date().getMonth() + 1): { start: string, end: string } => {
@@ -60,14 +95,14 @@ export default function Dashboard() {
     const firstDayMonth = (firstDay.getMonth() + 1).toString().padStart(2, '0');
     const firstDayDate = firstDay.getDate().toString().padStart(2, '0');
     const firstDayStr = `${firstDayYear}${firstDayMonth}${firstDayDate}`;
-    
+
     // 指定月份的最後一天
     const lastDay = new Date(year, month, 0); // 下個月的第0天就是當月的最後一天
     const lastDayYear = lastDay.getFullYear() - 1911; // 西元年轉民國年
     const lastDayMonth = (lastDay.getMonth() + 1).toString().padStart(2, '0');
     const lastDayDate = lastDay.getDate().toString().padStart(2, '0');
     const lastDayStr = `${lastDayYear}${lastDayMonth}${lastDayDate}`;
-    
+
     return { start: firstDayStr, end: lastDayStr };
   };
 
@@ -79,40 +114,42 @@ export default function Dashboard() {
 
   // 在組件加載時或月份變化時獲取數據
   useEffect(() => {
+    let isActive = true;
+
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // 獲取選擇的月份日期範圍
         const { start, end } = getMonthRange(selectedYear, selectedMonth);
-        
+
         // 獲取 LDRU=I 的每日數量數據
         const data = await fetchLdruICountsByDate(start, end);
-        
+
         // 獲取 A99 欄位為 75 的數量
         const a99Count = await fetchA99Count75(start, end);
-        
+
         // 獲取 A99 欄位的總和
         const a99Total = await fetchA99Total(start, end);
-        
+
         // 獲取 A99 欄位的分組統計數據
         const a99Stats = await fetchA99GroupStats(start, end);
-        
+
         // 獲取當日 A99 欄位的分組統計數據
         const dailyA99Stats = await fetchDailyA99GroupStats();
-        
+
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
-        
+
         // 計算當週 LDRU=I 的總數
         const now = new Date();
         const currentDay = now.getDay(); // 0 是星期日，1 是星期一，以此類推
         const firstDayOfWeek = new Date(now);
         firstDayOfWeek.setDate(now.getDate() - currentDay); // 設置為本週的星期日
-        
+
         const lastDayOfWeek = new Date(firstDayOfWeek);
         lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6); // 設置為本週的星期六
-        
+
         // 將日期轉換為民國年格式 (YYYMMDD)
         const formatToMinguoDate = (date: Date): string => {
           const year = date.getFullYear() - 1911; // 西元年轉民國年
@@ -120,10 +157,10 @@ export default function Dashboard() {
           const day = date.getDate().toString().padStart(2, '0');
           return `${year}${month}${day}`;
         };
-        
+
         const firstDayStr = formatToMinguoDate(firstDayOfWeek);
         const lastDayStr = formatToMinguoDate(lastDayOfWeek);
-        
+
         // 計算當週的 LDRU=I 總數
         let weeklyTotal = 0;
         Object.entries(data).forEach(([date, count]) => {
@@ -132,7 +169,11 @@ export default function Dashboard() {
             weeklyTotal += count;
           }
         });
-        
+
+        if (!isActive) {
+          return;
+        }
+
         setLdruICounts(data);
         setTotalLdruI(total);
         setWeeklyLdruI(weeklyTotal);
@@ -143,21 +184,29 @@ export default function Dashboard() {
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
-        setError('無法獲取 LDRU=I 每日數量數據');
+        if (isActive) {
+          setError('無法獲取 LDRU=I 每日數量數據');
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchData();
-  }, [selectedYear, selectedMonth]);
+    void fetchData();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedYear, selectedMonth, refreshVersion]);
 
   return (
     <Layout title="科技儀表板">
       <TechBackground>
         {/* 頂部標題 */}
         <DashboardHeader />
-        
+
         {/* 頂部統計卡片 */}
         <StatisticsCards
           totalLdruI={totalLdruI}
@@ -211,7 +260,7 @@ export default function Dashboard() {
               />
             )}
           </Grid>
-          
+
           {/* 右側當日 A99 金額面板 */}
           <Grid sx={{ width: { xs: '100%', lg: '24%' }, p: 1 }}>
             <Paper
@@ -270,15 +319,15 @@ export default function Dashboard() {
                   GROUP
                 </Box>
               </Typography>
-              
+
               {/* 動態生成當日 A99 分組數據 */}
               {(() => {
                 // 獲取 valueGroups 中的所有條目
                 const entries = Object.entries(dailyA99GroupStats.valueGroups);
-                
+
                 // 計算總計金額
                 const totalSum = dailyA99GroupStats.totalSum || 1; // 避免除以0
-                
+
                 // 按乘積降序排序
                 const sortedEntries = entries
                   .map(([value, count]) => ({
@@ -288,19 +337,19 @@ export default function Dashboard() {
                   }))
                   .sort((a, b) => b.product - a.product)
                   .slice(0, 3); // 只取前三個最大值
-                
+
                 // 顏色配置
                 const colors = [
                   { bg: 'rgba(64, 175, 255, 0.2)', color: '#40afff', barColor: 'primary.main', shadow: 'rgba(64, 175, 255, 0.5)' },
                   { bg: 'rgba(100, 255, 218, 0.2)', color: '#64ffda', barColor: 'success.main', shadow: 'rgba(100, 255, 218, 0.5)' },
                   { bg: 'rgba(255, 171, 64, 0.2)', color: '#ffab40', barColor: 'warning.main', shadow: 'rgba(255, 171, 64, 0.5)' }
                 ];
-                
+
                 return sortedEntries.map((entry, index) => {
                   const { value, count, product } = entry;
                   const percentage = (product / totalSum) * 100;
                   const color = colors[index % colors.length];
-                  
+
                   return (
                     <React.Fragment key={value}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: index === 0 ? 1 : 0 }}>
