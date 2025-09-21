@@ -504,4 +504,45 @@ router.get('/:fileName/:recordNo', async (req: Request, res: Response) => {
   }
 });
 
+
+
+router.delete('/:fileName/:recordNo', async (req: Request, res: Response) => {
+  const { fileName, recordNo } = req.params;
+
+  try {
+    await connect();
+
+    const baseName = path.basename(fileName, path.extname(fileName)).toLowerCase();
+    const collection = getCollection(baseName);
+
+    if (!collection) {
+      return res.status(404).json({ error: `Collection for ${fileName} not found` });
+    }
+
+    const recordNumber = parseInt(recordNo, 10);
+
+    if (Number.isNaN(recordNumber)) {
+      return res.status(400).json({ error: 'Invalid record number format' });
+    }
+
+    const record = await collection.findOne({ _recordNo: recordNumber });
+
+    if (!record) {
+      return res.status(404).json({ error: `Record ${recordNo} for ${fileName} not found` });
+    }
+
+    const deleteFilter = record._id ? { _id: record._id } : { _recordNo: recordNumber };
+    const deleteResult = await collection.deleteOne(deleteFilter);
+
+    if (deleteResult.deletedCount === 0) {
+      return res.status(500).json({ error: `Failed to delete ${fileName} record #${recordNo}` });
+    }
+
+    return res.json({ deleted: true, recordNo: recordNumber });
+  } catch (err) {
+    console.error(`Error deleting ${fileName} record #${recordNo}:`, err);
+    return res.status(500).json({ error: `Failed to delete ${fileName} record #${recordNo}` });
+  }
+});
+
 export default router;
