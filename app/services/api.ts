@@ -143,6 +143,24 @@ export const fetchKcstmrRecords = async (value: string) => {
 };
 
 /**
+ * @function fetchMpersonidRecords
+ * @description 依據 MPERSONID 查詢 CO01M.DBF 病患資料
+ * @param {string} value - 查詢值
+ * @returns {Promise<any>} 查詢結果
+ * @throws {Error} 若 API 請求失敗時拋出錯誤
+ */
+export const fetchMpersonidRecords = async (value: string) => {
+  try {
+    const encodedValue = encodeURIComponent(value);
+    const response = await api.get(`/MPERSONID/${encodedValue}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching MPERSONID=${value} records:`, error);
+    throw error;
+  }
+};
+
+/**
  * @function fetchKdrugRecords
  * @description 執行 KDRUG 查詢，根據指定值和日期範圍獲取相關記錄
  * @param {string} value - 查詢值

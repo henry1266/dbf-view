@@ -17,6 +17,7 @@ import dbfRecordsRouter from './src/routes/dbf-records';
 import dbfMatchRouter from './src/routes/dbf-match';
 import kcstmrRouter from './src/routes/kcstmr';
 import kdrugRouter from './src/routes/kdrug';
+import mpersonidRouter from './src/routes/mpersonid';
 import { saveWhiteboard, loadWhiteboard, deleteWhiteboard, getWhiteboards } from './src/routes/whiteboard';
 
 // 引入資料庫連線
@@ -51,6 +52,7 @@ app.use('/api/dbf', dbfRecordsRouter);
 app.use('/api/dbf-match', dbfMatchRouter);
 app.use('/api/KCSTMR', kcstmrRouter);
 app.use('/api/KDRUG', kdrugRouter);
+app.use('/api/MPERSONID', mpersonidRouter);
 
 // 白板管理路由
 app.post('/api/whiteboard', saveWhiteboard);

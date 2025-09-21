@@ -184,6 +184,35 @@ export function getColumns(priorityFields: string[], availableFields: string[], 
         },
       };
     }
+    if (field === 'MPERSONID') {
+      return {
+        id: field,
+        label: field,
+        align: 'left' as const,
+        minWidth: minWidth,
+        format: (value: any, record?: DbfRecord) => {
+          const mpersonidValue = record?.data?.MPERSONID ?? value;
+          if (!mpersonidValue) {
+            return '';
+          }
+          const displayValue = String(mpersonidValue).trim();
+          if (!displayValue) {
+            return '';
+          }
+          return React.createElement(
+            Link,
+            {
+              to: `/mpersonid/${encodeURIComponent(displayValue)}`,
+              style: {
+                color: '#64ffda',
+                textDecoration: 'none',
+              },
+            },
+            displayValue
+          );
+        },
+      };
+    }
     return {
       id: field,
       label: field,

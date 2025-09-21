@@ -35,6 +35,10 @@ export default [
     file: "routes/kcstmr.$value.tsx"
   },
   {
+    path: "/mpersonid/:value",
+    file: "routes/mpersonid.$value.tsx"
+  },
+  {
     path: "/kdrug/:value",
     file: "routes/kdrug.$value.tsx"
   },

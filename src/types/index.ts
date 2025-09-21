@@ -92,6 +92,17 @@ export interface KcstmrResponse {
 }
 
 /**
+ * @interface MpersonidResponse
+ * @description MPERSONID查詢結果
+ */
+export interface MpersonidResponse {
+  mpersonidValue: string;
+  records: DbfRecord[];
+  totalRecords: number;
+  uniqueKcstmrValues: string[];
+}
+
+/**
  * @interface KdrugResponse
  * @description KDRUG查詢回應
  */
