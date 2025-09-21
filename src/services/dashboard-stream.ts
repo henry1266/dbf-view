@@ -26,8 +26,14 @@ interface DashboardClient {
 
 const KEEP_ALIVE_INTERVAL = 25_000; // 25 秒傳送一次心跳，避免連線中斷
 const RESTART_DELAY = 3_000; // Change Stream 發生錯誤時的重新連線延遲
+const BROADCAST_DEBOUNCE_MS = Math.max(
+  0,
+  Number.parseInt(process.env.DASHBOARD_STREAM_DEBOUNCE_MS ?? '2000', 10) || 2000
+); // Minimum interval between dashboard stream broadcasts (ms)
 
 const clients = new Map<number, DashboardClient>();
+const pendingBroadcasts = new Map<string, DashboardChangePayload>();
+const broadcastTimers = new Map<string, NodeJS.Timeout>();
 let nextClientId = 1;
 
 let changeStream: ChangeStream | null = null;
@@ -36,6 +42,10 @@ let streamInitPromise: Promise<void> | null = null;
 let restartTimer: NodeJS.Timeout | null = null;
 
 function broadcast(payload: DashboardChangePayload): void {
+  if (clients.size === 0) {
+    return;
+  }
+
   const serialized = `event: change\ndata: ${JSON.stringify(payload)}\n\n`;
 
   for (const [clientId, client] of clients.entries()) {
@@ -46,6 +56,46 @@ function broadcast(payload: DashboardChangePayload): void {
       removeClient(clientId);
     }
   }
+}
+
+function clearBroadcastQueue(): void {
+  for (const timer of broadcastTimers.values()) {
+    clearTimeout(timer);
+  }
+
+  broadcastTimers.clear();
+  pendingBroadcasts.clear();
+}
+
+function queueBroadcast(payload: DashboardChangePayload): void {
+  if (clients.size === 0) {
+    return;
+  }
+
+  if (BROADCAST_DEBOUNCE_MS === 0) {
+    broadcast(payload);
+    return;
+  }
+
+  const key = payload.fullCollection || payload.collection;
+  pendingBroadcasts.set(key, payload);
+
+  if (broadcastTimers.has(key)) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    broadcastTimers.delete(key);
+
+    const latestPayload = pendingBroadcasts.get(key);
+    pendingBroadcasts.delete(key);
+
+    if (latestPayload) {
+      broadcast(latestPayload);
+    }
+  }, BROADCAST_DEBOUNCE_MS);
+
+  broadcastTimers.set(key, timer);
 }
 
 function sendHeartbeat(client: DashboardClient): void {
@@ -63,6 +113,10 @@ function removeClient(clientId: number): void {
 
   clearInterval(client.keepAliveTimer);
   clients.delete(clientId);
+
+  if (clients.size === 0) {
+    clearBroadcastQueue();
+  }
 }
 
 function scheduleStreamRestart(): void {
@@ -91,7 +145,7 @@ function handleChangeEvent(change: ChangeStreamDocument<Document>): void {
     fullCollection: fullCollection.toLowerCase()
   };
 
-  broadcast(payload);
+  queueBroadcast(payload);
 }
 
 async function openChangeStream(shouldResume: boolean): Promise<void> {
@@ -146,6 +200,7 @@ async function closeChangeStream(): Promise<void> {
     console.error('Failed to close dashboard change stream:', err);
   } finally {
     changeStream = null;
+    clearBroadcastQueue();
   }
 }
 
