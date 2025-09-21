@@ -455,6 +455,28 @@ export const deleteWhiteboard = async (recordId: string) => {
 };
 
 /**
+ * @function deleteDbfRecord
+ * @description 刪除特定 DBF 檔案中的特定記錄
+ * @param {string} fileName - DBF 檔案名稱
+ * @param {number} recordNo - 記錄編號
+ * @returns {Promise<any>} 刪除結果
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const result = await deleteDbfRecord('CO03L.DBF', 123);
+ * console.log(result); // 刪除結果
+ */
+export const deleteDbfRecord = async (fileName: string, recordNo: number) => {
+  try {
+    const encodedFileName = encodeURIComponent(fileName);
+    const response = await api.delete(`/dbf/${encodedFileName}/${recordNo}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting ${fileName} record #${recordNo}:`, error);
+    throw error;
+  }
+};
+
+/**
  * @function fetchA99GroupStats
  * @description 獲取 CO03L.DBF 中 A99 欄位的分組統計數據
  * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)

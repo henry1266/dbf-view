@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
-import { fetchDbfRecord, fetchMatchingCO02PRecords, saveWhiteboard, loadWhiteboard } from '../services/api';
+import { fetchDbfRecord, fetchMatchingCO02PRecords, saveWhiteboard, loadWhiteboard, deleteDbfRecord } from '../services/api';
 import axios from 'axios';
 import {
   Box,
@@ -47,6 +47,8 @@ export default function DbfRecordDetail() {
   const [textNote, setTextNote] = useState('');
   const [loadingTextNote, setLoadingTextNote] = useState(false);
   const [openNoteDialog, setOpenNoteDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   
 
   // 生成檔案列表的完整路徑，包含必要的查詢參數
@@ -168,6 +170,36 @@ export default function DbfRecordDetail() {
   // 處理關閉筆記編輯對話框
   const handleCloseNoteDialog = () => {
     setOpenNoteDialog(false);
+  };
+
+  // 處理打開刪除確認對話框
+  const handleOpenDeleteDialog = () => {
+    setOpenDeleteDialog(true);
+  };
+
+  // 處理關閉刪除確認對話框
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  // 處理確認刪除記錄
+  const handleConfirmDelete = async () => {
+    if (!fileName || !recordNo) return;
+
+    try {
+      setDeleting(true);
+      await deleteDbfRecord(fileName, parseInt(recordNo));
+
+      // 刪除成功後關閉對話框並跳轉到檔案列表頁面
+      setOpenDeleteDialog(false);
+      alert('記錄已成功刪除！');
+      window.location.href = getFileListPath(fileName);
+    } catch (error) {
+      console.error('刪除記錄失敗:', error);
+      alert('刪除失敗，請稍後再試。');
+    } finally {
+      setDeleting(false);
+    }
   };
   
   // 獲取筆記摘要（顯示前100個字符）
@@ -291,6 +323,38 @@ export default function DbfRecordDetail() {
               { label: `記錄 #${recordNo}`, icon: '🔍' }
             ]}
           />
+
+          {/* 刪除按鈕 - 所有記錄都顯示 */}
+          {!loading && record && (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleOpenDeleteDialog}
+              disabled={deleting}
+              sx={{
+                position: 'absolute',
+                right: fileName?.toUpperCase() === 'CO03L.DBF' && isPediatricMedication() ? '140px' : '20px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontFamily: 'monospace',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #d32f2f, #f44336)',
+                border: '1px solid rgba(244, 67, 54, 0.3)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #b71c1c, #d32f2f)',
+                  boxShadow: '0 0 15px rgba(211, 47, 47, 0.5)',
+                },
+                '&:disabled': {
+                  background: 'rgba(211, 47, 47, 0.5)',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                }
+              }}
+            >
+              {deleting ? '刪除中...' : '🗑️ 刪除'}
+            </Button>
+          )}
 
           {/* 批次列印按鈕 - 僅在CO03L.DBF且A99=65或70時顯示 */}
           {!loading && record && fileName?.toUpperCase() === 'CO03L.DBF' && isPediatricMedication() && (
@@ -565,6 +629,87 @@ export default function DbfRecordDetail() {
                           }}
                         >
                           儲存筆記
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+
+                    {/* 刪除確認對話框 */}
+                    <Dialog
+                      open={openDeleteDialog}
+                      onClose={handleCloseDeleteDialog}
+                      maxWidth="sm"
+                      fullWidth
+                      PaperProps={{
+                        sx: {
+                          bgcolor: 'rgba(17, 34, 64, 0.95)',
+                          backdropFilter: 'blur(8px)',
+                          border: '1px solid rgba(244, 67, 54, 0.3)',
+                          boxShadow: '0 4px 30px rgba(211, 47, 47, 0.3)',
+                        }
+                      }}
+                    >
+                      <DialogTitle sx={{
+                        color: '#ffcccc',
+                        fontFamily: 'monospace',
+                        borderBottom: '1px solid rgba(244, 67, 54, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}>
+                        <span>⚠️</span>
+                        確認刪除記錄
+                      </DialogTitle>
+                      <DialogContent sx={{ mt: 2 }}>
+                        <Box sx={{ color: '#e6f1ff', fontSize: '0.9rem' }}>
+                          <p>您確定要刪除以下記錄嗎？</p>
+                          <Box sx={{
+                            bgcolor: 'rgba(244, 67, 54, 0.1)',
+                            p: 2,
+                            borderRadius: 1,
+                            border: '1px solid rgba(244, 67, 54, 0.3)',
+                            mt: 2
+                          }}>
+                            <strong>檔案：</strong>{fileName}<br />
+                            <strong>記錄編號：</strong>#{recordNo}<br />
+                            {record?.data?.KCSTMR && <><strong>客戶編號：</strong>{record.data.KCSTMR}<br /></>}
+                            {record?.data?.LNAME && <><strong>姓名：</strong>{record.data.LNAME}<br /></>}
+                          </Box>
+                          <p style={{ color: '#ff9999', marginTop: '16px', fontSize: '0.8rem' }}>
+                            ⚠️ 此操作無法撤銷，刪除後的資料將永久遺失。
+                          </p>
+                        </Box>
+                      </DialogContent>
+                      <DialogActions sx={{ borderTop: '1px solid rgba(244, 67, 54, 0.3)' }}>
+                        <Button
+                          onClick={handleCloseDeleteDialog}
+                          disabled={deleting}
+                          sx={{
+                            color: '#e6f1ff',
+                            '&:hover': {
+                              bgcolor: 'rgba(230, 241, 255, 0.1)',
+                            },
+                          }}
+                        >
+                          取消
+                        </Button>
+                        <Button
+                          onClick={handleConfirmDelete}
+                          disabled={deleting}
+                          variant="contained"
+                          sx={{
+                            bgcolor: 'rgba(244, 67, 54, 0.2)',
+                            color: '#ffcccc',
+                            '&:hover': {
+                              bgcolor: 'rgba(244, 67, 54, 0.3)',
+                            },
+                            '&:disabled': {
+                              bgcolor: 'rgba(244, 67, 54, 0.1)',
+                              color: 'rgba(255, 204, 204, 0.5)',
+                            },
+                            fontFamily: 'monospace',
+                          }}
+                        >
+                          {deleting ? '刪除中...' : '確認刪除'}
                         </Button>
                       </DialogActions>
                     </Dialog>
