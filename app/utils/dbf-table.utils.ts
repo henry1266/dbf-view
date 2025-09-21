@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { Column, DbfRecord } from '../types/dbf.types';
 import CO09DFieldsForCO02P from '../components/dbf/CO09DFieldsForCO02P';
 
@@ -154,6 +155,35 @@ export function getColumns(priorityFields: string[], availableFields: string[], 
       };
     }
     
+    if (field === 'KCSTMR') {
+      return {
+        id: field,
+        label: field,
+        align: 'left' as const,
+        minWidth: minWidth,
+        format: (value: any, record?: DbfRecord) => {
+          const kcstmrValue = record?.data?.KCSTMR ?? value;
+          if (!kcstmrValue) {
+            return '';
+          }
+          const displayValue = String(kcstmrValue).trim();
+          if (!displayValue) {
+            return '';
+          }
+          return React.createElement(
+            Link,
+            {
+              to: `/kcstmr/${encodeURIComponent(displayValue)}`,
+              style: {
+                color: '#64ffda',
+                textDecoration: 'none',
+              },
+            },
+            displayValue
+          );
+        },
+      };
+    }
     return {
       id: field,
       label: field,

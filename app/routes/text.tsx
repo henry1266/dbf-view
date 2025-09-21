@@ -5,7 +5,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import { FloatingMenu, BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import DragHandle from '@tiptap/extension-drag-handle';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 
 export function meta() {
