@@ -6,13 +6,19 @@ import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import MedicationIcon from '@mui/icons-material/Medication';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { searchCO01MRecords } from '../services/api';
+import { searchCO01MRecords, fetchDbfRecords } from '../services/api';
 
 interface PatientRecord {
   KCSTMR: string;
   MNAME: string;
   MBIRTHDT: string;
   MPERSONID: string;
+}
+
+interface DrugRecord {
+  DNO: string;
+  DDESC: string;
+  KDRUG: string;
 }
 
 export function meta() {
@@ -26,6 +32,12 @@ export default function Search() {
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 藥品搜索相關狀態
+  const [drugSearchResults, setDrugSearchResults] = useState<DrugRecord[]>([]);
+  const [showDrugResults, setShowDrugResults] = useState(false);
+  const [isDrugLoading, setIsDrugLoading] = useState(false);
+  const [drugError, setDrugError] = useState<string | null>(null);
 
   const handleMultiConditionSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,22 +84,85 @@ if (!name && !birthDate && !mpersonid) {
     window.location.href = `/kcstmr/${record.KCSTMR}`;
   };
 
+  const handleMultiConditionDrugSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const drugCode = formData.get('drugCode')?.toString().trim() || '';
+    const drugName = formData.get('drugName')?.toString().trim() || '';
+
+    if (!drugCode && !drugName) {
+      alert('請至少輸入藥品編號或藥品名稱其中一個條件');
+      return;
+    }
+
+    setIsDrugLoading(true);
+    setDrugError(null);
+
+    try {
+      // 使用 fetchDbfRecords 查詢 CO09D.DBF
+      const result = await fetchDbfRecords(
+        'CO09D.DBF',
+        1,
+        100,
+        drugCode || drugName,
+        drugCode ? 'DNO' : 'DDESC',
+        'DNO',
+        'asc'
+      );
+
+      const records = result.records || [];
+
+      // 如果同時提供了藥品編號和藥品名稱，需要在前端進行額外的過濾
+      let filteredRecords = records;
+
+      if (drugCode && drugName) {
+        filteredRecords = records.filter((record: any) => {
+          const recordDrugCode = record.data.DNO || '';
+          const recordDrugName = record.data.DDESC || '';
+          const codeMatch = recordDrugCode.indexOf(drugCode) !== -1;
+          const nameMatch = recordDrugName.indexOf(drugName) !== -1;
+          return codeMatch && nameMatch;
+        });
+      } else if (drugCode) {
+        filteredRecords = records.filter((record: any) => {
+          const recordDrugCode = record.data.DNO || '';
+          return recordDrugCode.indexOf(drugCode) !== -1;
+        });
+      } else if (drugName) {
+        filteredRecords = records.filter((record: any) => {
+          const recordDrugName = record.data.DDESC || '';
+          return recordDrugName.indexOf(drugName) !== -1;
+        });
+      }
+
+      // 轉換為 DrugRecord 格式
+      const drugResults: DrugRecord[] = filteredRecords.map((record: any) => ({
+        DNO: record.data.DNO || '',
+        DDESC: record.data.DDESC || '',
+        KDRUG: record.data.KDRUG || ''
+      }));
+
+      setDrugSearchResults(drugResults);
+      setShowDrugResults(true);
+    } catch (error) {
+      console.error('藥品搜索失敗:', error);
+      setDrugError('藥品搜索過程中發生錯誤，請稍後再試');
+      setDrugSearchResults([]);
+      setShowDrugResults(true);
+    } finally {
+      setIsDrugLoading(false);
+    }
+  };
+
+  const handleSelectDrugRecord = (record: DrugRecord) => {
+    // 直接跳轉到 KDRUG 頁面
+    window.location.href = `/kdrug/${record.KDRUG}`;
+  };
+
   return (
     <Layout title="處方查詢系統">
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" component="h1" sx={{ 
-          mb: 2, 
-          fontWeight: 'bold',
-          color: '#0a192f',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}>
-          <SearchIcon /> 處方查詢
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#8892b0', mb: 4 }}>
-          使用以下選項查詢處方記錄，您可以通過 KCSTMR 查詢客戶處方或通過 KDRUG 查詢藥品處方。
-        </Typography>
 
         <Grid container spacing={3}>
           <Grid>
@@ -298,9 +373,54 @@ if (!name && !birthDate && !mpersonid) {
                   KDRUG 藥品查詢
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: '#8892b0', mb: 3 }}>
-                使用 KDRUG 值查詢相關的記錄，查看特定藥品的所有處方記錄。
-              </Typography>
+
+
+
+              {/* 多條件藥品搜索表單 */}
+              <form onSubmit={handleMultiConditionDrugSearch} className="flex flex-col space-y-3 mb-4">
+                <TextField
+                  name="drugCode"
+                  label="健保碼"
+                  placeholder="健保碼 (例如: AC479811G0)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                />
+                <TextField
+                  name="drugName"
+                  label="藥品名稱"
+                  placeholder="藥品名稱 (可輸入部分名稱，例如: 史蒂諾斯)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={isDrugLoading}
+                  sx={{
+                    backgroundColor: isDrugLoading ? '#9ca3af' : '#8b5cf6',
+                    '&:hover': isDrugLoading ? {} : { backgroundColor: '#7c3aed' },
+                    color: 'white',
+                    fontWeight: 'medium',
+                    py: 1.5
+                  }}
+                  fullWidth
+                >
+                  {isDrugLoading ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                      搜索中...
+                    </>
+                  ) : (
+                    '多條件查詢'
+                  )}
+                </Button>
+              </form>
+
+              <Divider sx={{ my: 2 }}>或</Divider>
+
+              {/* 直接 KDRUG 查詢表單 */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -311,49 +431,89 @@ if (!name && !birthDate && !mpersonid) {
                 }}
                 className="flex flex-col space-y-3"
               >
-                <input
-                  type="text"
+                <TextField
                   name="kdrugValue"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  label="KDRUG 值"
                   placeholder="輸入 KDRUG 值 (例如: ME500)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
                   required
                 />
-                <button
+                <Button
                   type="submit"
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#8b5cf6',
+                    '&:hover': { backgroundColor: '#7c3aed' },
+                    color: 'white',
+                    fontWeight: 'medium',
+                    py: 1.5
+                  }}
+                  fullWidth
                 >
-                  查詢
-                </button>
+                  直接查詢
+                </Button>
               </form>
+
+              {/* 藥品搜索結果顯示區域 */}
+              {showDrugResults && (
+                <Box sx={{ mt: 3, p: 2, backgroundColor: '#faf5ff', borderRadius: 1 }}>
+                  <Typography variant="h6" sx={{ mb: 2, color: '#7c3aed' }}>
+                    藥品搜索結果 ({drugSearchResults.length} 筆記錄)
+                  </Typography>
+
+                  {drugError ? (
+                    <Typography variant="body2" sx={{ color: '#ef4444', mb: 2 }}>
+                      {drugError}
+                    </Typography>
+                  ) : drugSearchResults.length === 0 ? (
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                      沒有找到符合條件的藥品記錄
+                    </Typography>
+                  ) : (
+                    <List>
+                      {drugSearchResults.map((record, index) => (
+                        <ListItem
+                          key={index}
+                          sx={{
+                            mb: 1,
+                            backgroundColor: 'white',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: 1,
+                            cursor: 'pointer',
+                            '&:hover': { backgroundColor: '#f3e8ff', borderColor: '#8b5cf6' }
+                          }}
+                          onClick={() => handleSelectDrugRecord(record)}
+                        >
+                          <ListItemText
+                            primary={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                  {record.DDESC}
+                                </Typography>
+                                <CheckCircleIcon sx={{ color: '#8b5cf6', fontSize: 20 }} />
+                              </Box>
+                            }
+                            secondary={
+                              <Typography variant="body2" sx={{ color: '#64748b' }}>
+                                DNO: {record.DNO} | KDRUG: {record.KDRUG}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+
+                  <Typography variant="body2" sx={{ mt: 2, color: '#64748b', fontStyle: 'italic' }}>
+                    點擊任一藥品記錄即可直接查看詳情
+                  </Typography>
+                </Box>
+              )}
             </Paper>
           </Grid>
         </Grid>
-      </Box>
-
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h6" component="h2" sx={{ 
-          mb: 2, 
-          fontWeight: 'bold',
-          color: '#0a192f',
-        }}>
-          其他查詢選項
-        </Typography>
-        <Paper sx={{
-          p: 3,
-          borderRadius: 2,
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-          background: 'linear-gradient(145deg, #ffffff, #f5f5f5)',
-        }}>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            您也可以瀏覽所有可用的 DBF 檔案，並查看每個檔案的記錄。
-          </Typography>
-          <Link
-            to="/dbf-files"
-            className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
-          >
-            查看 DBF 檔案
-          </Link>
-        </Paper>
       </Box>
     </Layout>
   );
