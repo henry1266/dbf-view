@@ -562,4 +562,90 @@ export const fetchDailyA99GroupStats = async () => {
   }
 };
 
+/**
+ * @function searchCO01MRecords
+ * @description 根據姓名、生日和 MPERSONID 搜索 CO01M.DBF 中的記錄
+ * @param {string} [name=''] - 患者姓名（支持部分匹配）
+ * @param {string} [birthDate=''] - 生日（支持部分匹配）
+ * @param {string} [mpersonid=''] - MPERSONID（支持部分匹配）
+ * @returns {Promise<Array<any>>} 包含匹配記錄的數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const records = await searchCO01MRecords('陳', '1985', 'A123456789');
+ * console.log(records); // 匹配的記錄數組
+ */
+export const searchCO01MRecords = async (name = '', birthDate = '', mpersonid = '') => {
+  try {
+    const response = await api.get('/dbf/CO01M.DBF', {
+      params: {
+        page: 1,
+        pageSize: 100, // 獲取更多記錄以支持搜索
+        search: name || birthDate, // 如果有姓名或生日，使用它們作為搜索關鍵字
+        field: name ? 'MNAME' : 'MBIRTHDT', // 根據提供的參數決定搜索欄位
+        sortField: 'KCSTMR',
+        sortDirection: 'asc'
+      },
+    });
+
+    // 如果提供了多個條件，需要在前端進行額外的過濾
+    let records = response.data.records || [];
+
+    if (name && birthDate && mpersonid) {
+      records = records.filter((record: DbfRecord) => {
+        const recordName = record.data.MNAME || '';
+        const recordBirthDate = record.data.MBIRTHDT || '';
+        const recordMpersonid = record.data.MPERSONID || '';
+        const nameMatch = recordName.indexOf(name) !== -1;
+        const birthMatch = recordBirthDate.indexOf(birthDate) !== -1;
+        const mpersonidMatch = recordMpersonid.indexOf(mpersonid) !== -1;
+        return nameMatch && birthMatch && mpersonidMatch;
+      });
+    } else if (name && birthDate) {
+      records = records.filter((record: DbfRecord) => {
+        const recordName = record.data.MNAME || '';
+        const recordBirthDate = record.data.MBIRTHDT || '';
+        const nameMatch = recordName.indexOf(name) !== -1;
+        const birthMatch = recordBirthDate.indexOf(birthDate) !== -1;
+        return nameMatch && birthMatch;
+      });
+    } else if (name && mpersonid) {
+      records = records.filter((record: DbfRecord) => {
+        const recordName = record.data.MNAME || '';
+        const recordMpersonid = record.data.MPERSONID || '';
+        const nameMatch = recordName.indexOf(name) !== -1;
+        const mpersonidMatch = recordMpersonid.indexOf(mpersonid) !== -1;
+        return nameMatch && mpersonidMatch;
+      });
+    } else if (birthDate && mpersonid) {
+      records = records.filter((record: DbfRecord) => {
+        const recordBirthDate = record.data.MBIRTHDT || '';
+        const recordMpersonid = record.data.MPERSONID || '';
+        const birthMatch = recordBirthDate.indexOf(birthDate) !== -1;
+        const mpersonidMatch = recordMpersonid.indexOf(mpersonid) !== -1;
+        return birthMatch && mpersonidMatch;
+      });
+    } else if (name) {
+      records = records.filter((record: DbfRecord) => {
+        const recordName = record.data.MNAME || '';
+        return recordName.indexOf(name) !== -1;
+      });
+    } else if (birthDate) {
+      records = records.filter((record: DbfRecord) => {
+        const recordBirthDate = record.data.MBIRTHDT || '';
+        return recordBirthDate.indexOf(birthDate) !== -1;
+      });
+    } else if (mpersonid) {
+      records = records.filter((record: DbfRecord) => {
+        const recordMpersonid = record.data.MPERSONID || '';
+        return recordMpersonid.indexOf(mpersonid) !== -1;
+      });
+    }
+
+    return records;
+  } catch (error) {
+    console.error('Error searching CO01M records:', error);
+    throw error;
+  }
+};
+
 export default api;
