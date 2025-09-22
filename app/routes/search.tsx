@@ -23,7 +23,6 @@ export function meta() {
 }
 export default function Search() {
   const [searchResults, setSearchResults] = useState<PatientRecord[]>([]);
-  const [selectedRecord, setSelectedRecord] = useState<PatientRecord | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +57,6 @@ if (!name && !birthDate && !mpersonid) {
 
       setSearchResults(results);
       setShowResults(true);
-      setSelectedRecord(null);
     } catch (error) {
       console.error('搜索失敗:', error);
       setError('搜索過程中發生錯誤，請稍後再試');
@@ -70,13 +68,8 @@ if (!name && !birthDate && !mpersonid) {
   };
 
   const handleSelectRecord = (record: PatientRecord) => {
-    setSelectedRecord(record);
-  };
-
-  const handleConfirmSelection = () => {
-    if (selectedRecord) {
-      window.location.href = `/kcstmr/${selectedRecord.KCSTMR}`;
-    }
+    // 直接跳轉到 KCSTMR 頁面
+    window.location.href = `/kcstmr/${record.KCSTMR}`;
   };
 
   return (
@@ -238,11 +231,11 @@ if (!name && !birthDate && !mpersonid) {
                           key={index}
                           sx={{
                             mb: 1,
-                            backgroundColor: selectedRecord?.KCSTMR === record.KCSTMR ? '#e0f2fe' : 'white',
-                            border: `1px solid ${selectedRecord?.KCSTMR === record.KCSTMR ? '#0891b2' : '#e2e8f0'}`,
+                            backgroundColor: 'white',
+                            border: '1px solid #e2e8f0',
                             borderRadius: 1,
                             cursor: 'pointer',
-                            '&:hover': { backgroundColor: '#f1f5f9' }
+                            '&:hover': { backgroundColor: '#f1f5f9', borderColor: '#0891b2' }
                           }}
                           onClick={() => handleSelectRecord(record)}
                         >
@@ -252,9 +245,7 @@ if (!name && !birthDate && !mpersonid) {
                                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                   {record.MNAME}
                                 </Typography>
-                                {selectedRecord?.KCSTMR === record.KCSTMR && (
-                                  <CheckCircleIcon sx={{ color: '#0891b2', fontSize: 20 }} />
-                                )}
+                                <CheckCircleIcon sx={{ color: '#10b981', fontSize: 20 }} />
                               </Box>
                             }
                             secondary={
@@ -268,23 +259,9 @@ if (!name && !birthDate && !mpersonid) {
                     </List>
                   )}
 
-                  {searchResults.length > 0 && (
-                    <Button
-                      variant="contained"
-                      onClick={handleConfirmSelection}
-                      disabled={!selectedRecord}
-                      sx={{
-                        mt: 2,
-                        backgroundColor: selectedRecord ? '#0891b2' : '#cbd5e1',
-                        '&:hover': selectedRecord ? { backgroundColor: '#0e7490' } : {},
-                        color: 'white',
-                        fontWeight: 'medium'
-                      }}
-                      fullWidth
-                    >
-                      {selectedRecord ? `確認選擇: ${selectedRecord.MNAME}` : '請選擇一個記錄'}
-                    </Button>
-                  )}
+                  <Typography variant="body2" sx={{ mt: 2, color: '#64748b', fontStyle: 'italic' }}>
+                    點擊任一記錄即可直接查看詳情
+                  </Typography>
                 </Box>
               )}
             </Paper>
