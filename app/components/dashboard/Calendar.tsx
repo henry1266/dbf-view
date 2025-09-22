@@ -14,16 +14,6 @@ interface CalendarProps {
   onMonthChange?: (year: number, month: number) => void;
 }
 
-// 將民國年日期轉換為西元年日期
-const convertMinguoToGregorian = (minguoDate: string): string => {
-  if (!minguoDate || minguoDate.length !== 7) return '';
-  
-  const year = parseInt(minguoDate.substring(0, 3)) + 1911;
-  const month = minguoDate.substring(3, 5);
-  const day = minguoDate.substring(5, 7);
-  
-  return `${year}-${month}-${day}`;
-};
 
 // 擴展 props 接口，添加初始年份和月份
 interface CalendarProps {
@@ -75,7 +65,6 @@ const Calendar: React.FC<CalendarProps> = ({
   return (
     <Paper
       sx={{
-
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -297,16 +286,6 @@ const Calendar: React.FC<CalendarProps> = ({
                           ? `1px solid rgba(121, 129, 203, ${0.6 + bgIntensity * 0.4})`
                           : '1px solid rgba(64, 175, 255, 0.3)'
                         : 'none',
-                    boxShadow: isToday
-                      ? '0 0 15px rgba(64, 175, 255, 0.7)'
-                      : ldruICount > 0
-                        ? `0 0 ${5 + bgIntensity * 10}px rgba(121, 129, 203, ${0.2 + bgIntensity * 0.4})`
-                        : 'none',
-                    textShadow: isToday
-                      ? '0 0 8px rgba(255, 255, 255, 0.8)'
-                      : isCurrentMonth
-                        ? '0 0 5px rgba(230, 241, 255, 0.5)'
-                        : 'none',
                     transition: 'all 0.2s',
                     position: 'relative',
                     '&:hover': {
@@ -315,8 +294,7 @@ const Calendar: React.FC<CalendarProps> = ({
                         : ldruICount > 0
                           ? `rgba(121, 129, 203, ${0.4 + bgIntensity * 0.5})`
                           : 'rgba(64, 175, 255, 0.3)',
-                      transform: 'scale(1.05)',
-                      boxShadow: '0 0 10px rgba(64, 175, 255, 0.5)'
+                      transform: 'scale(1.05)',  
                     }
                   }}
                 >
@@ -334,7 +312,6 @@ const Calendar: React.FC<CalendarProps> = ({
                         fontSize: '1.2rem',
                         fontWeight: 'bold',
                         color: '#64ffda',
-                        textShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
                         mb: 0.5
                       }}>
                         {ldruICount}
@@ -345,7 +322,7 @@ const Calendar: React.FC<CalendarProps> = ({
                         position: 'absolute',
                         bottom: '-8px',
                         right: '-4px',
-                        fontSize: '0.7rem',
+                        fontSize: '0.75rem',
                         color: 'rgba(230, 241, 255, 0.7)',
                       }}>
                         {d.date()}
@@ -373,10 +350,7 @@ const Calendar: React.FC<CalendarProps> = ({
           });
           
           // 渲染每周總和格子
-          const renderWeeklyTotals = weeklyTotals.map((total, weekIndex) => {
-            // 計算背景強度
-            const bgIntensity = Math.min(total / 50, 1); // 假設最大值為 50
-            
+          const renderWeeklyTotals = weeklyTotals.map((total, weekIndex) => {           
             return (
               <Tooltip
                 key={`week-total-${weekIndex}`}
@@ -393,30 +367,25 @@ const Calendar: React.FC<CalendarProps> = ({
                     color: '#e6f1ff',
                     fontWeight: 'bold',
                     fontFamily: 'monospace',
-                    fontSize: '0.875rem',
+                    fontSize: '0.75rem',
                     border: total > 0
-                      ? `1px solid rgba(100, 255, 218, ${0.6 + bgIntensity * 0.4})`
+                      ? '1px solid rgba(70, 172, 245, 0.6)'
                       : '1px solid rgba(64, 175, 255, 0.3)',
-                    boxShadow: total > 0
-                      ? `0 0 ${5 + bgIntensity * 10}px rgba(100, 255, 218, ${0.2 + bgIntensity * 0.4})`
-                      : 'none',
-                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                     transition: 'all 0.2s',
                     position: 'relative',
                     '&:hover': {
                       bgcolor: total > 0
-                        ? `rgba(100, 255, 218, ${0.2 + bgIntensity * 0.3})`
-                        : 'rgba(64, 175, 255, 0.3)',
+                        ? 'rgba(70, 172, 245, 0.4)'
+                        : 'rgba(64, 175, 255, 0.2)',
                       transform: 'scale(1.05)',
-                      boxShadow: '0 0 10px rgba(64, 175, 255, 0.5)'
                     }
                   }}
                 >
+                  {/* 總和字體顏色 */}
                   <Box sx={{
                     fontSize: '1.2rem',
                     fontWeight: 'bold',
-                    color: '#64ffda',
-                    textShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
+                    color: '#64dbffff',
                   }}>
                     {total}
                   </Box>

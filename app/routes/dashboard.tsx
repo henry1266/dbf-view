@@ -316,7 +316,7 @@ export default function Dashboard() {
                   alignItems: 'center',
                   textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
                 }}>
-                  GROUP
+                  DAY
                 </Box>
               </Typography>
 

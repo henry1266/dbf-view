@@ -77,7 +77,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             alignItems: 'center',
             textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
           }}>
-            GROUP
+            MONTH
           </Box>
         </Typography>
         

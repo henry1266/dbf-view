@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Box, Typography, Grid, Paper, Button } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -36,7 +35,6 @@ const HomeHeader: React.FC = () => {
       <Typography variant="body2" sx={{
         fontFamily: 'monospace',
         color: '#e6f1ff',
-        textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
         letterSpacing: '0.05em',
         display: 'flex',
         alignItems: 'center',
@@ -98,41 +96,9 @@ const BigCard = ({
       case 'warning':
         return 'linear-gradient(135deg, #ff9800, #ff6400)';
       case 'info':
-        return 'linear-gradient(135deg, #0078ff, #0050c8)';
+        return 'linear-gradient(135deg, #c940ffff, #cc00ffff)';
       default:
-        return 'linear-gradient(135deg, #40afff, #0078ff)';
-    }
-  };
-
-  // 根據顏色設置陰影
-  const getShadow = (color: string) => {
-    switch (color) {
-      case 'primary':
-        return '0 8px 35px rgba(64, 175, 255, 0.4)';
-      case 'success':
-        return '0 8px 35px rgba(100, 255, 218, 0.4)';
-      case 'warning':
-        return '0 8px 35px rgba(255, 152, 0, 0.4)';
-      case 'info':
-        return '0 8px 35px rgba(0, 120, 255, 0.4)';
-      default:
-        return '0 8px 35px rgba(64, 175, 255, 0.4)';
-    }
-  };
-
-  // 根據顏色設置邊框
-  const getBorder = (color: string) => {
-    switch (color) {
-      case 'primary':
-        return '1px solid rgba(64, 175, 255, 0.3)';
-      case 'success':
-        return '1px solid rgba(100, 255, 218, 0.3)';
-      case 'warning':
-        return '1px solid rgba(255, 152, 0, 0.3)';
-      case 'info':
-        return '1px solid rgba(0, 120, 255, 0.3)';
-      default:
-        return '1px solid rgba(64, 175, 255, 0.3)';
+        return 'linear-gradient(135deg, #c940ffff, #cc00ffff)';
     }
   };
 
@@ -143,8 +109,6 @@ const BigCard = ({
       overflow: 'hidden',
       position: 'relative',
       transition: 'all 0.3s ease-in-out',
-      boxShadow: getShadow(color),
-      border: getBorder(color),
       '&:hover': {
         transform: 'translateY(-10px)',
         boxShadow: color === 'primary'
@@ -153,7 +117,7 @@ const BigCard = ({
             ? '0 15px 40px rgba(100, 255, 218, 0.6)'
             : color === 'warning'
               ? '0 15px 40px rgba(255, 152, 0, 0.6)'
-              : '0 15px 40px rgba(0, 120, 255, 0.6)',
+              : '0 15px 40px rgba(234, 0, 255, 0.6)',
       },
       display: 'flex',
       flexDirection: 'column',
@@ -169,7 +133,7 @@ const BigCard = ({
             ? '0 0 20px rgba(100, 255, 218, 0.8)'
             : color === 'warning'
               ? '0 0 20px rgba(255, 152, 0, 0.8)'
-              : '0 0 20px rgba(0, 120, 255, 0.8)',
+              : '0 0 20px rgba(183, 0, 255, 0.8)',
       }} />
 
       {/* 卡片內容 */}
@@ -184,13 +148,6 @@ const BigCard = ({
             borderRadius: '50%',
             p: 2,
             mr: 2,
-            boxShadow: color === 'primary'
-              ? '0 0 25px rgba(64, 175, 255, 0.8), inset 0 0 15px rgba(64, 175, 255, 0.5)'
-              : color === 'success'
-                ? '0 0 25px rgba(100, 255, 218, 0.8), inset 0 0 15px rgba(100, 255, 218, 0.5)'
-                : color === 'warning'
-                  ? '0 0 25px rgba(255, 152, 0, 0.8), inset 0 0 15px rgba(255, 152, 0, 0.5)'
-                  : '0 0 25px rgba(0, 120, 255, 0.8), inset 0 0 15px rgba(0, 120, 255, 0.5)',
             fontSize: '2rem',
           }}>
             {icon}
@@ -234,30 +191,8 @@ const BigCard = ({
                 ? 'rgba(0, 50, 40, 0.9)'
                 : color === 'warning'
                   ? 'rgba(50, 30, 0, 0.9)'
-                  : 'rgba(0, 30, 60, 0.9)',
+                  : 'rgba(21, 0, 60, 0.9)',
             backdropFilter: 'blur(8px)',
-            border: color === 'primary'
-              ? '1px solid rgba(64, 175, 255, 0.8)'
-              : color === 'success'
-                ? '1px solid rgba(100, 255, 218, 0.8)'
-                : color === 'warning'
-                  ? '1px solid rgba(255, 152, 0, 0.8)'
-                  : '1px solid rgba(0, 120, 255, 0.8)',
-            color: '#ffffff',
-            boxShadow: color === 'primary'
-              ? '0 4px 20px rgba(64, 175, 255, 0.3), inset 0 0 10px rgba(64, 175, 255, 0.1)'
-              : color === 'success'
-                ? '0 4px 20px rgba(100, 255, 218, 0.3), inset 0 0 10px rgba(100, 255, 218, 0.1)'
-                : color === 'warning'
-                  ? '0 4px 20px rgba(255, 152, 0, 0.3), inset 0 0 10px rgba(255, 152, 0, 0.1)'
-                  : '0 4px 20px rgba(0, 120, 255, 0.3), inset 0 0 10px rgba(0, 120, 255, 0.1)',
-            textShadow: color === 'primary'
-              ? '0 0 5px rgba(64, 175, 255, 0.5)'
-              : color === 'success'
-                ? '0 0 5px rgba(100, 255, 218, 0.5)'
-                : color === 'warning'
-                  ? '0 0 5px rgba(255, 152, 0, 0.5)'
-                  : '0 0 5px rgba(0, 120, 255, 0.5)',
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -265,20 +200,6 @@ const BigCard = ({
               left: 0,
               width: '100%',
               height: '2px',
-              background: color === 'primary'
-                ? 'linear-gradient(90deg, transparent, rgba(64, 175, 255, 0.8), transparent)'
-                : color === 'success'
-                  ? 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.8), transparent)'
-                  : color === 'warning'
-                    ? 'linear-gradient(90deg, transparent, rgba(255, 152, 0, 0.8), transparent)'
-                    : 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.8), transparent)',
-              boxShadow: color === 'primary'
-                ? '0 0 10px rgba(64, 175, 255, 0.5)'
-                : color === 'success'
-                  ? '0 0 10px rgba(100, 255, 218, 0.5)'
-                  : color === 'warning'
-                    ? '0 0 10px rgba(255, 152, 0, 0.5)'
-                    : '0 0 10px rgba(0, 120, 255, 0.5)',
             },
             '&:hover': {
               bgcolor: color === 'primary'
@@ -286,23 +207,9 @@ const BigCard = ({
                 : color === 'success'
                   ? 'rgba(100, 255, 218, 0.9)'
                   : color === 'warning'
-                    ? 'rgba(255, 152, 0, 0.9)'
-                    : 'rgba(0, 120, 255, 0.9)',
+                    ? 'rgba(255, 197, 111, 1)'
+                    : 'rgba(196, 159, 255, 1)',
               color: '#000000',
-              boxShadow: color === 'primary'
-                ? '0 6px 25px rgba(64, 175, 255, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
-                : color === 'success'
-                  ? '0 6px 25px rgba(100, 255, 218, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
-                  : color === 'warning'
-                    ? '0 6px 25px rgba(255, 152, 0, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)'
-                    : '0 6px 25px rgba(0, 120, 255, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.3)',
-              border: color === 'primary'
-                ? '1px solid rgba(255, 255, 255, 0.8)'
-                : color === 'success'
-                  ? '1px solid rgba(255, 255, 255, 0.8)'
-                  : color === 'warning'
-                    ? '1px solid rgba(255, 255, 255, 0.8)'
-                    : '1px solid rgba(255, 255, 255, 0.8)',
             }
           }}
         >
