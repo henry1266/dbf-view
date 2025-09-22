@@ -189,19 +189,31 @@ if (!name && !birthDate && !mpersonid) {
                     window.location.href = `/kcstmr/${value}`;
                   }
                 }}
-                className="flex flex-col space-y-3 mb-4">
-                <input
-                  type="text"
+                className="flex flex-col space-y-3"
+              >
+                <TextField
                   name="kcstmrValue"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                  label="KCSTMR 值"
                   placeholder="輸入 KCSTMR 值 (例如: 0000008)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
                   required
                 />
-                <button
+                <Button
                   type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#10b981',
+                    '&:hover': { backgroundColor: '#059669' },
+                    color: 'white',
+                    fontWeight: 'medium',
+                    py: 1.5
+                  }}
+                  fullWidth
                 >
                   直接查詢
-                </button>
+                </Button>
               </form>
 
               {/* 搜索結果顯示區域 */}
