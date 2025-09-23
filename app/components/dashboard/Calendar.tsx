@@ -213,8 +213,8 @@ const Calendar: React.FC<CalendarProps> = ({
           background: 'linear-gradient(90deg, transparent, rgba(0, 120, 255, 0.2), transparent)'
         }
       }}>
-        {[...['S', 'M', 'T', 'W', 'T', 'F', 'S'], '總計'].map(day => (
-          <Box key={day} sx={{
+        {[...['S', 'M', 'T', 'W', 'T', 'F', 'S'], '總計'].map((day, idx) => (
+          <Box key={`${day}-${idx}`} sx={{
             textAlign: 'center',
             fontWeight: 'bold',
             color: '#64ffda',
