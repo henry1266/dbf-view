@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList
 } from 'recharts';
 
 interface LLDCNChartProps {
@@ -21,9 +22,9 @@ interface LLDCNChartProps {
 
 /**
  * @component LLDCNChart
- * @description LLDCN 統計數據折線圖組件
+ * @description LLDCN 統計數據疊合區域圖組件
  * @param {LLDCNChartProps} props - 組件屬性
- * @returns {JSX.Element} 渲染的折線圖
+ * @returns {JSX.Element} 渲染的疊合區域圖
  */
 const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
   // 格式化月份顯示 (民國年轉西元年顯示)
@@ -69,7 +70,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
 
   return (
     <ResponsiveContainer width="100%" height={400}>
-      <LineChart
+      <AreaChart
         data={data}
         margin={{
           top: 20,
@@ -102,34 +103,66 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             fontSize: '0.9rem'
           }}
         />
-        <Line
+        {/* LLDCN=1 在底部 */}
+        <Area
           type="monotone"
           dataKey="lldcn1"
+          stackId="1"
           stroke="#3b82f6"
-          strokeWidth={3}
+          fill="#3b82f6"
+          fillOpacity={0.8}
           name="LLDCN=1"
-          dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-          activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#1e40af' }}
-        />
-        <Line
+        >
+          <LabelList
+            dataKey="lldcn1"
+            position="center"
+            fill="#ffffff"
+            fontSize={12}
+            fontFamily="monospace"
+            formatter={(value: any) => typeof value === 'number' ? value.toLocaleString() : value}
+          />
+        </Area>
+        {/* LLDCN=2-3 疊加在上面 */}
+        <Area
           type="monotone"
           dataKey="lldcn2to3"
+          stackId="1"
           stroke="#10b981"
-          strokeWidth={3}
+          fill="#10b981"
+          fillOpacity={0.8}
           name="LLDCN=2-3"
-          dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-          activeDot={{ r: 6, stroke: '#10b981', strokeWidth: 2, fill: '#047857' }}
-        />
-        <Line
+        >
+          <LabelList
+            dataKey="lldcn2to3"
+            position="center"
+            fill="#ffffff"
+            fontSize={12}
+            fontFamily="monospace"
+            formatter={(value: any) => typeof value === 'number' ? value.toLocaleString() : value}
+          />
+        </Area>
+        {/* 總和線條 */}
+        <Area
           type="monotone"
           dataKey="total"
+          stackId="2"
           stroke="#f97316"
+          fill="transparent"
           strokeWidth={3}
           name="總計"
           dot={{ fill: '#f97316', strokeWidth: 2, r: 4 }}
-          activeDot={{ r: 6, stroke: '#f97316', strokeWidth: 2, fill: '#c2410c' }}
-        />
-      </LineChart>
+        >
+          <LabelList
+            dataKey="total"
+            position="top"
+            fill="#f97316"
+            fontSize={12}
+            fontFamily="monospace"
+            fontWeight="bold"
+            formatter={(value: any) => typeof value === 'number' ? `總:${value.toLocaleString()}` : value}
+          />
+        </Area>
+      </AreaChart>
     </ResponsiveContainer>
   );
 };
