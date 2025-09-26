@@ -11,7 +11,7 @@ import DailyA99AmountPanel from '../components/dashboard/DailyA99AmountPanel';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { API_BASE_URL, fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchLldcnEq1Count, fetchLldcnEq2Or3Count, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
+import { API_BASE_URL, fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchLldcnEq1Count, fetchLldcnEq2Or3Count, fetchA99GroupStats, fetchDailyA99GroupStats, fetchDailyLdruI, fetchDailyLldcnEq1, fetchDailyLldcnEq2Or3 } from '../services/api';
 
 /**
  * @function meta
@@ -47,6 +47,12 @@ export default function Dashboard() {
   const [a99GroupStats, setA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
   // 存儲當日 A99 欄位的分組統計數據
   const [dailyA99GroupStats, setDailyA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
+  // 存儲當日 LDRU=I 的總數
+  const [dailyLdruI, setDailyLdruI] = useState<number>(0);
+  // 存儲當日 LLDCN=1 的數量
+  const [dailyLldcnEq1, setDailyLldcnEq1] = useState<number>(0);
+  // 存儲當日 LLDCN=2-3 的數量
+  const [dailyLldcnEq2Or3, setDailyLldcnEq2Or3] = useState<number>(0);
   // 加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   // 錯誤狀態
@@ -142,6 +148,12 @@ export default function Dashboard() {
         const dailyA99Stats = await fetchDailyA99GroupStats();
         const lldcnCount = await fetchLldcnEq1Count(start, end);
         const lldcn2Or3Count = await fetchLldcnEq2Or3Count(start, end);
+        // 獲取當日 LDRU=I 的總數
+        const dailyLdruICount = await fetchDailyLdruI();
+        // 獲取當日 LLDCN=1 的數量
+        const dailyLldcn1Count = await fetchDailyLldcnEq1();
+        // 獲取當日 LLDCN=2-3 的數量
+        const dailyLldcn2Or3Count = await fetchDailyLldcnEq2Or3();
 
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
@@ -182,6 +194,9 @@ export default function Dashboard() {
         setLdruICounts(data);
         setTotalLdruI(total);
         setWeeklyLdruI(weeklyTotal);
+        setDailyLdruI(dailyLdruICount);
+        setDailyLldcnEq1(dailyLldcn1Count);
+        setDailyLldcnEq2Or3(dailyLldcn2Or3Count);
         setA99Count75(a99Count);
         setTotalA99(a99Total);
         setA99GroupStats(a99Stats);
@@ -268,7 +283,7 @@ export default function Dashboard() {
             )}
           </Grid>
           {/* 右側當日面板 */}
-          <DailyA99AmountPanel dailyA99GroupStats={dailyA99GroupStats} />
+          <DailyA99AmountPanel dailyA99GroupStats={dailyA99GroupStats} dailyLdruI={dailyLdruI} dailyLldcnEq1={dailyLldcnEq1} dailyLldcnEq2Or3={dailyLldcnEq2Or3} />
         </Grid>
       </TechBackground>
     </Layout>

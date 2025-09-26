@@ -721,4 +721,77 @@ export const searchCO01MRecords = async (name = '', birthDate = '', mpersonid = 
   }
 };
 
+/**
+ * @function fetchDailyLdruI
+ * @description 獲取 CO03L.DBF 中當日 LDRU=I 的總數
+ * @returns {Promise<number>} 當日 LDRU=I 的總數
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const count = await fetchDailyLdruI();
+ * console.log(count); // 25
+ */
+export const fetchDailyLdruI = async () => {
+  try {
+    // 獲取當日日期（民國年格式）
+    const now = new Date();
+    const year = now.getFullYear() - 1911; // 西元年轉民國年
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const today = `${year}${month}${day}`;
+
+    // 使用當日日期作為開始和結束日期
+    const counts = await fetchLdruICountsByDate(today, today);
+    return counts[today] || 0;
+  } catch (error) {
+    console.error('Error fetching daily LDRU=I count:', error);
+    throw error;
+  }
+};
+
+/**
+ * @function fetchDailyLldcnEq1
+ * @description 獲取 CO03L.DBF 中當日 LDRU=I 且 LLDCN 欄位為 1 的記錄數量
+ * @returns {Promise<number>} 當日選定條件的記錄數量
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const fetchDailyLldcnEq1 = async () => {
+  try {
+    // 獲取當日日期（民國年格式）
+    const now = new Date();
+    const year = now.getFullYear() - 1911; // 西元年轉民國年
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const today = `${year}${month}${day}`;
+
+    // 使用當日日期作為開始和結束日期
+    return fetchLldcnEq1Count(today, today);
+  } catch (error) {
+    console.error('Error fetching daily LLDCN=1 count:', error);
+    throw error;
+  }
+};
+
+/**
+ * @function fetchDailyLldcnEq2Or3
+ * @description 獲取 CO03L.DBF 中當日 LDRU=I 且 LLDCN 欄位為 2 或 3 的記錄數量
+ * @returns {Promise<number>} 當日選定條件的記錄數量
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const fetchDailyLldcnEq2Or3 = async () => {
+  try {
+    // 獲取當日日期（民國年格式）
+    const now = new Date();
+    const year = now.getFullYear() - 1911; // 西元年轉民國年
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const today = `${year}${month}${day}`;
+
+    // 使用當日日期作為開始和結束日期
+    return fetchLldcnEq2Or3Count(today, today);
+  } catch (error) {
+    console.error('Error fetching daily LLDCN=2 or 3 count:', error);
+    throw error;
+  }
+};
+
 export default api;
