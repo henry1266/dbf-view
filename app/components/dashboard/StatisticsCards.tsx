@@ -6,14 +6,14 @@ import DashboardCard from './DashboardCard';
 export interface StatisticsCardsProps {
   totalLdruI?: number;
   totalLldcnEq1?: number;
-  weeklyLdruI?: number;
+  totalLldcnEq2Or3?: number;
   a99Count75?: number;
   totalA99?: number;
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   totalLldcnEq1 = 0,
-  weeklyLdruI = 0,
+  totalLldcnEq2Or3 = 0,
   a99Count75 = 0,
   totalA99 = 0
 }) => {
@@ -29,7 +29,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
       </Box>
       <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
-          title="當月 LLDCN ＝1 件數"
+          title="當月 LLDCN ＝1 且 LDRU=I 件數"
           value={totalLldcnEq1.toString()}
           icon="💊"
           color="primary"
@@ -37,9 +37,9 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
       </Box>
       <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
-          title="當週調劑"
-          value={weeklyLdruI.toString()}
-          icon="📅"
+          title="當月 LLDCN ＝2 或 LLDCN ＝3 的項目總計"
+          value={totalLldcnEq2Or3.toString()}
+          icon="💊"
           color="warning"
         />
       </Box>

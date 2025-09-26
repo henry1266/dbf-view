@@ -352,7 +352,7 @@ export const fetchA99Count75 = async (startDate = '', endDate = '') => {
 
 /**
  * @function fetchLldcnEq1Count
- * @description 獲取 CO03L.DBF 中 LLDCN 欄位為 1 的記錄數量
+ * @description 獲取 CO03L.DBF 中 LDRU=I 且 LLDCN 欄位為 1 的記錄數量
  * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
  * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
  * @returns {Promise<number>} LLDCN 欄位為 04 的記錄數量
@@ -373,14 +373,52 @@ export const fetchLldcnEq1Count = async (startDate = '', endDate = '') => {
     );
     let count = 0;
     result.records.forEach((record: DbfRecord) => {
+      const ldruValue = record.data.LDRU || '';
       const lldcnValue = record.data.LLDCN !== undefined ? Number(record.data.LLDCN) : 0;
-      if (lldcnValue === 1) {
+      if (ldruValue === 'I' && lldcnValue === 1) {
         count++;
       }
     });
     return count;
   } catch (error) {
     console.error('Error fetching LLDCN=1 count:', error);
+    throw error;
+  }
+};
+
+/**
+ * @function fetchLldcnEq2Or3Count
+ * @description 獲取 CO03L.DBF 中 LDRU=I 且 LLDCN 欄位為 2 或 3 的記錄數量
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<number>} 選定條件的記錄數量
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ */
+export const fetchLldcnEq2Or3Count = async (startDate = '', endDate = '') => {
+  try {
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000,
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true'
+    );
+    let count = 0;
+    result.records.forEach((record: DbfRecord) => {
+      const ldruValue = record.data.LDRU || '';
+      const lldcnValue = record.data.LLDCN !== undefined ? Number(record.data.LLDCN) : 0;
+      if (ldruValue === 'I' && (lldcnValue === 2 || lldcnValue === 3)) {
+        count++;
+      }
+    });
+    return count;
+  } catch (error) {
+    console.error('Error fetching LLDCN=2 or 3 count:', error);
     throw error;
   }
 };
@@ -397,7 +435,7 @@ export const fetchLldcnEq1Count = async (startDate = '', endDate = '') => {
  * console.log(total); // 12345
  */
 export const fetchA99Total = async (startDate = '', endDate = '') => {
-  try {
+   try {
     // 獲取 CO03L.DBF 的所有記錄
     const result = await fetchDbfRecords(
       'CO03L.DBF',
