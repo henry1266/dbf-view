@@ -345,7 +345,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                       <Box sx={{
                         height: '100%',
                         width: `${percentage}%`,
-                        bgcolor: index === 0 ? '#3b82f6' : index === 1 ? '#10b981' : '#f97316',
+                        bgcolor: index === 0 ? '#3360a8ff' : index === 1 ? '#10b981' : '#f97316',
                       }} />
                     </Box>
                   </Box>

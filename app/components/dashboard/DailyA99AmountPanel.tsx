@@ -53,7 +53,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
               left: 0,
               width: '100%',
               height: '2px',
-              background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
+              background: 'linear-gradient(90deg, transparent, rgba(100, 154, 255, 1), transparent)',
 
             },
             '&::after': {
@@ -63,7 +63,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
               left: '10%',
               width: '80%',
               height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
+              background: 'linear-gradient(90deg, transparent, rgba(54, 72, 150, 1), transparent)',
             }
           }}
         >
@@ -130,7 +130,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
                       left: 0,
                       height: '100%',
                       width: `${(c1 / total) * 100}%`,
-                      bgcolor: '#3b82f6',
+                      bgcolor: '#6ca2f8ff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -146,7 +146,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
                       left: `${(c1 / total) * 100}%`,
                       height: '100%',
                       width: `${(c2to3 / total) * 100}%`,
-                      bgcolor: '#10b981',
+                      bgcolor: '#39d8a3ff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -188,7 +188,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
                     <Box sx={{
                       height: '100%',
                       width: `${(cOther / total) * 100}%`,
-                      bgcolor: '#f97316'
+                      bgcolor: '#f19756ff'
                     }} />
                   </Tooltip>
                 </Box>
@@ -204,6 +204,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
             pt: 1
           }}>
             <Typography variant="body2" sx={{
+              fontFamily: 'monospace',
               fontSize: '1.1rem',
               fontWeight: 'bold',
               background: 'linear-gradient(90deg, #40afff, #64ffda)',
@@ -236,7 +237,6 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
               width: '100%',
               height: '2px',
               background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
-              boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)',
             },
             '&::after': {
               content: '""',
@@ -245,8 +245,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
               left: '10%',
               width: '80%',
               height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
-              boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)',
+              background: 'linear-gradient(90deg, transparent, rgba(100, 167, 255, 0.6), transparent)',
             },
           }}
         >
@@ -345,7 +344,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
                         sx={{
                           height: '100%',
                           width: `${percentage}%`,
-                          bgcolor: index === 0 ? '#3b82f6' : index === 1 ? '#10b981' : '#f97316',
+                          bgcolor: index === 0 ? '#6e80d3ff' : index === 1 ? '#4acad3ff' : '#e49a2cff',
                         }}
                       />
                     </Box>
