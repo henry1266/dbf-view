@@ -313,7 +313,6 @@ export default function Dashboard() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                textShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
               }}>
                 <span>當日 A99 金額</span>
                 <Box component="span" sx={{
@@ -321,7 +320,6 @@ export default function Dashboard() {
                   color: '#64ffda',
                   display: 'flex',
                   alignItems: 'center',
-                  textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
                 }}>
                   DAY
                 </Box>
@@ -364,7 +362,6 @@ export default function Dashboard() {
                           fontFamily: 'monospace',
                           fontSize: '0.9rem',
                           color: '#e6f1ff',
-                          textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                           display: 'flex',
                           alignItems: 'center'
                         }}>
@@ -385,7 +382,6 @@ export default function Dashboard() {
                           fontFamily: 'monospace',
                           fontSize: '0.9rem',
                           color: color.color,
-                          textShadow: `0 0 8px ${color.shadow}`
                         }}>
                           {product}
                         </Typography>
@@ -441,7 +437,6 @@ export default function Dashboard() {
                   background: 'linear-gradient(90deg, #40afff, #64ffda)',
                   backgroundClip: 'text',
                   color: 'transparent',
-                  textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
                 }}>
                   總計: {dailyA99GroupStats.totalSum.toLocaleString()}
                 </Typography>

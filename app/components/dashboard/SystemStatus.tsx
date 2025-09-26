@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Box, Typography, Stack } from '@mui/material';
+import { Paper, Box, Typography, Stack, Tooltip } from '@mui/material';
 
 interface A99GroupStats {
   totalSum: number;
@@ -109,34 +109,38 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                 border: '1px solid #334155',
                 mb: 2
               }}>
-                <Box sx={{
-                  position: 'absolute',
-                  left: 0,
-                  height: '100%',
-                  width: `${(c1 / total) * 100}%`,
-                  bgcolor: '#3b82f6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Typography variant="caption" sx={{ color: '#ffffff', fontSize: '0.75rem', lineHeight: 1 }}>
-                    {c1.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box sx={{
-                  position: 'absolute',
-                  left: `${(c1 / total) * 100}%`,
-                  height: '100%',
-                  width: `${(c2to3 / total) * 100}%`,
-                  bgcolor: '#10b981',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Typography variant="caption" sx={{ color: '#ffffff', fontSize: '0.75rem', lineHeight: 1 }}>
-                    {c2to3.toLocaleString()}
-                  </Typography>
-                </Box>
+                <Tooltip title={c1.toLocaleString()} arrow>
+                  <Box sx={{
+                    position: 'absolute',
+                    left: 0,
+                    height: '100%',
+                    width: `${(c1 / total) * 100}%`,
+                    bgcolor: '#3b82f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Typography variant="caption" sx={{ color: '#ffffff', fontSize: '0.75rem', lineHeight: 1 }}>
+                      {c1.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Tooltip>
+                <Tooltip title={c2to3.toLocaleString()} arrow>
+                  <Box sx={{
+                    position: 'absolute',
+                    left: `${(c1 / total) * 100}%`,
+                    height: '100%',
+                    width: `${(c2to3 / total) * 100}%`,
+                    bgcolor: '#10b981',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Typography variant="caption" sx={{ color: '#ffffff', fontSize: '0.75rem', lineHeight: 1 }}>
+                      {c2to3.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Tooltip>
               </Box>
               {/* 其他 LDRU=I */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: 0 }}>
@@ -166,11 +170,13 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                 overflow: 'hidden',
                 border: '1px solid #334155'
               }}>
-                <Box sx={{
-                  height: '100%',
-                  width: `${(cOther / total) * 100}%`,
-                  bgcolor: '#f97316'
-                }} />
+                <Tooltip title={cOther.toLocaleString()} arrow>
+                  <Box sx={{
+                    height: '100%',
+                    width: `${(cOther / total) * 100}%`,
+                    bgcolor: '#f97316'
+                  }} />
+                </Tooltip>
               </Box>
             </>
           );
