@@ -45,8 +45,8 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
       </Box>
       <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
-          title="A99=75 數量"
-          value={a99Count75.toString()}
+          title="(LLDCN＝1 OR LLDCN＝2 OR LLDCN＝3) 且 LDRU=I"
+          value={(totalLldcnEq1 + totalLldcnEq2Or3).toString()}
           icon="🔢"
           color="info"
         />
