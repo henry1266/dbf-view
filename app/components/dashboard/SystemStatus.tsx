@@ -38,7 +38,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             width: '100%',
             height: '2px',
             background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
-            boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)'
+
           },
           '&::after': {
             content: '""',
@@ -48,7 +48,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             width: '80%',
             height: '1px',
             background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
-            boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)'
           }
         }}
       >
@@ -145,7 +144,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
                   color: '#e6f1ff',
-                  textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                   display: 'flex',
                   alignItems: 'center'
                 }}>
@@ -192,7 +190,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             background: 'linear-gradient(90deg, #40afff, #64ffda)',
             backgroundClip: 'text',
             color: 'transparent',
-            textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
           }}>
             總計: {totalLdruI.toLocaleString()} 張
           </Typography>
@@ -231,7 +228,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             width: '80%',
             height: '1px',
             background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
-            boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)'
           }
         }}
       >
@@ -292,7 +288,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                     fontFamily: 'monospace',
                     fontSize: '0.9rem',
                     color: '#e6f1ff',
-                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                     display: 'flex',
                     alignItems: 'center'
                   }}>
@@ -313,7 +308,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                     fontFamily: 'monospace',
                     fontSize: '0.9rem',
                     color: color.color,
-                    textShadow: `0 0 8px ${color.shadow}`
                   }}>
                     {product}
                   </Typography>
