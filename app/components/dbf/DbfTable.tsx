@@ -10,7 +10,9 @@ import {
   TableSortLabel,
   Paper,
   Box,
-  Button
+  Button,
+  Select,
+  MenuItem
 } from '@mui/material';
 import axios from 'axios';
 import { fetchMatchingCO02PRecords } from '../../services/api';
@@ -37,9 +39,12 @@ function DbfTable({
   order,
   onRequestSort
 }: DbfTableProps) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [matchingCO02PRecords, setMatchingCO02PRecords] = useState<DbfRecord[]>([]);
   const [loadingCO02PRecords, setLoadingCO02PRecords] = useState(false);
+  const [lcsFilter, setLcsFilter] = useState<string>(
+    searchParams.get('field') === 'LCS' ? searchParams.get('search') || '' : ''
+  );
 
   /**
    * 處理排序請求
@@ -185,7 +190,37 @@ function DbfTable({
                     padding: '11px',
                   }}
                 >
-                  {column.id !== 'actions' ? (
+                  {column.id === 'LCS' && data ? (
+                    <Select
+                      value={lcsFilter}
+                      onChange={(e) => {
+                        const value = e.target.value as string;
+                        setLcsFilter(value);
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set('page', '1');
+                        if (value) {
+                          newParams.set('field', 'LCS');
+                          newParams.set('search', value);
+                        } else {
+                          newParams.delete('field');
+                          newParams.delete('search');
+                        }
+                        setSearchParams(newParams);
+                      }}
+                      displayEmpty
+                      size="small"
+                      sx={{ color: '#e6f1ff', minWidth: 80 }}
+                    >
+                      <MenuItem value="">所有</MenuItem>
+                      {[...new Set(data.records.map((r) => r.data.LCS || ''))]
+                        .filter((v) => v)
+                        .map((v) => (
+                          <MenuItem key={v} value={v}>
+                            {v}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  ) : column.id !== 'actions' ? (
                     <TableSortLabel
                       active={orderBy === column.id}
                       direction={orderBy === column.id ? order : 'asc'}

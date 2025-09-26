@@ -95,7 +95,7 @@ function TechCollapsibleFields({
             border: '1px solid rgba(64, 175, 255, 0.3)',
             boxShadow: '0 4px 30px rgba(0, 120, 255, 0.3)',
             borderRadius: '4px',
-            overflow: 'hidden'
+            overflowY: 'auto'
           }}>
             <Table stickyHeader>
               <TableHead>

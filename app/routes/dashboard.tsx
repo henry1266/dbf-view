@@ -10,7 +10,7 @@ import Calendar from '../components/dashboard/Calendar';
 import TechBackground from '../components/TechBackground';
 
 // 引入 API 服務函數
-import { API_BASE_URL, fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
+import { API_BASE_URL, fetchLdruICountsByDate, fetchA99Count75, fetchA99Total, fetchLldcnEq1Count, fetchA99GroupStats, fetchDailyA99GroupStats } from '../services/api';
 
 /**
  * @function meta
@@ -40,6 +40,7 @@ export default function Dashboard() {
   const [a99Count75, setA99Count75] = useState<number>(0);
   // 存儲 A99 欄位的總和
   const [totalA99, setTotalA99] = useState<number>(0);
+  const [totalLldcnEq1, setTotalLldcnEq1] = useState<number>(0);
   // 存儲 A99 欄位的分組統計數據
   const [a99GroupStats, setA99GroupStats] = useState<{ totalSum: number, valueGroups: Record<string, number> }>({ totalSum: 0, valueGroups: {} });
   // 存儲當日 A99 欄位的分組統計數據
@@ -137,6 +138,7 @@ export default function Dashboard() {
 
         // 獲取當日 A99 欄位的分組統計數據
         const dailyA99Stats = await fetchDailyA99GroupStats();
+        const lldcnCount = await fetchLldcnEq1Count(start, end);
 
         // 計算 LDRU=I 的總數
         const total = Object.values(data).reduce((sum, count) => sum + count, 0);
@@ -181,6 +183,7 @@ export default function Dashboard() {
         setTotalA99(a99Total);
         setA99GroupStats(a99Stats);
         setDailyA99GroupStats(dailyA99Stats);
+        setTotalLldcnEq1(lldcnCount);
         setError(null);
       } catch (err) {
         console.error('獲取 LDRU=I 每日數量失敗:', err);
@@ -210,6 +213,7 @@ export default function Dashboard() {
         {/* 頂部統計卡片 */}
         <StatisticsCards
           totalLdruI={totalLdruI}
+          totalLldcnEq1={totalLldcnEq1}
           weeklyLdruI={weeklyLdruI}
           a99Count75={a99Count75}
           totalA99={totalA99}

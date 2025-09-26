@@ -3,15 +3,16 @@ import { Grid, Box } from '@mui/material';
 import DashboardCard from './DashboardCard';
 
 // 定義 props 接口
-interface StatisticsCardsProps {
+export interface StatisticsCardsProps {
   totalLdruI?: number;
+  totalLldcnEq1?: number;
   weeklyLdruI?: number;
   a99Count75?: number;
   totalA99?: number;
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({
-  totalLdruI = 0,
+  totalLldcnEq1 = 0,
   weeklyLdruI = 0,
   a99Count75 = 0,
   totalA99 = 0
@@ -28,8 +29,8 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
       </Box>
       <Box sx={{ width: { xs: '100%', sm: '50%', lg: '23%' }, p: 1 }}>
         <DashboardCard
-          title="當月調劑"
-          value={totalLdruI.toString()}
+          title="當月 LLDCN ＝1 件數"
+          value={totalLldcnEq1.toString()}
           icon="💊"
           color="primary"
         />

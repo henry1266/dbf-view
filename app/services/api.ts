@@ -351,6 +351,41 @@ export const fetchA99Count75 = async (startDate = '', endDate = '') => {
 };
 
 /**
+ * @function fetchLldcnEq1Count
+ * @description 獲取 CO03L.DBF 中 LLDCN 欄位為 1 的記錄數量
+ * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
+ * @param {string} [endDate=''] - 結束日期過濾 (民國年格式，例如：1130831)
+ * @returns {Promise<number>} LLDCN 欄位為 04 的記錄數量
+ */
+export const fetchLldcnEq1Count = async (startDate = '', endDate = '') => {
+  try {
+    const result = await fetchDbfRecords(
+      'CO03L.DBF',
+      1,
+      1000, // 使用較大的頁面大小以獲取更多記錄
+      '',
+      '',
+      '',
+      '',
+      startDate,
+      endDate,
+      'true'
+    );
+    let count = 0;
+    result.records.forEach((record: DbfRecord) => {
+      const lldcnValue = record.data.LLDCN !== undefined ? Number(record.data.LLDCN) : 0;
+      if (lldcnValue === 1) {
+        count++;
+      }
+    });
+    return count;
+  } catch (error) {
+    console.error('Error fetching LLDCN=1 count:', error);
+    throw error;
+  }
+};
+
+/**
  * @function fetchA99Total
  * @description 獲取 CO03L.DBF 中 A99 欄位的總和
  * @param {string} [startDate=''] - 開始日期過濾 (民國年格式，例如：1130801)
@@ -427,7 +462,7 @@ export const loadWhiteboard = async (recordId: string) => {
   try {
     const response = await api.get(`/whiteboard/${recordId}`);
     return response.data.canvasData;
-  } catch (error) {
+  } catch (error: any) {
     if (error.response?.status === 404) {
       // 沒有找到資料時返回 null
       return null;

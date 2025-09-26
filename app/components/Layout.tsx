@@ -247,7 +247,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: 1,
           width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
           ml: { md: `${DRAWER_WIDTH}px` },
           mt: { xs: 1, md: 0 }, // 移動端頂部留出空間給漢堡菜單
