@@ -76,7 +76,7 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
             justifyContent: 'space-between',
           }}
         >
-          <span>當日 A99 金額</span>
+          <span>當日調劑費 A99</span>
           <Box
             component="span"
             sx={{
@@ -183,14 +183,14 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
             variant="body2"
             sx={{
               fontFamily: 'monospace',
-              fontSize: '1rem',
+              fontSize: '1.1rem',
               fontWeight: 'bold',
               background: 'linear-gradient(90deg, #40afff, #64ffda)',
               backgroundClip: 'text',
               color: 'transparent',
             }}
           >
-            總計: {dailyA99GroupStats.totalSum.toLocaleString()}
+            總計: {dailyA99GroupStats.totalSum.toLocaleString()} 張
           </Typography>
         </Box>
       </Paper>
