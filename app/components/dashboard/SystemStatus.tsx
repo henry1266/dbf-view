@@ -60,7 +60,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span>當月 LDRU=I </span>
+          <span>當月調劑 LDRU=I </span>
           <Box component="span" sx={{
             fontSize: '0.9rem',
             color: '#64ffda',
@@ -246,7 +246,7 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span>當月 A99 金額</span>
+          <span>當月調劑費 A99</span>
           <Box component="span" sx={{
             fontSize: '0.9rem',
             color: '#64ffda',
