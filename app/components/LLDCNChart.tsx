@@ -88,12 +88,12 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
           tickFormatter={formatMonth}
           stroke="#e6f1ff"
           fontFamily="monospace"
-          fontSize={12}
+          fontSize={15}
         />
         <YAxis
           stroke="#e6f1ff"
           fontFamily="monospace"
-          fontSize={12}
+          fontSize={15}
         />
         <Tooltip content={<CustomTooltip />} />
         <Legend
@@ -115,9 +115,9 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         >
           <LabelList
             dataKey="lldcn1"
-            position="center"
+            position="bottom"
             fill="#ffffff"
-            fontSize={12}
+            fontSize={15}
             fontFamily="monospace"
             formatter={(value: any) => typeof value === 'number' ? value.toLocaleString() : value}
           />
@@ -134,9 +134,9 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         >
           <LabelList
             dataKey="lldcn2to3"
-            position="center"
+            position="bottom"
             fill="#ffffff"
-            fontSize={12}
+            fontSize={15}
             fontFamily="monospace"
             formatter={(value: any) => typeof value === 'number' ? value.toLocaleString() : value}
           />
@@ -156,7 +156,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             dataKey="total"
             position="top"
             fill="#f97316"
-            fontSize={12}
+            fontSize={14}
             fontFamily="monospace"
             fontWeight="bold"
             formatter={(value: any) => typeof value === 'number' ? `總:${value.toLocaleString()}` : value}
