@@ -45,5 +45,9 @@ export default [
   {
     path: "/dbf-stats/:fileName",
     file: "routes/dbf-stats.$fileName.tsx"
+  },
+  {
+    path: "/report/LLDCN",
+    file: "routes/report.LLDCN.tsx"
   }
 ] satisfies RouteConfig;

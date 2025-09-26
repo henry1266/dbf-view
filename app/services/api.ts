@@ -794,4 +794,57 @@ export const fetchDailyLldcnEq2Or3 = async () => {
   }
 };
 
+/**
+ * @function fetchMonthlyLldcnStats
+ * @description 獲取每月 LLDCN 統計數據 (LLDCN=1, LLDCN=2-3, 總計)
+ * @param {number} [months=12] - 要獲取的月份數量
+ * @returns {Promise<Array<{month: string, lldcn1: number, lldcn2to3: number, total: number}>>} 每月統計數據數組
+ * @throws {Error} 當 API 請求失敗時拋出錯誤
+ * @example
+ * const stats = await fetchMonthlyLldcnStats(12);
+ * console.log(stats); // [{ month: '11301', lldcn1: 10, lldcn2to3: 15, total: 25 }, ...]
+ */
+export const fetchMonthlyLldcnStats = async (months = 12) => {
+  try {
+    const stats = [];
+
+    // 獲取當前日期
+    const now = new Date();
+
+    for (let i = months - 1; i >= 0; i--) {
+      // 計算每個月的開始和結束日期
+      const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const year = targetDate.getFullYear() - 1911; // 西元年轉民國年
+      const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+
+      // 獲取該月的第一天和最後一天
+      const firstDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+      const lastDay = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+
+      const startDate = `${year}${month}${firstDay.getDate().toString().padStart(2, '0')}`;
+      const endDate = `${year}${month}${lastDay.getDate().toString().padStart(2, '0')}`;
+
+      // 並發獲取該月的數據
+      const [lldcn1, lldcn2to3] = await Promise.all([
+        fetchLldcnEq1Count(startDate, endDate),
+        fetchLldcnEq2Or3Count(startDate, endDate)
+      ]);
+
+      const total = lldcn1 + lldcn2to3;
+
+      stats.push({
+        month: `${year}${month}`,
+        lldcn1,
+        lldcn2to3,
+        total
+      });
+    }
+
+    return stats;
+  } catch (error) {
+    console.error('Error fetching monthly LLDCN stats:', error);
+    throw error;
+  }
+};
+
 export default api;
