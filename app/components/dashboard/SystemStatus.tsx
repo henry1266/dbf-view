@@ -10,9 +10,11 @@ interface A99GroupStats {
 interface SystemStatusProps {
   a99GroupStats: A99GroupStats;
   totalLdruI?: number;
+  totalLldcnEq1?: number;
+  totalLldcnEq2Or3?: number;
 }
 
-const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI = 0 }) => {
+const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI = 0, totalLldcnEq1 = 0, totalLldcnEq2Or3 = 0 }) => {
   return (
     <Stack spacing={3}>
       <Box sx={{ width: '100%', mb: 3 }}>
@@ -23,6 +25,146 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
           color="primary"
         />
       </Box>
+
+      <Paper
+        sx={{
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          height: 250,
+          bgcolor: 'rgba(17, 34, 64, 0.6)',
+          backdropFilter: 'blur(8px)',
+          boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
+          borderRadius: 2,
+          position: 'relative',
+          overflow: 'hidden',
+          border: '1px solid rgba(100, 255, 218, 0.3)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
+            boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)'
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: '10%',
+            width: '80%',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.6), transparent)',
+            boxShadow: '0 0 10px rgba(100, 255, 218, 0.4)'
+          }
+        }}
+      >
+        <Typography variant="h6" gutterBottom sx={{
+          fontFamily: 'monospace',
+          letterSpacing: '0.05em',
+          fontSize: '0.9rem',
+          color: '#64ffda',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          textShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
+        }}>
+          <span>當月 LDRU=I </span>
+          <Box component="span" sx={{
+            fontSize: '0.9rem',
+            color: '#64ffda',
+            display: 'flex',
+            alignItems: 'center',
+            textShadow: '0 0 8px rgba(100, 255, 218, 0.6)'
+          }}>
+            MONTH
+          </Box>
+        </Typography>
+        
+        {/* 分組顯示 LLDCN=1,2,3 與其他 LDRU=I */}
+        {(() => {
+          const group1Count = (totalLldcnEq1 || 0) + (totalLldcnEq2Or3 || 0);
+          const group2Count = totalLdruI - group1Count;
+          const totalSum = totalLdruI || 1;
+          const data = [
+            { label: 'LLDCN 1-3 且 LDRU=I', count: group1Count, color: '#3b82f6', shadow: 'rgba(59, 130, 246, 0.6)' },
+            { label: '其他 LDRU=I', count: group2Count, color: '#10b981', shadow: 'rgba(16, 185, 129, 0.6)' }
+          ];
+          return data.map((item, index) => {
+            const percentage = (item.count / totalSum) * 100;
+            return (
+              <React.Fragment key={item.label}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, mt: index === 0 ? 1 : 0 }}>
+                  <Typography variant="body2" sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.9rem',
+                    color: '#e6f1ff',
+                    textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {item.label}
+                  </Typography>
+                  <Typography variant="body2" sx={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.9rem',
+                    color: item.color,
+                    textShadow: `0 0 8px ${item.shadow}`
+                  }}>
+                    {item.count.toLocaleString()}
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  width: '100%',
+                  mb: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
+                }}>
+                  <Box sx={{
+                    flex: 1,
+                    height: 5,
+                    bgcolor: '#1e293b',
+                    borderRadius: 1,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid #334155'
+                  }}>
+                    <Box sx={{
+                      height: '100%',
+                      width: `${percentage}%`,
+                      bgcolor: item.color
+                    }} />
+                  </Box>
+                </Box>
+              </React.Fragment>
+            );
+          });
+        })()}
+        {/* LDRU=I 總計 */}
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 2,
+          borderTop: '1px solid rgba(64, 175, 255, 0.2)',
+          pt: 1
+        }}>
+          <Typography variant="body2" sx={{
+            fontFamily: 'monospace',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(90deg, #40afff, #64ffda)',
+            backgroundClip: 'text',
+            color: 'transparent',
+            textShadow: '0 0 8px rgba(64, 175, 255, 0.5)'
+          }}>
+            總計: {totalLdruI.toLocaleString()}
+          </Typography>
+        </Box>
+      </Paper>
+
 
       <Paper
         sx={{

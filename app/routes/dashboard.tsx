@@ -226,7 +226,7 @@ export default function Dashboard() {
         <Grid container spacing={1}>
           {/* 左側統計面板 */}
           <Grid sx={{ width: { xs: '100%', lg: '24%' }, p: 1 }}>
-            <SystemStatus a99GroupStats={a99GroupStats} totalLdruI={totalLdruI} />
+            <SystemStatus a99GroupStats={a99GroupStats} totalLdruI={totalLdruI} totalLldcnEq1={totalLldcnEq1} totalLldcnEq2Or3={totalLldcnEq2Or3} />
           </Grid>
 
           {/* 中央日曆 */}

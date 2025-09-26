@@ -14,7 +14,6 @@ export interface StatisticsCardsProps {
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   totalLldcnEq1 = 0,
   totalLldcnEq2Or3 = 0,
-  a99Count75 = 0,
   totalA99 = 0
 }) => {
   return (
