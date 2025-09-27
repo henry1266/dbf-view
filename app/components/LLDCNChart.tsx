@@ -572,7 +572,6 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             alignItems: 'center',
             gap: '12px',
             padding: '6px 12px',
-            background: 'linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.6))',
             borderRadius: '6px 6px 0 0'
           }}
         >
