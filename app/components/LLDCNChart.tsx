@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -54,6 +54,8 @@ const getStandardDeviation = (values: number[], meanValue: number): number => {
 };
 
 const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
+  const [noteOpen, setNoteOpen] = useState(false);
+
   const formatMonth = (monthStr: string) => {
     if (monthStr.length === 5) {
       const year = parseInt(monthStr.substring(0, 3), 10) + 1911;
@@ -335,6 +337,8 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
       ? `Lag-1 Pearson: ${lag1Correlation.toFixed(2)}`
       : 'Lag-1 Pearson: N/A';
 
+  const noteDialogId = 'recovery-interpretation-dialog';
+
   return (
     <div
       style={{
@@ -465,114 +469,144 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         </ResponsiveContainer>
       </div>
 
-      <div style={{ position: 'relative', width: '100%', height: 320 }}>
+      <div style={{ position: 'relative', width: '100%' }}>
         <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            fontFamily: 'monospace',
-            color: '#facc15',
-            fontSize: '0.95rem',
-            letterSpacing: '0.05em'
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '6px 12px',
+            background: 'linear-gradient(90deg, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.6))',
+            borderRadius: '6px 6px 0 0'
           }}
         >
-          表二：T+1 續領回補率
-        </div>
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
-            data={chartData}
-            margin={{
-              top: 40,
-              right: 40,
-              left: 20,
-              bottom: 20
+          <span
+            style={{
+              fontFamily: 'monospace',
+              color: '#facc15',
+              fontSize: '0.95rem',
+              letterSpacing: '0.05em'
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(250, 204, 21, 0.2)" />
-            <XAxis
-              dataKey="month"
-              tickFormatter={formatMonth}
-              stroke="#fbed96"
-              fontFamily="monospace"
-              fontSize={15}
-            />
-            <YAxis
-              stroke="#fbed96"
-              fontFamily="monospace"
-              fontSize={15}
-              tickFormatter={(value: number) => formatPercent(value, 0)}
-              domain={[0, ratioAxisMax]}
-              allowDecimals
-            />
-            <Tooltip content={<RecoveryTooltip />} />
-            <Legend
-              wrapperStyle={{
-                fontFamily: 'monospace',
-                color: '#facc15',
-                fontSize: '0.9rem'
+            表二：T+1 續領回補率
+          </span>
+          <button
+            type="button"
+            onClick={() => setNoteOpen((prev) => !prev)}
+            aria-expanded={noteOpen}
+            aria-controls={noteDialogId}
+            style={{
+              backgroundColor: 'rgba(250, 204, 21, 0.15)',
+              border: '1px solid rgba(250, 204, 21, 0.6)',
+              borderRadius: '6px',
+              color: '#facc15',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem',
+              padding: '6px 12px',
+              cursor: 'pointer'
+            }}
+          >
+            判讀註解
+          </button>
+        </div>
+        <div style={{ width: '100%', height: 320 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 40,
+                left: 20,
+                bottom: 20
               }}
-            />
-            <Area
-              type="monotone"
-              dataKey="normalBandLow"
-              stackId="band"
-              stroke="none"
-              fill="transparent"
-              isAnimationActive={false}
-              legendType="none"
-              connectNulls
-            />
-            <Area
-              type="monotone"
-              dataKey="bandSpan"
-              stackId="band"
-              stroke="none"
-              fill="rgba(250, 204, 21, 0.18)"
-              name="常態帶"
-              isAnimationActive={false}
-              connectNulls
-            />
-            <ReferenceLine
-              y={1}
-              stroke="#ef4444"
-              strokeDasharray="6 6"
-              label={{
-                position: 'insideTopRight',
-                value: '警戒線 1.0',
-                fill: '#ef4444',
-                fontSize: 12,
-                fontFamily: 'monospace'
-              }}
-            />
-            <ReferenceLine
-              y={1.8}
-              stroke="#dc2626"
-              strokeDasharray="4 4"
-              label={{
-                position: 'insideTopRight',
-                value: '警戒線 1.8',
-                fill: '#dc2626',
-                fontSize: 12,
-                fontFamily: 'monospace'
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="recoveryRate"
-              stroke="#facc15"
-              strokeWidth={3}
-              dot={{ r: 4, stroke: '#facc15', fill: '#111a2b', strokeWidth: 2 }}
-              name="T+1 續領回補率"
-              isAnimationActive={false}
-              connectNulls={false}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(250, 204, 21, 0.2)" />
+              <XAxis
+                dataKey="month"
+                tickFormatter={formatMonth}
+                stroke="#fbed96"
+                fontFamily="monospace"
+                fontSize={15}
+              />
+              <YAxis
+                stroke="#fbed96"
+                fontFamily="monospace"
+                fontSize={15}
+                tickFormatter={(value: number) => formatPercent(value, 0)}
+                domain={[0, ratioAxisMax]}
+                allowDecimals
+              />
+              <Tooltip content={<RecoveryTooltip />} />
+              <Legend
+                wrapperStyle={{
+                  fontFamily: 'monospace',
+                  color: '#facc15',
+                  fontSize: '0.9rem'
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="normalBandLow"
+                stackId="band"
+                stroke="none"
+                fill="transparent"
+                isAnimationActive={false}
+                legendType="none"
+                connectNulls
+              />
+              <Area
+                type="monotone"
+                dataKey="bandSpan"
+                stackId="band"
+                stroke="none"
+                fill="rgba(250, 204, 21, 0.18)"
+                name="常態帶"
+                isAnimationActive={false}
+                connectNulls
+              />
+              <ReferenceLine
+                y={1}
+                stroke="#ef4444"
+                strokeDasharray="6 6"
+                label={{
+                  position: 'insideTopRight',
+                  value: '警戒線 1.0',
+                  fill: '#ef4444',
+                  fontSize: 12,
+                  fontFamily: 'monospace'
+                }}
+              />
+              <ReferenceLine
+                y={1.8}
+                stroke="#dc2626"
+                strokeDasharray="4 4"
+                label={{
+                  position: 'insideTopRight',
+                  value: '警戒線 1.8',
+                  fill: '#dc2626',
+                  fontSize: 12,
+                  fontFamily: 'monospace'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="recoveryRate"
+                stroke="#facc15"
+                strokeWidth={3}
+                dot={{ r: 4, stroke: '#facc15', fill: '#111a2b', strokeWidth: 2 }}
+                name="T+1 續領回補率"
+                isAnimationActive={false}
+                connectNulls={false}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
         <div
           style={{
             position: 'absolute',
-            top: 12,
+            top: 56,
             right: 16,
             backgroundColor: 'rgba(17, 34, 64, 0.9)',
             border: '1px solid rgba(100, 255, 218, 0.4)',
@@ -586,6 +620,71 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         >
           {correlationLabel}
         </div>
+        {noteOpen && (
+          <div
+            id={noteDialogId}
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby="recovery-interpretation-title"
+            style={{
+              marginTop: '16px',
+              backgroundColor: 'rgba(17, 24, 39, 0.95)',
+              border: '1px solid rgba(250, 204, 21, 0.4)',
+              borderRadius: '10px',
+              padding: '16px',
+              color: '#fefce8',
+              fontFamily: 'monospace',
+              boxShadow: '0 12px 30px rgba(250, 204, 21, 0.25)'
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '12px'
+              }}
+            >
+              <div
+                id="recovery-interpretation-title"
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  color: '#facc15'
+                }}
+              >
+                T+1 續領回補率判讀說明
+              </div>
+              <button
+                type="button"
+                onClick={() => setNoteOpen(false)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(250, 204, 21, 0.4)',
+                  borderRadius: '4px',
+                  color: '#facc15',
+                  fontFamily: 'monospace',
+                  fontSize: '0.8rem',
+                  padding: '2px 8px',
+                  cursor: 'pointer'
+                }}
+              >
+                關閉
+              </button>
+            </div>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
+              觀察窗口：最近 6–12 個月的 T+1 續領回補率，確保資料量足夠但保持新鮮度。
+            </p>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
+              常態帶計算：採移動中位數為中心，若中位數具代表性則使用 ±1.5×MAD 作為容忍範圍；
+              當 MAD 近似 0 時改用 ±2×標準差，避免帶寬縮成零。
+            </p>
+            <p style={{ margin: '0', fontSize: '0.85rem' }}>
+              判讀提示：當回補率落在常態帶內視為穩定；突破上界代表續領動能偏高，需留意是否供應緊俏或政策拉貨；
+              跌破下界則提示續領回補不足，應檢視首開轉續流程與用藥黏著度。警戒線 1.0 與 1.8 為關鍵門檻，可和常態帶交叉比對做分級監控。
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
