@@ -117,7 +117,7 @@ export default function LLDCNReport() {
                     mb: 2
                   }}
                 >
-                  每月 LLDCN 統計趨勢 (過去12個月)
+                  每月慢箋調劑統計趨勢 LLDCN(過去12個月)
                 </Typography>
                 <LLDCNChart data={monthlyStats} />
               </Box>

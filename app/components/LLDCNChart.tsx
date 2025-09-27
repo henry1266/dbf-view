@@ -109,7 +109,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
           dataKey="lldcn1"
           stackId="1"
           stroke="#3b82f6"
-          fill="#3b82f6"
+          fill="#3b83f681"
           fillOpacity={0.8}
           name="LLDCN=1"
         >
@@ -128,7 +128,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
           dataKey="lldcn2to3"
           stackId="1"
           stroke="#10b981"
-          fill="#10b981"
+          fill="#10b9818c"
           fillOpacity={0.8}
           name="LLDCN=2-3"
         >
