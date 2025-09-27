@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   LabelList,
   Line,
-  LineChart,
+  ComposedChart,
   ReferenceLine
 } from 'recharts';
 
@@ -26,7 +26,32 @@ interface LLDCNChartProps {
 interface ChartEntry extends LLDCNChartProps['data'][number] {
   refillShare: number | null;
   recoveryRate: number | null;
+  normalBandLow: number | null;
+  normalBandHigh: number | null;
+  bandSpan: number | null;
 }
+
+const getMedian = (values: number[]): number => {
+  if (values.length === 0) {
+    return Number.NaN;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+  return sorted[mid];
+};
+
+const getStandardDeviation = (values: number[], meanValue: number): number => {
+  if (values.length === 0) {
+    return 0;
+  }
+  const variance =
+    values.reduce((acc, value) => acc + (value - meanValue) ** 2, 0) /
+    values.length;
+  return Math.sqrt(variance);
+};
 
 const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
   const formatMonth = (monthStr: string) => {
@@ -49,7 +74,8 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
     if (!Array.isArray(data)) {
       return [];
     }
-    return data.map((row, index) => {
+
+    const baseRows = data.map((row, index) => {
       const total = typeof row.total === 'number' ? row.total : 0;
       const refillShare = total > 0 ? row.lldcn2to3 / total : null;
       const nextRow = data[index + 1];
@@ -57,11 +83,66 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         nextRow && typeof row.lldcn1 === 'number' && row.lldcn1 > 0
           ? nextRow.lldcn2to3 / row.lldcn1
           : null;
+
       return {
         ...row,
         refillShare,
-        recoveryRate
-      };
+        recoveryRate,
+        normalBandLow: null,
+        normalBandHigh: null,
+        bandSpan: null
+      } as ChartEntry;
+    });
+
+    return baseRows.map((row, index, rows) => {
+      const windowSlice = rows
+        .slice(Math.max(0, index - 11), index + 1)
+        .map((entry) => entry.recoveryRate)
+        .filter((value): value is number => typeof value === 'number' && !Number.isNaN(value));
+
+      if (windowSlice.length >= 6) {
+        const medianValue = getMedian(windowSlice);
+        if (!Number.isNaN(medianValue)) {
+          const deviations = windowSlice.map((value) => Math.abs(value - medianValue));
+          const mad = getMedian(deviations);
+
+          let lowerBound: number | null = null;
+          let upperBound: number | null = null;
+
+          if (mad > 0) {
+            const offset = mad * 1.5;
+            lowerBound = medianValue - offset;
+            upperBound = medianValue + offset;
+          } else {
+            const meanValue =
+              windowSlice.reduce((acc, value) => acc + value, 0) / windowSlice.length;
+            const sd = getStandardDeviation(windowSlice, meanValue);
+            const offset = sd * 2;
+            lowerBound = meanValue - offset;
+            upperBound = meanValue + offset;
+          }
+
+          if (
+            typeof lowerBound === 'number' &&
+            typeof upperBound === 'number' &&
+            Number.isFinite(lowerBound) &&
+            Number.isFinite(upperBound)
+          ) {
+            const normalizedLow = Math.max(lowerBound, 0);
+            const normalizedHigh = Math.max(upperBound, normalizedLow);
+            const span = normalizedHigh - normalizedLow;
+
+            return {
+              ...row,
+              normalBandLow: normalizedLow,
+              normalBandHigh: normalizedHigh,
+              bandSpan: span >= 0 ? span : 0
+            };
+          }
+        }
+      }
+
+      return row;
     });
   }, [data]);
 
@@ -115,14 +196,24 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
   }, [data]);
 
   const ratioAxisMax = useMemo(() => {
-    const maxValue = chartData.reduce((max, row) => {
-      if (typeof row.recoveryRate === 'number') {
-        return Math.max(max, row.recoveryRate);
-      }
-      return max;
+    if (!chartData.length) {
+      return 2;
+    }
+
+    const maxValue = chartData.reduce((acc, row) => {
+      const candidates = [row.recoveryRate, row.normalBandHigh];
+      const rowMax = candidates.reduce((innerMax, value) => {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return Math.max(innerMax, value);
+        }
+        return innerMax;
+      }, acc);
+      return Math.max(acc, rowMax);
     }, 0);
+
     const upper = Math.max(1.8, maxValue);
-    return Number.isFinite(upper) && upper > 0 ? Math.max(upper * 1.1, 2) : 2;
+    const padded = upper * 1.1;
+    return Number.isFinite(padded) && padded > 0 ? Math.max(padded, 2) : 2;
   }, [chartData]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -186,6 +277,14 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
 
   const RecoveryTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const row = payload[0]?.payload as ChartEntry | undefined;
+      if (!row) {
+        return null;
+      }
+
+      const hasBand =
+        typeof row.normalBandLow === 'number' && typeof row.normalBandHigh === 'number';
+
       return (
         <div
           style={{
@@ -207,18 +306,24 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
           >
             {`月份: ${formatMonth(label)}`}
           </p>
-          {payload.map((entry: any, index: number) => (
-            <p
-              key={index}
-              style={{
-                margin: '4px 0',
-                color: entry.color,
-                fontSize: '0.9rem'
-              }}
-            >
-              {`${entry.name}: ${formatPercent(entry.value, 1)}`}
-            </p>
-          ))}
+          <p
+            style={{
+              margin: '4px 0',
+              color: '#facc15',
+              fontSize: '0.9rem'
+            }}
+          >
+            {`T+1 續領回補率: ${formatPercent(row.recoveryRate, 1)}`}
+          </p>
+          <p
+            style={{
+              margin: '4px 0',
+              color: '#fde68a',
+              fontSize: '0.85rem'
+            }}
+          >
+            {`常態帶: ${hasBand ? `${formatPercent(row.normalBandLow, 1)} ~ ${formatPercent(row.normalBandHigh, 1)}` : 'N/A'}`}
+          </p>
         </div>
       );
     }
@@ -375,7 +480,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
           表二：T+1 續領回補率
         </div>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
+          <ComposedChart
             data={chartData}
             margin={{
               top: 40,
@@ -407,6 +512,26 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
                 color: '#facc15',
                 fontSize: '0.9rem'
               }}
+            />
+            <Area
+              type="monotone"
+              dataKey="normalBandLow"
+              stackId="band"
+              stroke="none"
+              fill="transparent"
+              isAnimationActive={false}
+              legendType="none"
+              connectNulls
+            />
+            <Area
+              type="monotone"
+              dataKey="bandSpan"
+              stackId="band"
+              stroke="none"
+              fill="rgba(250, 204, 21, 0.18)"
+              name="常態帶"
+              isAnimationActive={false}
+              connectNulls
             />
             <ReferenceLine
               y={1}
@@ -442,7 +567,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
               isAnimationActive={false}
               connectNulls={false}
             />
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
         <div
           style={{

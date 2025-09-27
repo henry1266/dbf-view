@@ -57,25 +57,10 @@ export default function LLDCNReport() {
   return (
     <Layout title="LLDCN 報告">
       <TechBackground>
-        <Box sx={{ p: 3 }}>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{
-              fontFamily: 'monospace',
-              letterSpacing: '0.05em',
-              fontSize: '1.5rem',
-              color: '#64ffda',
-              textAlign: 'center',
-              mb: 3
-            }}
-          >
-            LLDCN 統計報告
-          </Typography>
-
+        <Box sx={{ p: 1 }}>
           <Paper
             sx={{
-              p: 3,
+              p: 1,
               bgcolor: 'rgba(17, 34, 64, 0.6)',
               backdropFilter: 'blur(8px)',
               boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
@@ -95,7 +80,7 @@ export default function LLDCNReport() {
               </Box>
             ) : error ? (
               <Box sx={{
-                p: 2,
+                p: 1,
                 color: '#ff6b6b',
                 bgcolor: 'rgba(255, 107, 107, 0.1)',
                 border: '1px solid rgba(255, 107, 107, 0.3)',
@@ -114,7 +99,7 @@ export default function LLDCNReport() {
                     fontFamily: 'monospace',
                     color: '#e6f1ff',
                     textAlign: 'center',
-                    mb: 2
+                    mb: 1
                   }}
                 >
                   每月慢箋調劑統計趨勢 LLDCN(過去12個月)
