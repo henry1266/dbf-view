@@ -349,7 +349,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         height: '100%'
       }}
     >
-      <div style={{ position: 'relative', width: '100%', height: 400 }}>
+      <div style={{ position: 'relative', width: '100%', height: 400, overflow: 'visible' }}>
         <div
           style={{
             position: 'absolute',
@@ -363,6 +363,83 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         >
           表一：LLDCN 月度趨勢
         </div>
+        {noteOpen && (
+          <div
+            id={noteDialogId}
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby="recovery-interpretation-title"
+            style={{
+              position: 'absolute',
+              top: -24,
+              right: 16,
+              width: 'min(420px, 90%)',
+              backgroundColor: 'rgba(17, 24, 39, 0.95)',
+              border: '1px solid rgba(250, 204, 21, 0.4)',
+              borderRadius: '10px',
+              padding: '16px',
+              color: '#fefce8',
+              fontFamily: 'monospace',
+              boxShadow: '0 12px 30px rgba(250, 204, 21, 0.25)',
+              zIndex: 5
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '12px'
+              }}
+            >
+              <div
+                id="recovery-interpretation-title"
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  color: '#facc15'
+                }}
+              >
+                T+1 續領回補率判讀說明
+              </div>
+              <button
+                type="button"
+                onClick={() => setNoteOpen(false)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(250, 204, 21, 0.4)',
+                  borderRadius: '4px',
+                  color: '#facc15',
+                  fontFamily: 'monospace',
+                  fontSize: '0.8rem',
+                  padding: '2px 8px',
+                  cursor: 'pointer'
+                }}
+              >
+                關閉
+              </button>
+            </div>
+            
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
+              常態帶計算：採移動中位數為中心，若中位數具代表性則使用 ±1.5×MAD 作為容忍範圍；
+              當 MAD 近似 0 時改用 ±2×標準差，避免帶寬縮成零。
+            </p>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
+              T+1 續領回補率判讀提示：
+            </p>
+            <p style={{ margin: '0', fontSize: '0.85rem' }}>
+              當回補率落在常態帶內視為穩定
+              警戒線 1.0 與 1.8 為關鍵門檻，可和常態帶交叉比對做分級監控。
+              1.2–1.8：常態（表示 2nd + 3rd fill 管線量充足且節律正常）。
+              < 1.0：偏弱警訊
+                可能 2nd/3rd fill 流失、或 t 月首開暴增造成分母過大但隔月未完全接上。
+                提示續領回補不足，應檢視首開轉續流程與用藥黏著度。
+              > 1.8：偏高警訊/事件性
+                可能 t−1 月首開高峰在 t+1 月集中回補、或有月度結算/連假前後的提前/延後領藥。
+                代表續領動能偏高，需留意是否供應緊俏或政策拉貨；
+            </p>
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={chartData}
@@ -620,71 +697,6 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         >
           {correlationLabel}
         </div>
-        {noteOpen && (
-          <div
-            id={noteDialogId}
-            role="dialog"
-            aria-modal="false"
-            aria-labelledby="recovery-interpretation-title"
-            style={{
-              marginTop: '16px',
-              backgroundColor: 'rgba(17, 24, 39, 0.95)',
-              border: '1px solid rgba(250, 204, 21, 0.4)',
-              borderRadius: '10px',
-              padding: '16px',
-              color: '#fefce8',
-              fontFamily: 'monospace',
-              boxShadow: '0 12px 30px rgba(250, 204, 21, 0.25)'
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '12px'
-              }}
-            >
-              <div
-                id="recovery-interpretation-title"
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  color: '#facc15'
-                }}
-              >
-                T+1 續領回補率判讀說明
-              </div>
-              <button
-                type="button"
-                onClick={() => setNoteOpen(false)}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(250, 204, 21, 0.4)',
-                  borderRadius: '4px',
-                  color: '#facc15',
-                  fontFamily: 'monospace',
-                  fontSize: '0.8rem',
-                  padding: '2px 8px',
-                  cursor: 'pointer'
-                }}
-              >
-                關閉
-              </button>
-            </div>
-            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
-              觀察窗口：最近 6–12 個月的 T+1 續領回補率，確保資料量足夠但保持新鮮度。
-            </p>
-            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
-              常態帶計算：採移動中位數為中心，若中位數具代表性則使用 ±1.5×MAD 作為容忍範圍；
-              當 MAD 近似 0 時改用 ±2×標準差，避免帶寬縮成零。
-            </p>
-            <p style={{ margin: '0', fontSize: '0.85rem' }}>
-              判讀提示：當回補率落在常態帶內視為穩定；突破上界代表續領動能偏高，需留意是否供應緊俏或政策拉貨；
-              跌破下界則提示續領回補不足，應檢視首開轉續流程與用藥黏著度。警戒線 1.0 與 1.8 為關鍵門檻，可和常態帶交叉比對做分級監控。
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
