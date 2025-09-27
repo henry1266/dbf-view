@@ -53,6 +53,13 @@ const getStandardDeviation = (values: number[], meanValue: number): number => {
   return Math.sqrt(variance);
 };
 
+const formatPercent = (value: number | null | undefined, digits = 1) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 'N/A';
+  }
+  return `${(value * 100).toFixed(digits)}%`;
+};
+
 const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
   const [noteOpen, setNoteOpen] = useState(false);
 
@@ -63,13 +70,6 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
       return `${year}/${month}`;
     }
     return monthStr;
-  };
-
-  const formatPercent = (value: number | null | undefined, digits = 1) => {
-    if (typeof value !== 'number' || Number.isNaN(value)) {
-      return 'N/A';
-    }
-    return `${(value * 100).toFixed(digits)}%`;
   };
 
   const chartData: ChartEntry[] = useMemo(() => {
@@ -93,7 +93,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         normalBandLow: null,
         normalBandHigh: null,
         bandSpan: null
-      } as ChartEntry;
+      };
     });
 
     return baseRows.map((row, index, rows) => {
@@ -218,6 +218,11 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
     return Number.isFinite(padded) && padded > 0 ? Math.max(padded, 2) : 2;
   }, [chartData]);
 
+  const correlationLabel =
+    typeof lag1Correlation === 'number'
+      ? `Lag-1 Pearson: ${lag1Correlation.toFixed(2)}`
+      : 'Lag-1 Pearson: N/A';
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const row = payload[0]?.payload as ChartEntry | undefined;
@@ -332,11 +337,6 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
     return null;
   };
 
-  const correlationLabel =
-    typeof lag1Correlation === 'number'
-      ? `Lag-1 Pearson: ${lag1Correlation.toFixed(2)}`
-      : 'Lag-1 Pearson: N/A';
-
   const noteDialogId = 'recovery-interpretation-dialog';
 
   return (
@@ -371,16 +371,18 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             aria-labelledby="recovery-interpretation-title"
             style={{
               position: 'absolute',
-              top: -24,
+              top: -25,
               right: 16,
               width: 'min(420px, 90%)',
-              backgroundColor: 'rgba(17, 24, 39, 0.95)',
+              backgroundColor: 'rgba(17, 24, 39, 0.6)',
               border: '1px solid rgba(250, 204, 21, 0.4)',
               borderRadius: '10px',
               padding: '16px',
               color: '#fefce8',
               fontFamily: 'monospace',
-              boxShadow: '0 12px 30px rgba(250, 204, 21, 0.25)',
+              backdropFilter: 'blur(100px)',           // 模糊濾鏡
+              WebkitBackdropFilter: 'blur(100px)',     // Safari 相容
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)', // 建議加柔和陰影
               zIndex: 5
             }}
           >
@@ -400,7 +402,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
                   color: '#facc15'
                 }}
               >
-                T+1 續領回補率判讀說明
+                判讀說明
               </div>
               <button
                 type="button"
@@ -419,25 +421,40 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
                 關閉
               </button>
             </div>
-            
-            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
-              常態帶計算：採移動中位數為中心，若中位數具代表性則使用 ±1.5×MAD 作為容忍範圍；
-              當 MAD 近似 0 時改用 ±2×標準差，避免帶寬縮成零。
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', lineHeight: 1.6 }}>
+              觀察窗口：最近 6–12 個月的 T+1 續領回補率，確保資料量足夠但保持新鮮度。
             </p>
-            <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem' }}>
-              T+1 續領回補率判讀提示：
+            <p style={{ margin: '0 0 12px 0', fontSize: '0.85rem', lineHeight: 1.6 }}>
+              常態帶計算：以移動中位數為中心，常態時使用 ±1.5×MAD 作為監測區間；當 MAD 近似 0 時改用 ±2×標準差避免區間坍縮。
             </p>
-            <p style={{ margin: '0', fontSize: '0.85rem' }}>
-              當回補率落在常態帶內視為穩定
-              警戒線 1.0 與 1.8 為關鍵門檻，可和常態帶交叉比對做分級監控。
-              1.2–1.8：常態（表示 2nd + 3rd fill 管線量充足且節律正常）。
-              < 1.0：偏弱警訊
-                可能 2nd/3rd fill 流失、或 t 月首開暴增造成分母過大但隔月未完全接上。
-                提示續領回補不足，應檢視首開轉續流程與用藥黏著度。
-              > 1.8：偏高警訊/事件性
-                可能 t−1 月首開高峰在 t+1 月集中回補、或有月度結算/連假前後的提前/延後領藥。
-                代表續領動能偏高，需留意是否供應緊俏或政策拉貨；
-            </p>
+            <div
+              style={{
+                border: '1px solid rgba(250, 204, 21, 0.35)',
+                borderRadius: '8px',
+                padding: '12px',
+                background: 'rgba(250, 204, 21, 0.2)',
+                display: 'grid',
+                rowGap: '8px',
+                fontSize: '0.85rem',
+                lineHeight: 1.6
+              }}
+            >
+              <div style={{ color: '#facc15', fontWeight: 'bold' }}>T+1 續領回補率判讀提示</div>
+              <div>
+                <strong>常態帶內</strong>：視為穩定。
+                <br />
+                <strong>警戒線 1.0 與 1.8</strong>：搭配常態帶作為分級監控門檻。
+              </div>
+              <div>
+                <strong>1.2–1.8（健康區間）</strong>：續領節奏正常，2nd/3rd fill 管線供應充足。
+              </div>
+              <div>
+                <strong>{'< 1.0'} 偏弱警訊</strong>：可能續領流失，或 t 月首開暴增造成分母放大但隔月回補不足，需檢視首開轉續流程與用藥黏著度。
+              </div>
+              <div>
+                <strong>{'> 1.8'} 偏高警訊</strong>：可能因 t−1 月首開高峰集中於 t+1 回補，或月度結算／連假前後的提前/延後領藥。代表續領動能偏高，需留意供應緊俏或政策拉貨。
+              </div>
+            </div>
           </div>
         )}
         <ResponsiveContainer width="100%" height="100%">
@@ -537,7 +554,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
                 fontWeight="bold"
                 formatter={(value: any) =>
                   typeof value === 'number'
-                    ? `總 ${value.toLocaleString()}`
+                    ? ` ${value.toLocaleString()}`
                     : value
                 }
               />
@@ -563,8 +580,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             style={{
               fontFamily: 'monospace',
               color: '#facc15',
-              fontSize: '0.95rem',
-              letterSpacing: '0.05em'
+              fontSize: '0.95rem'
             }}
           >
             表二：T+1 續領回補率
@@ -575,7 +591,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
             aria-expanded={noteOpen}
             aria-controls={noteDialogId}
             style={{
-              backgroundColor: 'rgba(250, 204, 21, 0.15)',
+              backgroundColor: 'rgba(250, 204, 21, 0)',
               border: '1px solid rgba(250, 204, 21, 0.6)',
               borderRadius: '6px',
               color: '#facc15',
@@ -638,7 +654,7 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
                 dataKey="bandSpan"
                 stackId="band"
                 stroke="none"
-                fill="rgba(250, 204, 21, 0.18)"
+                fill="rgba(250, 204, 21, 0.2)"
                 name="常態帶"
                 isAnimationActive={false}
                 connectNulls
@@ -683,8 +699,8 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
         <div
           style={{
             position: 'absolute',
-            top: 56,
-            right: 16,
+            top: 10,
+            right: 110,
             backgroundColor: 'rgba(17, 34, 64, 0.9)',
             border: '1px solid rgba(100, 255, 218, 0.4)',
             borderRadius: 6,
@@ -703,3 +719,6 @@ const LLDCNChart: React.FC<LLDCNChartProps> = ({ data }) => {
 };
 
 export default LLDCNChart;
+
+
+
