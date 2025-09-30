@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import FolderIcon from '@mui/icons-material/Folder';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import MenuIcon from '@mui/icons-material/Menu';
 
 /**
@@ -49,7 +50,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
     { text: '儀表板', path: '/dashboard', icon: <DashboardIcon /> },
     { text: '查詢', path: '/search', icon: <SearchIcon /> },
     { text: 'DBF 列表', path: '/dbf-files', icon: <FolderIcon /> },
-    { text: '文本編輯器', path: '/text', icon: <EditIcon /> },
+    { text: '報表', path: '/report/LLDCN', icon: <AssessmentIcon /> },
   ];
 
   // 側邊欄內容
