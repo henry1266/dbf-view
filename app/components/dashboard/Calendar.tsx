@@ -182,7 +182,6 @@ const Calendar: React.FC<CalendarProps> = ({
           color: '#e6f1ff',
           display: 'flex',
           alignItems: 'center',
-          textShadow: '0 0 10px rgba(230, 241, 255, 0.6)'
         }}>
           <Box component="span" sx={{
             width: 8,
@@ -265,86 +264,88 @@ const Calendar: React.FC<CalendarProps> = ({
                 arrow
                 placement="top"
               >
-                <Box
-                  sx={{
-                    textAlign: 'center',
-                    p: 1,
-                    borderRadius: 1,
-                    bgcolor: isToday
-                      ? 'rgba(34, 89, 129, 0.8)'
-                      : isCurrentMonth
-                        ? 'rgba(17, 34, 64, 0.5)'
-                        : 'transparent',
-                    color: isToday ? 'white' : isCurrentMonth ? '#e6f1ff' : 'rgba(230, 241, 255, 0.4)',
-                    fontWeight: isToday ? 'bold' : 'normal',
-                    fontFamily: 'monospace',
-                    fontSize: '0.875rem',
-                    border: isToday
-                      ? '1px solid rgba(167, 245, 255, 1)'
-                      : isCurrentMonth
-                        ? ldruICount > 0
-                          ? `1px solid rgba(121, 129, 203, ${0.6 + bgIntensity * 0.4})`
-                          : '1px solid rgba(64, 175, 255, 0.3)'
-                        : 'none',
-                    transition: 'all 0.2s',
-                    position: 'relative',
-                    '&:hover': {
+                <a href={`/dbf/CO03L.DBF?sortField=_recordNo&sortDirection=desc&page=1&search=${minguoDate}&field=DATE`} target="_blank" style={{textDecoration: 'none', display: 'block'}}>
+                  <Box
+                    sx={{
+                      textAlign: 'center',
+                      p: 1,
+                      borderRadius: 1,
                       bgcolor: isToday
-                        ? 'rgba(54, 165, 245, 0.9)'
-                        : ldruICount > 0
-                          ? `rgba(121, 129, 203, ${0.4 + bgIntensity * 0.5})`
-                          : 'rgba(64, 175, 255, 0.3)',
-                      transform: 'scale(1.05)',  
-                    }
-                  }}
-                >
-                  {/* 顯示 LDRU=I 數量 - 放在中間位置，更加突出 */}
-                  {ldruICount > 0 ? (
-                    <Box sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '100%',
-                      position: 'relative'
-                    }}>
-                      <Box sx={{
-                        fontSize: '1.2rem',
-                        fontWeight: 'bold',
-                        color: '#64ffda',
-                        mb: 0.5
-                      }}>
-                        {ldruICount}
-                      </Box>
-                      
-                      {/* 日期放在右下角 */}
-                      <Box sx={{
-                        position: 'absolute',
-                        bottom: '-8px',
-                        right: '-4px',
-                        fontSize: '0.75rem',
-                        color: 'rgba(230, 241, 255, 0.7)',
-                      }}>
-                        {d.date()}
-                      </Box>
-                    </Box>
-                  ) : (
-                    // 沒有數據時只顯示日期
-                    <Box sx={{
+                        ? 'rgba(34, 89, 129, 0.8)'
+                        : isCurrentMonth
+                          ? 'rgba(17, 34, 64, 0.5)'
+                          : 'transparent',
+                      color: isToday ? 'white' : isCurrentMonth ? '#e6f1ff' : 'rgba(230, 241, 255, 0.4)',
+                      fontWeight: isToday ? 'bold' : 'normal',
+                      fontFamily: 'monospace',
+                      fontSize: '0.875rem',
+                      border: isToday
+                        ? '1px solid rgba(167, 245, 255, 1)'
+                        : isCurrentMonth
+                          ? ldruICount > 0
+                            ? `1px solid rgba(121, 129, 203, ${0.6 + bgIntensity * 0.4})`
+                            : '1px solid rgba(64, 175, 255, 0.3)'
+                          : 'none',
+                      transition: 'all 0.2s',
                       position: 'relative',
-                      height: '100%'
-                    }}>
+                      '&:hover': {
+                        bgcolor: isToday
+                          ? 'rgba(54, 165, 245, 0.9)'
+                          : ldruICount > 0
+                            ? `rgba(121, 129, 203, ${0.4 + bgIntensity * 0.5})`
+                            : 'rgba(64, 175, 255, 0.3)',
+                        transform: 'scale(1.05)',
+                      }
+                    }}
+                  >
+                    {/* 顯示 LDRU=I 數量 - 放在中間位置，更加突出 */}
+                    {ldruICount > 0 ? (
                       <Box sx={{
-                        position: 'absolute',
-                        bottom: '-8px',
-                        right: '-4px',
-                        fontSize: '0.7rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        position: 'relative'
                       }}>
-                        {d.date()}
+                        <Box sx={{
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                          color: '#64ffda',
+                          mb: 0.5
+                        }}>
+                          {ldruICount}
+                        </Box>
+
+                        {/* 日期放在右下角 */}
+                        <Box sx={{
+                          position: 'absolute',
+                          bottom: '-8px',
+                          right: '-4px',
+                          fontSize: '0.75rem',
+                          color: 'rgba(230, 241, 255, 0.7)',
+                        }}>
+                          {d.date()}
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
-                </Box>
+                    ) : (
+                      // 沒有數據時只顯示日期
+                      <Box sx={{
+                        position: 'relative',
+                        height: '100%'
+                      }}>
+                        <Box sx={{
+                          position: 'absolute',
+                          bottom: '-8px',
+                          right: '-4px',
+                          fontSize: '0.7rem',
+                        }}>
+                          {d.date()}
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                </a>
               </Tooltip>
             );
           });
