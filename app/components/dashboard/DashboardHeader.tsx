@@ -36,7 +36,6 @@ const DashboardHeader: React.FC = () => {
           width: '100%',
           height: '2px',
           background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.8), transparent)',
-          boxShadow: '0 0 10px rgba(100, 255, 218, 0.6)'
         }
       }}>
         處方儀表板
@@ -44,7 +43,6 @@ const DashboardHeader: React.FC = () => {
       <Typography variant="body2" sx={{
         fontFamily: 'monospace',
         color: '#e6f1ff',
-        textShadow: '0 0 5px rgba(230, 241, 255, 0.6)',
         letterSpacing: '0.05em',
         display: 'flex',
         alignItems: 'center',
@@ -54,7 +52,6 @@ const DashboardHeader: React.FC = () => {
         py: 0.5,
         borderRadius: 1,
         border: '1px solid rgba(64, 175, 255, 0.3)',
-        boxShadow: '0 0 10px rgba(64, 175, 255, 0.3)'
       }}>
         <Box component="span" sx={{
           width: 8,
@@ -63,7 +60,6 @@ const DashboardHeader: React.FC = () => {
           bgcolor: '#64ffda',
           display: 'inline-block',
           mr: 1,
-          boxShadow: '0 0 8px rgba(100, 255, 218, 0.7)',
           animation: 'pulse 1.5s infinite',
           '@keyframes pulse': {
             '0%': { opacity: 0.5, transform: 'scale(0.8)' },

@@ -25,7 +25,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
           height: 220,
           bgcolor: 'rgba(17, 34, 64, 0.6)',
           backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
           borderRadius: 2,
           position: 'relative',
           overflow: 'hidden',
@@ -38,7 +37,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             width: '100%',
             height: '2px',
             background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
-
           },
           '&::after': {
             content: '""',
@@ -85,7 +83,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
                   color: '#e6f1ff',
-                  textShadow: '0 0 5px rgba(230, 241, 255, 0.5)',
                   display: 'flex',
                   alignItems: 'center'
                 }}>
@@ -211,7 +208,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
           height: 250,
           bgcolor: 'rgba(17, 34, 64, 0.6)',
           backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
           borderRadius: 2,
           position: 'relative',
           overflow: 'hidden',
@@ -224,7 +220,6 @@ const SystemStatus: React.FC<SystemStatusProps> = ({ a99GroupStats, totalLdruI =
             width: '100%',
             height: '2px',
             background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.9), transparent)',
-            boxShadow: '0 0 20px rgba(100, 255, 218, 0.8)'
           },
           '&::after': {
             content: '""',

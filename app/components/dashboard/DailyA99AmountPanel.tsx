@@ -54,7 +54,6 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
               width: '100%',
               height: '2px',
               background: 'linear-gradient(90deg, transparent, rgba(100, 154, 255, 1), transparent)',
-
             },
             '&::after': {
               content: '""',
@@ -224,7 +223,6 @@ const DailyA99AmountPanel: React.FC<DailyA99AmountPanelProps> = ({ dailyA99Group
             height: 250,
             bgcolor: 'rgba(17, 34, 64, 0.6)',
             backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 30px rgba(100, 255, 218, 0.4)',
             borderRadius: 2,
             position: 'relative',
             overflow: 'hidden',

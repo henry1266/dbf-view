@@ -329,11 +329,23 @@ const Calendar: React.FC<CalendarProps> = ({
                         </Box>
                       </Box>
                     ) : (
-                      // 沒有數據時只顯示日期
+                      // 沒有數據時顯示 - 和日期
                       <Box sx={{
-                        position: 'relative',
-                        height: '100%'
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        position: 'relative'
                       }}>
+                        <Box sx={{
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                          color: '#64ffda',
+                          mb: 0.5
+                        }}>
+                          -
+                        </Box>
                         <Box sx={{
                           position: 'absolute',
                           bottom: '-8px',

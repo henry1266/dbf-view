@@ -64,7 +64,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         radial-gradient(circle at 50% 50%, rgba(0, 30, 60, 0.1) 0%, rgba(0, 30, 60, 0.2) 100%),
         linear-gradient(145deg, #0a192f 0%, #112240 100%)
       `,
-      boxShadow: 'inset 0 0 30px rgba(64, 175, 255, 0.1)',
       overflow: 'hidden',
       position: 'relative',
     }}>
@@ -98,7 +97,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           letterSpacing: '0.1em',
           color: '#64ffda',
           fontWeight: 'bold',
-          textShadow: '0 0 10px rgba(100, 255, 218, 0.6)',
         }}>
           藥局處方瀏覽器
         </Typography>
@@ -118,7 +116,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
               color: location.pathname === item.path ? '#64ffda' : '#e6f1ff',
               bgcolor: location.pathname === item.path ? 'rgba(100, 255, 218, 0.1)' : 'transparent',
               border: location.pathname === item.path ? '1px solid rgba(100, 255, 218, 0.3)' : 'none',
-              boxShadow: location.pathname === item.path ? '0 0 15px rgba(100, 255, 218, 0.2)' : 'none',
               '&:hover': {
                 bgcolor: 'rgba(100, 255, 218, 0.05)',
                 boxShadow: '0 0 10px rgba(100, 255, 218, 0.1)',
@@ -146,11 +143,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
                 left: 0,
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '3px',
+                width: '2px',
                 height: '70%',
                 bgcolor: '#64ffda',
                 borderRadius: '0 4px 4px 0',
-                boxShadow: '0 0 10px rgba(100, 255, 218, 0.8)',
               }} />
             )}
           </ListItem>
@@ -166,7 +162,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         width: '80%',
         height: '1px',
         background: 'linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.5), transparent)',
-        boxShadow: '0 0 10px rgba(100, 255, 218, 0.3)',
       }} />
     </Box>
   );

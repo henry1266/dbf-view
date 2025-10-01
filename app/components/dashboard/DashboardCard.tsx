@@ -81,7 +81,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
           letterSpacing: '0.05em',
           fontSize: '0.9rem',
           textTransform: 'uppercase',
-          textShadow: '0 0 5px rgba(230, 241, 255, 0.5)'
         }}>
           {title}
         </Typography>
@@ -141,7 +140,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
         fontWeight: 'bold',
         letterSpacing: '0.05em',
         color: '#ffffff',
-        textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
       }}>
         {value}
       </Typography>
@@ -149,7 +147,6 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, icon, color
         mt: 2,
         height: '2px',
         background: `linear-gradient(90deg, transparent, ${color}.light, transparent)`,
-        boxShadow: `0 0 10px ${color}.light`
       }} />
     </CardContent>
   </Card>
